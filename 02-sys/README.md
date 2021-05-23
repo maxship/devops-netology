@@ -46,6 +46,8 @@ vagrant@vagrant:**~/test_dir$ touch file{000000..100000}**
 vagrant@vagrant:**~/test_dir$ touch file{000000..300000}**  
 -bash: /usr/bin/touch: Argument list too long
 
+vagrant@vagrant:~/test_dir$ **touch file{000000..100000}; touch file{100001..200000}; touch file{200001..300000}**
+
 ### 11. В man bash поищите по /\[\[. Что делает конструкция [[ -d /tmp ]]
 
 [[ expression ]] (line 240). Возвращает 0 или 1 в результате проверки выражения в скобках.  
