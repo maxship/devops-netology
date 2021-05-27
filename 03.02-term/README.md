@@ -81,3 +81,11 @@ vagrant@vagrant:~$ ls /not_existing_dir 2> /dev/pts/2
 ls: cannot access '/not_existing_dir': No such file or directory
 ```
 
+### 7. Выполните команду bash 5>&1. К чему она приведет? Что будет, если вы выполните echo netology > /proc/$$/fd/5?
+```bash
+vagrant@vagrant:~$ bash 5>&1
+echo netology > /proc/$$/fd/5
+netology
+```
+В первой команде создается новый дескриптор 5, который добавляется к стандартному выводу 1 (то есть дублирует stdout).
+Вторая команда выводит поток bash с дескриптором 5, он полностью идентичен выводу команды ```echo netology```.
