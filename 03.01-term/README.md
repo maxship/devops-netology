@@ -22,7 +22,7 @@ config.vm.box = "bento/ubuntu-20.04"
 end
 ```
 
-### 7. Подключение по SHH
+### 7. Подключение по SSH
 
 ![Screenshot_9](https://user-images.githubusercontent.com/72273610/119250783-44f7b280-bbc4-11eb-942c-2eba67c344c1.png)
 
