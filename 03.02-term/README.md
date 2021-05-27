@@ -72,7 +72,7 @@ vagrant@vagrant:~$ screen
 vagrant@vagrant:~$ who am i
 vagrant  pts/2        2021-05-27 10:51 (:pts/0:S.1)
 ```
-Переключаемся Ctrl+A Ctrl+A обратно в терминал pts/1 и оправляем stderror на терминал pts/2 (для проверки в параметрах ls указана несуществующая директория):
+Переключаемся обратно в терминал pts/1 (Ctrl+A Ctrl+A) и оправляем stderror на терминал pts/2 (для проверки в параметрах ls указана несуществующая директория):
 ```bash
 vagrant@vagrant:~$ ls /not_existing_dir 2> /dev/pts/2
 ```
@@ -80,6 +80,23 @@ vagrant@vagrant:~$ ls /not_existing_dir 2> /dev/pts/2
 ```bash
 ls: cannot access '/not_existing_dir': No such file or directory
 ```
+
+### 5. Получится ли одновременно передать команде файл на stdin и вывести ее stdout в другой файл?
+Не уверен, возможно, что-то типа такого:  
+
+Создаем файлик с тестовой строкой
+```
+[max@hi10 ~]$ nano test_stdin_out
+```
+И проверяем
+```
+[max@hi10 ~]$ cat <> test_stdin_out 
+Test line for input/output
+```
+
+### 6. Получится ли вывести находясь в графическом режиме данные из PTY в какой-либо из эмуляторов TTY? Сможете ли вы наблюдать выводимые данные?
+
+
 
 ### 7. Выполните команду bash 5>&1. К чему она приведет? Что будет, если вы выполните echo netology > /proc/$$/fd/5?
 ```bash
