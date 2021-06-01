@@ -127,3 +127,63 @@ netology
 ```
 В первой команде создается новый дескриптор 5, который добавляется к стандартному выводу 1 (то есть дублирует stdout).
 Вторая команда выводит поток bash с дескриптором 5, он полностью идентичен выводу команды ```echo netology```.
+
+### 8. Получится ли в качестве входного потока для pipe использовать только stderr команды, не потеряв при этом отображение stdout на pty?
+
+### 9. Что выведет команда cat /proc/$$/environ? Как еще можно получить аналогичный по содержанию вывод?
+Содержит переменные окружения, заданные на момент запуска процесса. Выводит данные без разделителей. Чтобы вывести то же самое построчно, можно ввести:
+```
+vagrant@vagrant:~$ cat /proc/$$/environ | tr '\000' '\n'
+USER=vagrant
+LOGNAME=vagrant
+HOME=/home/vagrant
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+SHELL=/bin/bash
+TERM=xterm-256color
+XDG_SESSION_ID=4
+XDG_RUNTIME_DIR=/run/user/1000
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+XDG_SESSION_TYPE=tty
+XDG_SESSION_CLASS=user
+MOTD_SHOWN=pam
+LANG=en_US.UTF-8
+LANGUAGE=en_US:
+SSH_CLIENT=10.0.2.2 53575 22
+SSH_CONNECTION=10.0.2.2 53575 10.0.2.15 22
+SSH_TTY=/dev/pts/1
+```
+
+Эти же переменные есть и в выводе команды ```$ env```
+
+### 10. Используя man, опишите что доступно по адресам /proc/[PID]/cmdline, /proc/[PID]/exe
+
+В файле /proc/[PID]/cmdline содержится командная строка, которой был запущен процесс. Если это процесс зомби, то файл будет пустым (line 226).  
+В файле /proc/[PID]/exe содержится символьная ссылка на исполняемую команду              
+           
+### 11. Узнайте, какую наиболее старшую версию набора инструкций SSE поддерживает ваш процессор с помощью /proc/cpuinfo
+
+SSE 4.2
+```
+vagrant@vagrant:~$ grep -i SSE /proc/cpuinfo
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx fxsr_opt rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid tsc_known_freq pni ssse3 sse4_1 sse4_2 hypervisor lahf_lm cmp_legacy cr8_legacy 3dnowprefetch ssbd vmmcall fsgsbase arat
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx fxsr_opt rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid tsc_known_freq pni ssse3 sse4_1 sse4_2 hypervisor lahf_lm cmp_legacy cr8_legacy 3dnowprefetch ssbd vmmcall fsgsbase arat
+```
+           
+### 12. При открытии нового окна терминала и vagrant ssh создается новая сессия и выделяется pty. Это можно подтвердить командой tty, которая упоминалась в лекции 3.2. Однако:
+```
+vagrant@netology1:~$ ssh localhost 'tty'
+not a tty
+```           
+### Почитайте, почему так происходит, и как изменить поведение.
+
+Возможно, команда не работает, т.к. запускается из псевдотерминала, а не из графического интерфейса. Если прописать опцию -t, указывающую на псевдотерминал, то получается так:
+```
+vagrant@vagrant:~$ ssh -t localhost 'tty'
+vagrant@localhost's password:
+/dev/pts/2
+Connection to localhost closed.
+```
+
+### 13. Бывает, что есть необходимость переместить запущенный процесс из одной сессии в другую. Попробуйте сделать это, воспользовавшись reptyr. Например, так можно перенести в screen процесс, который вы запустили по ошибке в обычной SSH-сессии.
+
+### 14. sudo echo string > /root/new_file не даст выполнить перенаправление под обычным пользователем, так как перенаправлением занимается процесс shell'а, который запущен без sudo под вашим пользователем. Для решения данной проблемы можно использовать конструкцию echo string | sudo tee /root/new_file. Узнайте что делает команда tee и почему в отличие от sudo echo команда с sudo tee будет работать.
