@@ -72,7 +72,7 @@ vagrant@vagrant:~$ screen
 vagrant@vagrant:~$ who am i
 vagrant  pts/2        2021-05-27 10:51 (:pts/0:S.1)
 ```
-Переключаемся обратно в терминал pts/1 (Ctrl+A Ctrl+A) и оправляем stderror на терминал pts/2 (для проверки в параметрах ls указана несуществующая директория):
+Переключаемся обратно в терминал pts/1 и оправляем stderror на терминал pts/2 (для проверки в параметрах ls указана несуществующая директория):
 ```bash
 vagrant@vagrant:~$ ls /not_existing_dir 2> /dev/pts/2
 ```
