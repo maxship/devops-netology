@@ -189,35 +189,39 @@ Connection to localhost closed.
 Запускаю ```top``` в одной сессии
 ```
 vagrant@vagrant:~$ tty
-/dev/pts/10
+/dev/pts/1
 
 vagrant@vagrant:~$ top
 
 Ctrl+Z
 
 [1]+  Stopped                 top
+
+vagrant@vagrant:~$ bg
+[1]+ top &
+
 vagrant@vagrant:~$ jobs -l
 [1]+  1633 Stopped (signal)        top
-vagrant@vagrant:~$
+
+vagrant@vagrant:~$ disown top
+-bash: warning: deleting stopped job 1 with process group 1718
+
+vagrant@vagrant:~$ screen
 ```
 Перекдючаюсь на другую и пробую претащить туда висящий в фоне процесс, но что-то идет не так, не могу понять:
 ```
 vagrant@vagrant:~$ tty
-/dev/pts/11
+/dev/pts/10
 
-vagrant@vagrant:~$ reptyr 1633
-Unable to attach to pid 1633: Operation not permitted
+vagrant@vagrant:~$ reptyr 1718
+Unable to attach to pid 1718: Operation not permitted
 The kernel denied permission while attaching. If your uid matches
 the target's, check the value of /proc/sys/kernel/yama/ptrace_scope.
 For more information, see /etc/sysctl.d/10-ptrace.conf
 
-vagrant@vagrant:~$ sudo reptyr 1633
+vagrant@vagrant:~$ sudo reptyr 1718
 [-] Unable to open the tty in the child.
-Unable to attach to pid 1633: Permission denied
-
-vagrant@vagrant:~$ sudo reptyr 1633
-[-] Unable to open the tty in the child.
-Unable to attach to pid 1633: Permission denied
+Unable to attach to pid 1718: Permission denied
 ```
 
 ### 14. sudo echo string > /root/new_file не даст выполнить перенаправление под обычным пользователем, так как перенаправлением занимается процесс shell'а, который запущен без sudo под вашим пользователем. Для решения данной проблемы можно использовать конструкцию echo string | sudo tee /root/new_file. Узнайте что делает команда tee и почему в отличие от sudo echo команда с sudo tee будет работать.
