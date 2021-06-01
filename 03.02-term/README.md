@@ -82,16 +82,31 @@ ls: cannot access '/not_existing_dir': No such file or directory
 ```
 
 ### 5. Получится ли одновременно передать команде файл на stdin и вывести ее stdout в другой файл?
-Не уверен, возможно, что-то типа такого:  
 
-Создаем файлик с тестовой строкой
+Создадим файл file_1 с некоторым содержимым.
 ```
-[max@hi10 ~]$ nano test_stdin_out
+vagrant@vagrant:~$ cat file_1
+USER=vagrant
+LOGNAME=vagrant
+HOME=/home/vagrant
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+.......
 ```
-И проверяем
+Направим содержимое этого файла на ввод команды cat, а вывод с помощью пайпа на ввод команды tee:
 ```
-[max@hi10 ~]$ cat <> test_stdin_out 
-Test line for input/output
+vagrant@vagrant:~$ cat < file_1 | tee file_2
+USER=vagrant
+LOGNAME=vagrant
+HOME=/home/vagrant
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+.......
+
+vagrant@vagrant:~$ cat file_2
+USER=vagrant
+LOGNAME=vagrant
+HOME=/home/vagrant
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+.......
 ```
 
 ### 6. Получится ли вывести находясь в графическом режиме данные из PTY в какой-либо из эмуляторов TTY? Сможете ли вы наблюдать выводимые данные?
