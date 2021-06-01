@@ -96,7 +96,7 @@ Test line for input/output
 
 ### 6. Получится ли вывести находясь в графическом режиме данные из PTY в какой-либо из эмуляторов TTY? Сможете ли вы наблюдать выводимые данные?
 
-Получится. Открываем в графическом режиме, например, Xterm, смотрим номер псевдотерминала:
+Открываем в графическом режиме, например, Xterm, смотрим номер псевдотерминала:
 ```
 [max@hi10 ~]$ who am i
 max      pts/1        2021-05-28 03:33 (:0)
@@ -130,19 +130,23 @@ netology
 
 ### 8. Получится ли в качестве входного потока для pipe использовать только stderr команды, не потеряв при этом отображение stdout на pty?
 
+Как поменять местами stdout и stderr, кажется разобрался:
+Сначала задаем новый fd 3 и направляем на stdout ```3>&1```. Потом перенаправляем stdout на stderr ```1>&2```. Последним действием перенаправляем stderr на stdout ```2>&3```. 
 
+При корректной отработке команды ls видим список файлов. Файл stderr_redirection пуст, т.к. ошибок не было. При этом вывод видим в терминале.
 ```
-vagrant@vagrant:~$ vagrant@vagrant:~$ ls |& cat
-file
-res
-result
-stderr_redirection
-test_dir
-
-vagrant@vagrant:~$ ls not_existing_dir |& cat
-ls: cannot access 'not_existing_dir': No such file or directory
+vagrant@vagrant:~$ ls 3>&1 1>&2 2>&3 | tee stderr_redirection
+file  res  result  stderr_redirection  test_dir
+vagrant@vagrant:~$ cat file
 ```
 
+Если при выполнении команды возникла ошибка, на вход команды tee передается stderr и записывается в файл stderr_redirection.
+```
+vagrant@vagrant:~$ ls dir 3>&1 1>&2 2>&3 | tee file
+ls: cannot access 'dir': No such file or directory
+vagrant@vagrant:~$ cat file
+ls: cannot access 'dir': No such file or directory
+```
 
 ### 9. Что выведет команда cat /proc/$$/environ? Как еще можно получить аналогичный по содержанию вывод?
 Содержит переменные окружения, заданные на момент запуска процесса. Выводит данные без разделителей. Чтобы вывести то же самое построчно, можно ввести:
