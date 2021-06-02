@@ -30,6 +30,11 @@ root@vagrant:~# dpkg -L bpfcc-tools | grep sbin/opensnoop
 
 ### 6. Какой системный вызов использует uname -a? Приведите цитату из man по этому системному вызову, где описывается альтернативное местоположение в /proc, где можно узнать версию ядра и релиз ОС.
 
+```uname()```
+
+ Part of the utsname information is also accessible via /proc/sys/kernel/{ostype,  hostname,  osrelease,  version,  domain‐
+ name} (man 2 uname: line 55).
+
 ### 7. Чем отличается последовательность команд через ; и через && в bash? Например:
 ```
 root@netology1:~# test -d /tmp/some_dir; echo Hi
