@@ -27,37 +27,23 @@ vagrant@netology1:~$ file /bin/bash
 root@vagrant:~# dpkg -L bpfcc-tools | grep sbin/opensnoop
 /usr/sbin/opensnoop-bpfcc
 ```
-На какие файлы вы увидели вызовы группы open за первую секунду работы утилиты? Воспользуйтесь пакетом bpfcc-tools для Ubuntu 20.04. Дополнительные сведения по установке.
+### На какие файлы вы увидели вызовы группы open за первую секунду работы утилиты? Воспользуйтесь пакетом bpfcc-tools для Ubuntu 20.04. Дополнительные сведения по установке.
+Не совсем разобрался как запускать эту утилиту, почему-то синтаксис из ридми не работает.
 ```
-vagrant@vagrant:~$ strace -tt dpkg -L bpfcc-tools | grep sbin/opensnoop
-16:43:57.694144 execve("/usr/bin/dpkg", ["dpkg", "-L", "bpfcc-tools"], 0x7ffcc72c2238 /* 24 vars */) = 0
-16:43:57.699365 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.705275 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libselinux.so.1", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.718933 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.745722 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpcre2-8.so.0", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.759291 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libdl.so.2", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.775816 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpthread.so.0", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.831598 openat(AT_FDCWD, "/proc/filesystems", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.840693 openat(AT_FDCWD, "/usr/lib/locale/locale-archive", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.853856 openat(AT_FDCWD, "/etc/dpkg/dpkg.cfg.d", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = 3
-16:43:57.864099 openat(AT_FDCWD, "/etc/dpkg/dpkg.cfg.d/excludes", O_RDONLY) = 3
-16:43:57.870457 openat(AT_FDCWD, "/etc/dpkg/dpkg.cfg", O_RDONLY) = 3
-16:43:57.878732 openat(AT_FDCWD, "/home/vagrant/.dpkg.cfg", O_RDONLY) = -1 ENOENT (No such file or directory)
-16:43:57.894112 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.899223 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.945477 openat(AT_FDCWD, "/usr/lib/locale/locale-archive", O_RDONLY|O_CLOEXEC) = 3
-16:43:57.953940 openat(AT_FDCWD, "/var/lib/dpkg/arch", O_RDONLY) = 3
-16:43:57.965111 openat(AT_FDCWD, "/var/lib/dpkg/status", O_RDONLY) = 3
-16:43:57.998860 openat(AT_FDCWD, "/var/lib/dpkg/updates/", O_RDONLY|O_NONBLOCK|O_CLOEXEC|O_DIRECTORY) = 3
-16:43:58.006354 openat(AT_FDCWD, "/var/lib/dpkg/triggers/File", O_RDONLY) = 3
-16:43:58.014881 openat(AT_FDCWD, "/var/lib/dpkg/triggers/Unincorp", O_RDONLY) = 3
-16:43:58.031937 openat(AT_FDCWD, "/var/lib/dpkg/info/bpfcc-tools.list", O_RDONLY) = 4
-16:43:58.040585 openat(AT_FDCWD, "/var/lib/dpkg/diversions", O_RDONLY) = 4
-16:43:58.062540 openat(AT_FDCWD, "/usr/share/locale/locale.alias", O_RDONLY|O_CLOEXEC) = 5
-16:43:58.071514 openat(AT_FDCWD, "/usr/share/locale/en_US/LC_MESSAGES/dpkg.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
-16:43:58.072977 openat(AT_FDCWD, "/usr/share/locale/en/LC_MESSAGES/dpkg.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
-16:43:58.075018 openat(AT_FDCWD, "/usr/share/locale-langpack/en_US/LC_MESSAGES/dpkg.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
-16:43:58.076939 openat(AT_FDCWD, "/usr/share/locale-langpack/en/LC_MESSAGES/dpkg.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+vagrant@vagrant:/$ opensnoop
+-bash: opensnoop: command not found
+
+vagrant@vagrant:/usr/sbin$ sudo opensnoop-bpfcc -T
+TIME(s)       PID    COMM               FD ERR PATH
+0.000000000   579    irqbalance          6   0 /proc/interrupts
+0.000259000   579    irqbalance          6   0 /proc/stat
+0.000443000   579    irqbalance          6   0 /proc/irq/20/smp_affinity
+0.000610000   579    irqbalance          6   0 /proc/irq/0/smp_affinity
+0.000779000   579    irqbalance          6   0 /proc/irq/1/smp_affinity
+0.000946000   579    irqbalance          6   0 /proc/irq/8/smp_affinity
+0.001114000   579    irqbalance          6   0 /proc/irq/12/smp_affinity
+0.001287000   579    irqbalance          6   0 /proc/irq/14/smp_affinity
+0.001457000   579    irqbalance          6   0 /proc/irq/15/smp_affinity
 ```
 
 
