@@ -19,6 +19,58 @@ vagrant@netology1:~$ file /bin/bash
 
 ### 3. Предположим, приложение пишет лог в текстовый файл. Этот файл оказался удален (deleted в lsof), однако возможности сигналом сказать приложению переоткрыть файлы или просто перезапустить приложение – нет. Так как приложение продолжает писать в удаленный файл, место на диске постепенно заканчивается. Основываясь на знаниях о перенаправлении потоков предложите способ обнуления открытого удаленного файла (чтобы освободить место на файловой системе).
 
+Делаем файл, куда постоянно дописыается вывод команды топ.
+```
+vagrant@vagrant:~$ tty
+/dev/pts/0
+vagrant@vagrant:~$ top | tee -a logfile
+```
+Проверяем - размер действительно увеличивается со временем.
+```
+vagrant@vagrant:~$ tty
+/dev/pts/1
+vagrant@vagrant:~$ ll
+total 14284
+-rw-rw-r-- 1 vagrant vagrant  230912 Jun  4 05:59 logfile
+
+vagrant@vagrant:~$ ll
+total 14336
+-rw-rw-r-- 1 vagrant vagrant  285910 Jun  4 06:00 logfile
+```
+Смотрим нужную инфу по процессу::
+```
+vagrant@vagrant:~$ ps aux | grep tee
+vagrant     1313  0.0  0.0   8088   528 pts/0    S+   06:15   0:00 tee -a logfile
+vagrant     1315  0.0  0.0   8900   736 pts/1    S+   06:15   0:00 grep --color=auto tee
+
+vagrant@vagrant:~$ lsof -p 1313 | grep logfile
+tee     1313 vagrant    3w   REG  253,0   115588 2883616 /home/vagrant/logfile
+```
+Удаляем файл.
+```
+vagrant@vagrant:~$ rm logfile
+vagrant@vagrant:~$ cat logfile
+cat: logfile: No such file or directory
+```
+Смотрим содержимое удаленного файла
+```
+vagrant@vagrant:~$ lsof -p 1313 | grep logfile
+tee     1313 vagrant    3w   REG  253,0   260578 2883616 /home/vagrant/logfile (deleted)
+
+vagrant@vagrant:~$ cat /proc/1313/fd/3
+top - 06:19:07 up  1:05,  2 users,  load average: 0.02, 0.01, 0.00
+Tasks: 103 total,   1 running,  99 sleeping,   3 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :   1987.6 total,   1476.1 free,     98.0 used,    413.5 buff/cache
+MiB Swap:    980.0 total,    980.0 free,      0.0 used.   1732.9 avail Mem
+......
+```
+Копируем содержимое в заново созданный файл, 
+```
+cat /proc/1313/fd/3 > logfile
+```
+
+
 ### 4. Занимают ли зомби-процессы какие-то ресурсы в ОС (CPU, RAM, IO)?
 Зомби-процесс не потребляет ресурсов, просто висит в таблице процессов с выходным статусом для родительского процесса.
 
