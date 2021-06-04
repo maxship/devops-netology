@@ -108,6 +108,11 @@ HOME=/home/vagrant
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 .......
 ```
+Более простой способ (правильный)
+
+```
+cat < file_1 > tee file_2
+```
 
 ### 6. Получится ли вывести находясь в графическом режиме данные из PTY в какой-либо из эмуляторов TTY? Сможете ли вы наблюдать выводимые данные?
 
