@@ -65,9 +65,9 @@ MiB Mem :   1987.6 total,   1476.1 free,     98.0 used,    413.5 buff/cache
 MiB Swap:    980.0 total,    980.0 free,      0.0 used.   1732.9 avail Mem
 ......
 ```
-Копируем содержимое в заново созданный файл, 
+Обнуляем содержимое файлового дескриптора.
 ```
-cat /proc/1313/fd/3 > logfile
+cat /dev/null > /proc/1313/fd/3
 ```
 
 
