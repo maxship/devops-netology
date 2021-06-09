@@ -75,10 +75,6 @@ Disk identifier: ADC11E7A-C11E-3C42-AD48-A446231C5DA9
 Device       Start     End Sectors  Size Type
 /dev/sdc1     2048 4196351 4194304    2G Linux filesystem
 /dev/sdc2  4196352 5242846 1046495  511M Linux filesystem
-
-The partition table has been altered.
-Calling ioctl() to re-read partition table.
-Syncing disks.
 ```
 
 6. Соберите `mdadm` RAID1 на паре разделов 2 Гб.
