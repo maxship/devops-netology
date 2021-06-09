@@ -1,11 +1,12 @@
 # 3.5. Файловые системы
 
+1. Узнайте о [sparse](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D0%B7%D1%80%D0%B5%D0%B6%D1%91%D0%BD%D0%BD%D1%8B%D0%B9_%D1%84%D0%B0%D0%B9%D0%BB) (разряженных) файлах.
 
 2. Могут ли файлы, являющиеся жесткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
 
 Не могут, т.к. с точки зрения системы все жесткие ссылки эквивалентны этому объекту и иимеют те же атрибуты.
 
-3. Используя `fdisk`, разбейте первый диск на 2 раздела: 2 Гб, оставшееся пространство.
+4. Используя `fdisk`, разбейте первый диск на 2 раздела: 2 Гб, оставшееся пространство.
 ```
 root@vagrant:/home/vagrant# lsblk
 NAME                 MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
@@ -45,7 +46,7 @@ Device       Start     End Sectors  Size Type
 ```
 
 
-4. Используя `sfdisk`, перенесите данную таблицу разделов на второй диск.
+5. Используя `sfdisk`, перенесите данную таблицу разделов на второй диск.
 
 ```
 root@vagrant:/home/vagrant# sfdisk -d /dev/sdb | sfdisk /dev/sdc
@@ -63,21 +64,21 @@ Calling ioctl() to re-read partition table.
 Syncing disks.
 ```
 
-5. Соберите `mdadm` RAID1 на паре разделов 2 Гб.
+6. Соберите `mdadm` RAID1 на паре разделов 2 Гб.
 
 ```
 root@vagrant:/home/vagrant# mdadm --create --verbose /dev/md0 --level=1 --raid-devices=2 /dev/sdb1 /dev/sdc1
 mdadm: array /dev/md0 started.
 ```
 
-6. Соберите `mdadm` RAID0 на второй паре маленьких разделов.
+7. Соберите `mdadm` RAID0 на второй паре маленьких разделов.
 
 ```
 root@vagrant:/home/vagrant# mdadm -C -v /dev/md1 --level=0 --raid-devices=2 /dev/sdb2 /dev/sdc2
 mdadm: array /dev/md1 started.
 ```
 
-7. Создайте 2 независимых PV на получившихся md-устройствах.
+8. Создайте 2 независимых PV на получившихся md-устройствах.
 
 ```
 root@vagrant:/home/vagrant# pvcreate /dev/md0
@@ -86,7 +87,7 @@ root@vagrant:/home/vagrant# pvcreate /dev/md1
   Physical volume "/dev/md1" successfully created.
 ```
 
-8. Создайте общую volume-group на этих двух PV.
+9. Создайте общую volume-group на этих двух PV.
 
 ```
 root@vagrant:/home/vagrant# vgcreate test_vg /dev/md0 /dev/md1
@@ -106,14 +107,14 @@ root@vagrant:/home/vagrant# pvdisplay
 .....
 ```
 
-9. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
+10. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
 
 ```
 root@vagrant:/home/vagrant# lvcreate -n test_lv -L100M test_vg /dev/md1
   Logical volume "test_lv" created.
 ```
 
-10. Создайте `mkfs.ext4` ФС на получившемся LV.
+11. Создайте `mkfs.ext4` ФС на получившемся LV.
 
 ```
 root@vagrant:/home/vagrant# lvdisplay
@@ -127,14 +128,14 @@ root@vagrant:/home/vagrant# mkfs.ext4 /dev/test_vg/test_lv
 Writing superblocks and filesystem accounting information: done
 ```
 
-11. Смонтируйте этот раздел в любую директорию, например, `/tmp/new`.
+12. Смонтируйте этот раздел в любую директорию, например, `/tmp/new`.
 
 ```
 root@vagrant:/home/vagrant# mkdir /tmp/new
 root@vagrant:/home/vagrant# mount /dev/test_vg/test_lv /tmp/new
 ```
 
-12. Поместите туда тестовый файл, например `wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz`.
+13. Поместите туда тестовый файл, например `wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz`.
 
 ```
 root@vagrant:/home/vagrant# wget -q https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz
@@ -142,7 +143,7 @@ root@vagrant:/home/vagrant# ls /tmp/new
 lost+found  test.gz
 ```
 
-13. Прикрепите вывод `lsblk`.
+14. Прикрепите вывод `lsblk`.
 
 ```
 root@vagrant:/home/vagrant# lsblk
@@ -167,31 +168,42 @@ sdc                     8:32   0  2.5G  0 disk
     └─test_vg-test_lv 253:2    0  100M  0 lvm   /tmp/new
 ```
 
-14. Протестируйте целостность файла:
+15. Протестируйте целостность файла:
 
-    ```bash
+```
 root@vagrant:/home/vagrant# gzip -t /tmp/new/test.gz
 root@vagrant:/home/vagrant# echo $?
 0
-    ```
+```
 
-15. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
+16. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
 
 ```
 root@vagrant:/home/vagrant# pvmove /dev/md1 /dev/md0
   /dev/md1: Moved: 100.00%
 ```
 
-16. Сделайте `--fail` на устройство в вашем RAID1 md.
+17. Сделайте `--fail` на устройство в вашем RAID1 md.
 
-17. Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.
+```
+root@vagrant:/home/vagrant# mdadm /dev/md0 --fail /dev/sdc1
+mdadm: set /dev/sdc1 faulty in /dev/md0
+```
 
-18. Протестируйте целостность файла, несмотря на "сбойный" диск он должен продолжать быть доступен:
+18. Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.
 
-    ```bash
-    root@vagrant:~# gzip -t /tmp/new/test.gz
-    root@vagrant:~# echo $?
-    0
-    ```
+```
+root@vagrant:/home/vagrant# dmesg | grep md0
+[18542.496026] md/raid1:md0: Disk failure on sdc1, disabling device.
+               md/raid1:md0: Operation continuing on 1 devices.
+```
+
+19. Протестируйте целостность файла, несмотря на "сбойный" диск он должен продолжать быть доступен:
+
+```
+root@vagrant:/home/vagrant# gzip -t /tmp/new/test.gz
+root@vagrant:/home/vagrant# echo $?
+0
+ ```
 
 
