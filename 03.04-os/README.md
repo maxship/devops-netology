@@ -6,6 +6,62 @@
     * предусмотрите возможность добавления опций к запускаемому процессу через внешний файл (посмотрите, например, на `systemctl cat cron`),
     * удостоверьтесь, что с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.
 
+```
+sudo useradd node_exporter -s /sbin/nologin
+
+wget https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz
+tar xvfz node_exporter-1.1.2.linux-amd64.tar.gz
+cd node_exporter-1.1.2.linux-amd64
+
+sudo cp node_exporter /usr/sbin/
+
+sudo touch /etc/systemd/system/node_exporter.service
+sudo nano /etc/systemd/system/node_exporter.service
+.....
+
+cat /etc/systemd/system/node_exporter.service
+
+[Unit]
+Description=Node Exporter
+
+[Service]
+User=node_exporter
+EnvironmentFile=/etc/sysconfig/node_exporter
+ExecStart=/usr/sbin/node_exporter $OPTIONS
+
+[Install]
+WantedBy=multi-user.target
+.....
+
+sudo mkdir -p /etc/sysconfig
+sudo touch /etc/sysconfig/node_exporter
+sudo nano /etc/sysconfig/node_exporter
+sudo cat /etc/sysconfig/node_exporter
+OPTIONS="--collector.disable-defaults  --collector.cpu --collector.processes  --collector.netdev --collector.loadavg --collector.meminfo"
+
+sudo systemctl daemon-reload
+sudo systemctl enable node_exporter
+sudo systemctl start node_exporter
+
+sudo systemctl status node_exporter
+● node_exporter.service - Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
+     Active: active (running) since Fri 2021-06-11 05:08:42 UTC; 2s ago
+   Main PID: 1328 (node_exporter)
+      Tasks: 4 (limit: 2281)
+     Memory: 2.4M
+     CGroup: /system.slice/node_exporter.service
+             └─1328 /usr/sbin/node_exporter
+....
+
+sudo shutdown -r now
+sudo systemctl status node_exporter
+● node_exporter.service - Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
+     Active: active (running) since Fri 2021-06-11 05:32:20 UTC; 32s ago
+
+```
+
 1. Ознакомьтесь с опциями node_exporter и выводом `/metrics` по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.
 1. Установите в свою виртуальную машину [Netdata](https://github.com/netdata/netdata). Воспользуйтесь [готовыми пакетами](https://packagecloud.io/netdata/netdata/install) для установки (`sudo apt install -y netdata`). После успешной установки:
     * в конфигурационном файле `/etc/netdata/netdata.conf` в секции [web] замените значение с localhost на `bind to = 0.0.0.0`,
