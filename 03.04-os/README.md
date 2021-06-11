@@ -112,12 +112,16 @@ sudo systemctl status node_exporter
 
 Отфильтровав вывод по ключевым словам vb и virt, можно понять, что ОС знает, что запущена на виртуалке.
 ```
-vagrant@vagrant:~$ dmesg | grep vb
+vagrant@vagrant:~$ dmesg | grep -P 'virt|vb'
+[    0.003521] CPU MTRRs all blank - virtualized system.
+[    0.040166] Booting paravirtualized kernel on KVM
+[    0.279251] Performance Events: PMU not available due to virtualization, using software events only.
 [    2.174802] vboxvideo: loading out-of-tree module taints kernel.
 [    2.174820] vboxvideo: module verification failed: signature and/or required key missing - tainting kernel
 [    2.222127] fbcon: vboxvideodrmfb (fb0) is primary device
 [    2.308891] vboxvideo 0000:00:02.0: fb0: vboxvideodrmfb frame buffer device
 [    2.318711] [drm] Initialized vboxvideo 1.0.0 20130823 for 0000:00:02.0 on minor 0
+[    9.975126] systemd[1]: Detected virtualization oracle.
 [   13.083422] vboxguest: Successfully loaded version 6.1.16
 [   13.083459] vboxguest: misc device minor 58, IRQ 20, I/O port d020, MMIO at 00000000f0400000 (size 0x400000)
 [   13.083460] vboxguest: Successfully loaded version 6.1.16 (interface 0x00010004)
@@ -127,12 +131,37 @@ vagrant@vagrant:~$ dmesg | grep vb
 [   17.223936] vboxsf: SHFL_FN_MAP_FOLDER failed for '/vagrant': share not found
 [   17.223938] vbsf_read_super_aux err=-6
 [   20.031282] 06:23:11.621053 main     vbglR3GuestCtrlDetectPeekGetCancelSupport: Supported (#1)
-vagrant@vagrant:~$ dmesg | grep virt
-[    0.003521] CPU MTRRs all blank - virtualized system.
-[    0.040166] Booting paravirtualized kernel on KVM
-[    0.279251] Performance Events: PMU not available due to virtualization, using software events only.
-[    9.975126] systemd[1]: Detected virtualization oracle.
 ```
 6. Как настроен sysctl `fs.nr_open` на системе по-умолчанию? Узнайте, что означает этот параметр. Какой другой существующий лимит не позволит достичь такого числа (`ulimit --help`)?
+
+Максимальное количество открытых файлов в системе.
+```
+vagrant@vagrant:~$ sudo sysctl -a | grep 'fs.nr_open'
+fs.nr_open = 1048576
+```
+
+Параметрами, заданными по умолчанию в ```ulimit```, количество открытых файлов ограничено 1024. В отличие от ```fs.nr_open```, накладывает лимиты только на текущий шелл и все процессы, запущенные в этом шелле.
+```
+vagrant@vagrant:~$ ulimit -a
+core file size          (blocks, -c) 0
+data seg size           (kbytes, -d) unlimited
+scheduling priority             (-e) 0
+file size               (blocks, -f) unlimited
+pending signals                 (-i) 7605
+max locked memory       (kbytes, -l) 65536
+max memory size         (kbytes, -m) unlimited
+open files                      (-n) 1024
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+real-time priority              (-r) 0
+stack size              (kbytes, -s) 8192
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 7605
+virtual memory          (kbytes, -v) unlimited
+file locks                      (-x) unlimited
+```
+
 7. Запустите любой долгоживущий процесс (не `ls`, который отработает мгновенно, а, например, `sleep 1h`) в отдельном неймспейсе процессов; покажите, что ваш процесс работает под PID 1 через `nsenter`. Для простоты работайте в данном задании под root (`sudo -i`). Под обычным пользователем требуются дополнительные опции (`--map-root-user`) и т.д.
-8. Найдите информацию о том, что такое `:(){ :|:& };:`. Запустите эту команду в своей виртуальной машине Vagrant с Ubuntu 20.04 (**это важно, поведение в других ОС не проверялось**). Некоторое время все будет "плохо", после чего (минуты) – ОС должна стабилизироваться. Вызов `dmesg` расскажет, какой механизм помог автоматической стабилизации. Как настроен этот механизм по-умолчанию, и как изменить число процессов, которое можно создать в сессии?
+
+
+9. Найдите информацию о том, что такое `:(){ :|:& };:`. Запустите эту команду в своей виртуальной машине Vagrant с Ubuntu 20.04 (**это важно, поведение в других ОС не проверялось**). Некоторое время все будет "плохо", после чего (минуты) – ОС должна стабилизироваться. Вызов `dmesg` расскажет, какой механизм помог автоматической стабилизации. Как настроен этот механизм по-умолчанию, и как изменить число процессов, которое можно создать в сессии?
