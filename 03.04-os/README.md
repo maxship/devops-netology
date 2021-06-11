@@ -226,5 +226,10 @@ file locks                      (-x) unlimited
 Можно защититься от подобного, уменьшив максимальное количество запущенных в шелле процессов с помощью ```ulimit -u```, или изменив системные ограничения в ```/etc/security/limits.conf``` (параметр ```hard nproc```).
 
 
-
-
+Я так и не понял, закончилось ли выполнение этой команды, нажал минут через 15 Ctrl+C. В выводе ```dmesg``` есть запись:
+```
+vagrant@vagrant:~$ dmesg
+.......
+7688.768050] cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-3.scope
+```
+Насколько я понял, именно этот pids controller и остановил размножение процессов.
