@@ -201,9 +201,29 @@ root          11  0.0  0.1  11492  3448 pts/2    R+   08:19   0:00 ps aux
 };
 :
 ```
-Здесь задается функция ```:```, которая передает в пайп саму себя, уходит в фон, снова вызывает сама себя и продолжает цикл до бесконечности.
+Здесь задается функция ```:```, которая вызывает дважды сама себя и уходит в фон, т.е. каждый процесс форкает 2 новых и так до бесконечности (в теории). Система не даст это делать бсконечно, т.к. есть ограничения, в нашем случае 3697 процессов на пользователя:
 
-Можно защититься от подобного, ограничив для пользователя количество запущенных в шелле процессов с помощью ```ulimit -u```, или изменив системные ограничения в ```/etc/security/limits.conf``` (параметр ```hard nproc```).
+```
+vagrant@vagrant:~$ ulimit -a
+core file size          (blocks, -c) 0
+data seg size           (kbytes, -d) unlimited
+scheduling priority             (-e) 0
+file size               (blocks, -f) unlimited
+pending signals                 (-i) 3697
+max locked memory       (kbytes, -l) 16384
+max memory size         (kbytes, -m) unlimited
+open files                      (-n) 1024
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+real-time priority              (-r) 0
+stack size              (kbytes, -s) 8192
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 3697
+virtual memory          (kbytes, -v) unlimited
+file locks                      (-x) unlimited
+```
+
+Можно защититься от подобного, уменьшив максимальное количество запущенных в шелле процессов с помощью ```ulimit -u```, или изменив системные ограничения в ```/etc/security/limits.conf``` (параметр ```hard nproc```).
 
 
 
