@@ -207,3 +207,20 @@ vagrant@vagrant:~$ tshark -r ~/tcpdump.pcap
   100  13.511690    10.0.2.15 → 10.0.2.2     TCP 54 19999 → 60566 [ACK] Seq=1 Ack=730 Win=65535 Len=0
 
 ```
+R, Reserved. 1 bit.
+Should be set to 0.
+
+DF, Don't fragment. 1 bit.
+Controls the fragmentation of the datagram.
+
+Value	Description
+0	Fragment if necessary.
+1	Do not fragment.
+MF, More fragments. 1 bit.
+Indicates if the datagram contains additional fragments.
+
+Value	Description
+0	This is the last fragment.
+1	More fragments follow this fragment.
+
+
