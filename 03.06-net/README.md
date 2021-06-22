@@ -79,16 +79,16 @@ Recv-Q  Send-Q  Local                 Address:Port  Peer  Address:Port  Process
 0       4096    0.0.0.0:19999         0.0.0.0:*
 0       4096    0.0.0.0:sunrpc        0.0.0.0:*
 
-vagrant@vagrant:~$ sudo lsof -ni :53,22,8125,19999,111 | grep TCP | grep IPv4 | column -t
-systemd    1     root             35u  IPv4  1798   0t0  TCP  *:sunrpc                         (LISTEN)
-rpcbind    544   _rpc             4u   IPv4  1798   0t0  TCP  *:sunrpc                         (LISTEN)
-systemd-r  545   systemd-resolve  13u  IPv4  20386  0t0  TCP  127.0.0.53:domain                (LISTEN)
-netdata    613   netdata          4u   IPv4  22850  0t0  TCP  *:19999                          (LISTEN)
-netdata    613   netdata          21u  IPv4  33706  0t0  TCP  10.0.2.15:19999->10.0.2.2:60600  (ESTABLISHED)
-netdata    613   netdata          33u  IPv4  23526  0t0  TCP  127.0.0.1:8125                   (LISTEN)
-sshd       697   root             3u   IPv4  22889  0t0  TCP  *:ssh                            (LISTEN)
-sshd       1391  root             4u   IPv4  30449  0t0  TCP  10.0.2.15:ssh->10.0.2.2:50988    (ESTABLISHED)
-sshd       1442  vagrant          4u   IPv4  30449  0t0  TCP  10.0.2.15:ssh->10.0.2.2:50988    (ESTABLISHED)
+vagrant@vagrant:~$ sudo lsof -ni :53,22,8125,19999,111 | grep TCP | grep IPv4
+systemd      1            root   35u  IPv4   1798      0t0  TCP *:sunrpc (LISTEN)
+rpcbind    544            _rpc    4u  IPv4   1798      0t0  TCP *:sunrpc (LISTEN)
+systemd-r  545 systemd-resolve   13u  IPv4  20386      0t0  TCP 127.0.0.53:domain (LISTEN)
+netdata    613         netdata    4u  IPv4  22850      0t0  TCP *:19999 (LISTEN)
+netdata    613         netdata   21u  IPv4  33706      0t0  TCP 10.0.2.15:19999->10.0.2.2:60600 (ESTABLISHED)
+netdata    613         netdata   33u  IPv4  23526      0t0  TCP 127.0.0.1:8125 (LISTEN)
+sshd       697            root    3u  IPv4  22889      0t0  TCP *:ssh (LISTEN)
+sshd      1391            root    4u  IPv4  30449      0t0  TCP 10.0.2.15:ssh->10.0.2.2:50988 (ESTABLISHED)
+sshd      1442         vagrant    4u  IPv4  30449      0t0  TCP 10.0.2.15:ssh->10.0.2.2:50988 (ESTABLISHED)
 ```
 
 13. Какой ключ нужно добавить в `tcpdump`, чтобы он начал выводить не только заголовки, но и содержимое фреймов в текстовом виде? А в текстовом и шестнадцатиричном?
