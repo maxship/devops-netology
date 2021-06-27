@@ -106,31 +106,49 @@ sshd      1442         vagrant    4u  IPv4  30449      0t0  TCP 10.0.2.15:ssh->1
 
 13. Какой ключ нужно добавить в `tcpdump`, чтобы он начал выводить не только заголовки, но и содержимое фреймов в текстовом виде? А в текстовом и шестнадцатиричном?
 
+С ключом `-A` формате ASCII:
+```
+vagrant@vagrant:~$ sudo tcpdump -vA -c 50
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+12:12:01.199396 IP (tos 0x10, ttl 64, id 28648, offset 0, flags [DF], proto TCP (6), length 140)
+    vagrant.ssh > _gateway.52943: Flags [P.], cksum 0x188f (incorrect -> 0x55f8), seq 3080147308:3080147408, ack 8137847, win 64032, length 100
+E...o.@.@..c
+...
+.........Ql.|,wP.. ..........<.........}x...C[x..E@Po..4RA      o....z...\.....M..!!.z....!?D/.pX.....&.H..?s..b.l....I?N.CG...e
+12:12:01.199809 IP (tos 0x0, ttl 64, id 1793, offset 0, flags [none], proto TCP (6), length 40)
+
+
+```
+С ключом `-XX` формате ASCII+HEX:
+```
+vagrant@vagrant:~$ sudo tcpdump -vXX -c 50
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+12:10:45.323208 IP (tos 0x10, ttl 64, id 28585, offset 0, flags [DF], proto TCP (6), length 76)
+    vagrant.ssh > _gateway.52943: Flags [P.], cksum 0x184f (incorrect -> 0x32f6), seq 3080109860:3080109896, ack 8137343, win 64032, length 36
+        0x0000:  5254 0012 3502 0800 2714 86db 0800 4510  RT..5...'.....E.
+        0x0010:  004c 6fa9 4000 4006 b2e2 0a00 020f 0a00  .Lo.@.@.........
+        0x0020:  0202 0016 cecf b796 bf24 007c 2a7f 5018  .........$.|*.P.
+        0x0030:  fa20 184f 0000 9555 346b eb94 8149 362a  ...O...U4k...I6*
+        0x0040:  300d af6e ac62 a774 e11d fac8 d1e6 9799  0..n.b.t........
+        0x0050:  92a5 c8e7 cf53 a5ae 43d1                 .....S..C.
+12:10:45.323496 IP (tos 0x0, ttl 64, id 1716, offset 0, flags [none], proto TCP (6), length 40)
+```
+
+
 14. Попробуйте собрать дамп трафика с помощью `tcpdump` на основном интерфейсе вашей виртуальной машины и посмотреть его через tshark или Wireshark (можно ограничить число пакетов `-c 100`). Встретились ли вам какие-то установленные флаги Internet Protocol (не флаги TCP, а флаги IP)? Узнайте, какие флаги бывают. Как на самом деле называется стандарт Ethernet, фреймы которого попали в ваш дамп? Можно ли где-то в дампе увидеть OUI?
 
 
 В выводе ```tcpdump``` эти флаги есть:
 ```
-13:28:41.200808 IP (tos 0x10, ttl 64, id 3107, offset 0, flags [DF], proto TCP (6), length 92)
-    vagrant.ssh > _gateway.50988: tcp 52
-13:28:41.201060 IP (tos 0x10, ttl 64, id 3108, offset 0, flags [DF], proto TCP (6), length 84)
-    vagrant.ssh > _gateway.50988: tcp 44
-13:28:41.201309 IP (tos 0x10, ttl 64, id 3109, offset 0, flags [DF], proto TCP (6), length 84)
-    vagrant.ssh > _gateway.50988: tcp 44
-13:28:41.201557 IP (tos 0x10, ttl 64, id 3110, offset 0, flags [DF], proto TCP (6), length 84)
-    vagrant.ssh > _gateway.50988: tcp 44
-13:28:41.201805 IP (tos 0x10, ttl 64, id 3111, offset 0, flags [DF], proto TCP (6), length 84)
-    vagrant.ssh > _gateway.50988: tcp 44
-13:28:41.202061 IP (tos 0x0, ttl 64, id 11507, offset 0, flags [none], proto TCP (6), length 40)
-    _gateway.50988 > vagrant.ssh: tcp 0
-13:28:41.202061 IP (tos 0x0, ttl 64, id 11508, offset 0, flags [none], proto TCP (6), length 40)
-    _gateway.50988 > vagrant.ssh: tcp 0
-13:28:41.202061 IP (tos 0x0, ttl 64, id 11509, offset 0, flags [none], proto TCP (6), length 40)
-    _gateway.50988 > vagrant.ssh: tcp 0
-13:28:41.202061 IP (tos 0x0, ttl 64, id 11510, offset 0, flags [none], proto TCP (6), length 40)
-    _gateway.50988 > vagrant.ssh: tcp 0
-13:28:41.202061 IP (tos 0x0, ttl 64, id 11511, offset 0, flags [none], proto TCP (6), length 40)
-    _gateway.50988 > vagrant.ssh: tcp 0
+ sudo tcpdump -v -c 100
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+11:51:32.641692 IP (tos 0x10, ttl 64, id 28270, offset 0, flags [DF], proto TCP (6), length 76)
+    vagrant.ssh > _gateway.52943: Flags [P.], cksum 0x184f (incorrect -> 0x7edd), seq 3080088756:3080088792, ack 8131583, win 64032, length 36
+11:51:32.641952 IP (tos 0x0, ttl 64, id 1231, offset 0, flags [none], proto TCP (6), length 40)
+    _gateway.52943 > vagrant.ssh: Flags [.], cksum 0x8ff4 (correct), ack 36, win 65535, length 0
+11:51:32.642160 IP (tos 0x0, ttl 64, id 33049, offset 0, flags [DF], proto UDP (17), length 78)
+    vagrant.47878 > 10.0.2.3.domain: 3229+ [1au] PTR? 2.2.0.10.in-addr.arpa. (50)
+11:51:32.642493 IP (tos 0x10, ttl 64, id 28271, offset 0, flags [DF], proto TCP (6), length 140)
 ```
 
 Флаги протокола IP, указывающие на фрагментацию:
