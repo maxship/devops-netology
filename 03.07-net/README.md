@@ -43,6 +43,43 @@
 
 5. Сколько и каких итеративных запросов будет сделано при резолве домена `www.google.co.uk`?
 
+ - Первый запрос - поиск `.`
+```
+[max@hi10 ~]$ dig +trace www.google.co.uk
+
+; <<>> DiG 9.16.18 <<>> +trace www.google.co.uk
+;; global options: +cmd
+.....
+.			443	IN	NS	c.root-servers.net.
+.			443	IN	NS	i.root-servers.net.
+.			443	IN	NS	a.root-servers.net.
+.....
+;; Received 239 bytes from 192.168.43.1#53(192.168.43.1) in 83 ms
+```
+ - Далее поиск зоны верхнего уровня `uk.` 
+```
+....
+uk.			172800	IN	NS	dns2.nic.uk.
+uk.			172800	IN	NS	nsb.nic.uk.
+uk.			172800	IN	NS	dns4.nic.uk.
+....
+;; Received 832 bytes from 192.36.148.17#53(i.root-servers.net) in 56 ms
+```
+ - Поиск `google.co.uk.`
+```
+google.co.uk.		172800	IN	NS	ns1.google.com.
+google.co.uk.		172800	IN	NS	ns2.google.com.
+google.co.uk.		172800	IN	NS	ns3.google.com.
+google.co.uk.		172800	IN	NS	ns4.google.com.
+....
+;; Received 650 bytes from 43.230.48.1#53(dns4.nic.uk) in 76 ms
+```
+ - Поиск `www.google.co.uk.`
+```
+www.google.co.uk.	300	IN	A	64.233.162.94
+;; Received 61 bytes from 216.239.36.10#53(ns3.google.com) in 59 ms
+```
+
 6. Сколько доступно для назначения хостам адресов в подсети `/25`? А в подсети с маской `255.248.0.0`. Постарайтесь потренироваться в ручных вычислениях чтобы немного набить руку, не пользоваться калькулятором сразу.
 
 Подсеть с маской `/25`. 
