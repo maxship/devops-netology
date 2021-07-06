@@ -42,6 +42,168 @@
 На прошлой лекции был приведен сокращенный вариант ответа на этот вопрос. Теперь вы знаете намного больше, в частности про IP адресацию, DNS и т.д.
 Опишите максимально подробно насколько вы это можете сделать, что происходит, когда вы делаете запрос `curl -I http://netology.ru` с вашей рабочей станции. Предположим, что arp кеш очищен, в локальном DNS нет закешированных записей.
 
+Удаляем записи кэш
+```
+vagrant@vagrant:~$ ip neigh show
+10.0.2.3 dev eth0 lladdr 52:54:00:12:35:03 STALE
+10.0.2.2 dev eth0 lladdr 52:54:00:12:35:02 REACHABLE
+vagrant@vagrant:~$ sudo ip neigh del 10.0.2.2 dev eth0
+vagrant@vagrant:~$ sudo ip neigh del 10.0.2.3 dev eth0
+vagrant@vagrant:~$ sudo systemd-resolve --flush-caches
+```
+Запускаем мониторинг
+```
+vagrant@vagrant:~$ sudo tcpdump -i eth0 -v | grep -v 'vagrant.ssh' >> tcpdump1
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+79 packets captured
+81 packets received by filter
+0 packets dropped by kernel
+```
+
+Параллельно открываем сайт
+```
+vagrant@vagrant:~$ sudo strace -e network curl -I http://netology.ru
+socket(AF_INET6, SOCK_DGRAM, IPPROTO_IP) = 3
+socketpair(AF_UNIX, SOCK_STREAM, 0, [3, 4]) = 0
+socketpair(AF_UNIX, SOCK_STREAM, 0, [5, 6]) = 0
+socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) = 5
+setsockopt(5, SOL_TCP, TCP_NODELAY, [1], 4) = 0
+setsockopt(5, SOL_SOCKET, SO_KEEPALIVE, [1], 4) = 0
+setsockopt(5, SOL_TCP, TCP_KEEPIDLE, [60], 4) = 0
+setsockopt(5, SOL_TCP, TCP_KEEPINTVL, [60], 4) = 0
+connect(5, {sa_family=AF_INET, sin_port=htons(80), sin_addr=inet_addr("172.67.43.83")}, 16) = -1 EINPROGRESS (Operation now in progress)
+getsockopt(5, SOL_SOCKET, SO_ERROR, [0], [4]) = 0
+getpeername(5, {sa_family=AF_INET, sin_port=htons(80), sin_addr=inet_addr("172.67.43.83")}, [128->16]) = 0
+getsockname(5, {sa_family=AF_INET, sin_port=htons(60152), sin_addr=inet_addr("10.0.2.15")}, [128->16]) = 0
+sendto(5, "HEAD / HTTP/1.1\r\nHost: netology."..., 76, MSG_NOSIGNAL, NULL, 0) = 76
+recvfrom(5, "HTTP/1.1 301 Moved Permanently\r\n"..., 102400, 0, NULL, NULL) = 397
+HTTP/1.1 301 Moved Permanently
+Date: Tue, 06 Jul 2021 18:54:17 GMT
+Connection: keep-alive
+Cache-Control: max-age=3600
+Expires: Tue, 06 Jul 2021 19:54:17 GMT
+Location: https://netology.ru/
+cf-request-id: 0b1ec4d7b300002de4392df000000001
+Server: cloudflare
+CF-RAY: 66ab0a6c5cc42de4-DME
+alt-svc: h3-27=":443"; ma=86400, h3-28=":443"; ma=86400, h3-29=":443"; ma=86400, h3=":443"; ma=86400
+
++++ exited with 0 +++
+
+```
+Смотрим вывод
+
+```
+    GNU nano 4.8                                           tcpdump1                                                     
+18:54:13.135822 IP (tos 0x10, ttl 64, id 60102, offset 0, flags [DF], proto TCP (6), length 148)
+18:54:13.136479 IP (tos 0x0, ttl 64, id 10575, offset 0, flags [none], proto TCP (6), length 40)
+18:54:14.131155 ARP, Ethernet (len 6), IPv4 (len 4), Request who-has 10.0.2.3 tell vagrant, length 28
+18:54:14.132754 ARP, Ethernet (len 6), IPv4 (len 4), Reply 10.0.2.3 is-at 52:54:00:12:35:03 (oui Unknown), length 46
+18:54:14.132810 IP (tos 0x0, ttl 64, id 4786, offset 0, flags [DF], proto UDP (17), length 67)
+    vagrant.36812 > 10.0.2.3.domain: 56325+ PTR? 2.2.0.10.in-addr.arpa. (39)
+18:54:14.299110 IP (tos 0x0, ttl 64, id 10576, offset 0, flags [none], proto UDP (17), length 117)
+    10.0.2.3.domain > vagrant.36812: 56325 NXDomain* 0/1/0 (89)
+18:54:14.304232 IP (tos 0x0, ttl 64, id 4804, offset 0, flags [DF], proto UDP (17), length 68)
+    vagrant.44221 > 10.0.2.3.domain: 36900+ PTR? 15.2.0.10.in-addr.arpa. (40)
+18:54:14.327183 IP (tos 0x0, ttl 64, id 10577, offset 0, flags [none], proto UDP (17), length 118)
+    10.0.2.3.domain > vagrant.44221: 36900 NXDomain* 0/1/0 (90)
+18:54:14.334887 IP (tos 0x0, ttl 64, id 10578, offset 0, flags [none], proto TCP (6), length 76)
+18:54:14.379555 IP (tos 0x10, ttl 64, id 60103, offset 0, flags [DF], proto TCP (6), length 40)
+18:54:14.575602 IP (tos 0x0, ttl 64, id 10579, offset 0, flags [none], proto TCP (6), length 76)
+18:54:14.575686 IP (tos 0x10, ttl 64, id 60104, offset 0, flags [DF], proto TCP (6), length 40)
+18:54:14.580277 IP (tos 0x10, ttl 64, id 60105, offset 0, flags [DF], proto TCP (6), length 92)
+18:54:14.582127 IP (tos 0x0, ttl 64, id 10580, offset 0, flags [none], proto TCP (6), length 40)
+18:54:14.583048 IP (tos 0x10, ttl 64, id 60106, offset 0, flags [DF], proto TCP (6), length 172)
+18:54:14.585227 IP (tos 0x0, ttl 64, id 10581, offset 0, flags [none], proto TCP (6), length 40)
+18:54:15.150979 IP (tos 0x0, ttl 64, id 4994, offset 0, flags [DF], proto UDP (17), length 67)
+    vagrant.43752 > 10.0.2.3.domain: 61700+ PTR? 3.2.0.10.in-addr.arpa. (39)
+18:54:15.180827 IP (tos 0x0, ttl 64, id 10582, offset 0, flags [none], proto UDP (17), length 117)
+    10.0.2.3.domain > vagrant.43752: 61700 NXDomain* 0/1/0 (89)
+18:54:16.527939 IP (tos 0x0, ttl 64, id 10583, offset 0, flags [none], proto TCP (6), length 76)
+18:54:16.528079 IP (tos 0x10, ttl 64, id 60107, offset 0, flags [DF], proto TCP (6), length 40)
+18:54:16.537214 IP (tos 0x10, ttl 64, id 60108, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.539424 IP (tos 0x0, ttl 64, id 10584, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.771350 IP (tos 0x10, ttl 64, id 60109, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.772935 IP (tos 0x0, ttl 64, id 10585, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.773799 IP (tos 0x10, ttl 64, id 60110, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.775129 IP (tos 0x10, ttl 64, id 60111, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.775383 IP (tos 0x0, ttl 64, id 10586, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.776417 IP (tos 0x0, ttl 64, id 10587, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.779784 IP (tos 0x0, ttl 64, id 5072, offset 0, flags [DF], proto UDP (17), length 57)
+    vagrant.57271 > 10.0.2.3.domain: 31668+ A? netology.ru. (29)
+18:54:16.780231 IP (tos 0x0, ttl 64, id 5073, offset 0, flags [DF], proto UDP (17), length 57)
+    vagrant.40496 > 10.0.2.3.domain: 41498+ AAAA? netology.ru. (29)
+18:54:16.926383 IP (tos 0x0, ttl 64, id 10588, offset 0, flags [none], proto UDP (17), length 57)
+    10.0.2.3.domain > vagrant.40496: 41498 0/0/0 (29)
+18:54:16.926384 IP (tos 0x0, ttl 64, id 10589, offset 0, flags [none], proto UDP (17), length 105)
+    10.0.2.3.domain > vagrant.57271: 31668 3/0/0 netology.ru. A 172.67.43.83, netology.ru. A 104.22.48.171, netology.>
+18:54:16.935188 IP (tos 0x10, ttl 64, id 60112, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.936863 IP (tos 0x0, ttl 64, id 10590, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.937016 IP (tos 0x0, ttl 64, id 27890, offset 0, flags [DF], proto TCP (6), length 60)
+    vagrant.60152 > 172.67.43.83.http: Flags [S], cksum 0xe3d3 (incorrect -> 0x6d2c), seq 3201531502, win 64240, opti>
+18:54:16.939428 IP (tos 0x10, ttl 64, id 60113, offset 0, flags [DF], proto TCP (6), length 84)
+18:54:16.941009 IP (tos 0x0, ttl 64, id 10591, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.989812 IP (tos 0x0, ttl 64, id 10592, offset 0, flags [none], proto TCP (6), length 44)
+    172.67.43.83.http > vagrant.60152: Flags [S.], cksum 0x59d0 (correct), seq 638848001, ack 3201531503, win 65535, >
+18:54:16.990029 IP (tos 0x0, ttl 64, id 27891, offset 0, flags [DF], proto TCP (6), length 40)
+    vagrant.60152 > 172.67.43.83.http: Flags [.], cksum 0xe3bf (incorrect -> 0x769c), ack 1, win 64240, length 0
+18:54:16.539424 IP (tos 0x0, ttl 64, id 10584, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.771350 IP (tos 0x10, ttl 64, id 60109, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.772935 IP (tos 0x0, ttl 64, id 10585, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.773799 IP (tos 0x10, ttl 64, id 60110, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.775129 IP (tos 0x10, ttl 64, id 60111, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.775383 IP (tos 0x0, ttl 64, id 10586, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.776417 IP (tos 0x0, ttl 64, id 10587, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.779784 IP (tos 0x0, ttl 64, id 5072, offset 0, flags [DF], proto UDP (17), length 57)
+    vagrant.57271 > 10.0.2.3.domain: 31668+ A? netology.ru. (29)
+18:54:16.780231 IP (tos 0x0, ttl 64, id 5073, offset 0, flags [DF], proto UDP (17), length 57)
+    vagrant.40496 > 10.0.2.3.domain: 41498+ AAAA? netology.ru. (29)
+18:54:16.926383 IP (tos 0x0, ttl 64, id 10588, offset 0, flags [none], proto UDP (17), length 57)
+    10.0.2.3.domain > vagrant.40496: 41498 0/0/0 (29)
+18:54:16.926384 IP (tos 0x0, ttl 64, id 10589, offset 0, flags [none], proto UDP (17), length 105)
+    10.0.2.3.domain > vagrant.57271: 31668 3/0/0 netology.ru. A 172.67.43.83, netology.ru. A 104.22.48.171, netology.>
+18:54:16.935188 IP (tos 0x10, ttl 64, id 60112, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:16.936863 IP (tos 0x0, ttl 64, id 10590, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.937016 IP (tos 0x0, ttl 64, id 27890, offset 0, flags [DF], proto TCP (6), length 60)
+    vagrant.60152 > 172.67.43.83.http: Flags [S], cksum 0xe3d3 (incorrect -> 0x6d2c), seq 3201531502, win 64240, opti>
+18:54:16.939428 IP (tos 0x10, ttl 64, id 60113, offset 0, flags [DF], proto TCP (6), length 84)
+18:54:16.941009 IP (tos 0x0, ttl 64, id 10591, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.989812 IP (tos 0x0, ttl 64, id 10592, offset 0, flags [none], proto TCP (6), length 44)
+    172.67.43.83.http > vagrant.60152: Flags [S.], cksum 0x59d0 (correct), seq 638848001, ack 3201531503, win 65535, >
+18:54:16.990029 IP (tos 0x0, ttl 64, id 27891, offset 0, flags [DF], proto TCP (6), length 40)
+    vagrant.60152 > 172.67.43.83.http: Flags [.], cksum 0xe3bf (incorrect -> 0x769c), ack 1, win 64240, length 0
+18:54:16.994770 IP (tos 0x0, ttl 64, id 27892, offset 0, flags [DF], proto TCP (6), length 116)
+    vagrant.60152 > 172.67.43.83.http: Flags [P.], cksum 0xe40b (incorrect -> 0x15cb), seq 1:77, ack 1, win 64240, le>
+        HEAD / HTTP/1.1
+        Host: netology.ru
+        User-Agent: curl/7.68.0
+        Accept: */*
+
+18:54:16.996188 IP (tos 0x10, ttl 64, id 60114, offset 0, flags [DF], proto TCP (6), length 84)
+18:54:16.997159 IP (tos 0x0, ttl 64, id 10593, offset 0, flags [none], proto TCP (6), length 40)
+    172.67.43.83.http > vagrant.60152: Flags [.], cksum 0x7141 (correct), ack 77, win 65535, length 0
+18:54:16.998068 IP (tos 0x0, ttl 64, id 10594, offset 0, flags [none], proto TCP (6), length 40)
+18:54:16.998502 IP (tos 0x10, ttl 64, id 60115, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:17.001077 IP (tos 0x0, ttl 64, id 10595, offset 0, flags [none], proto TCP (6), length 40)
+18:54:17.057323 IP (tos 0x0, ttl 64, id 10596, offset 0, flags [none], proto TCP (6), length 437)
+    172.67.43.83.http > vagrant.60152: Flags [P.], cksum 0x2fd1 (correct), seq 1:398, ack 77, win 65535, length 397: >
+        HTTP/1.1 301 Moved Permanently
+        Date: Tue, 06 Jul 2021 18:54:17 GMT
+        Connection: keep-alive
+        Cache-Control: max-age=3600
+        Expires: Tue, 06 Jul 2021 19:54:17 GMT
+        Location: https://netology.ru/
+        cf-request-id: 0b1ec4d7b300002de4392df000000001
+        Server: cloudflare
+        CF-RAY: 66ab0a6c5cc42de4-DME
+        alt-svc: h3-27=":443"; ma=86400, h3-28=":443"; ma=86400, h3-29=":443"; ma=86400, h3=":443"; ma=86400
+18:54:17.057443 IP (tos 0x0, ttl 64, id 27893, offset 0, flags [DF], proto TCP (6), length 40)
+    vagrant.60152 > 172.67.43.83.http: Flags [.], cksum 0xe3bf (incorrect -> 0x7650), ack 398, win 63843, length 0
+18:54:17.061120 IP (tos 0x10, ttl 64, id 60116, offset 0, flags [DF], proto TCP (6), length 76)
+18:54:17.063182 IP (tos 0x0, ttl 64, id 10597, offset 0, flags [none], proto TCP (6), length 40)
+
+```
+
 5. Сколько и каких итеративных запросов будет сделано при резолве домена `www.google.co.uk`?
 
  - Первый запрос - поиск `.`
