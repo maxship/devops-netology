@@ -15,6 +15,13 @@ Vault v1.7.3 (5d517c864c8f10385bf65627891bc7ef55f5e827)
    
 2. Запустить Vault-сервер в dev-режиме (дополнив ключ `-dev` упомянутым выше `-dev-listen-address`, если хотите увидеть UI).
 
+```
+vagrant@vagrant:~$ vault server -dev -dev-listen-address="0.0.0.0:8200"
+...
+Unseal Key: w1t/HaZHW78y15081pEmP8ozfogNnOioJi3NdEtLRDE=
+Root Token: s.PW0umb9PEH33LkmowU5KFDmn
+```
+
 ![Screenshot from 2021-07-10 23-40-29](https://user-images.githubusercontent.com/72273610/125171853-59c1f100-e1d8-11eb-9cf5-530370fb140d.png)
 
 3. Используя [PKI Secrets Engine](https://www.vaultproject.io/docs/secrets/pki), создайте Root CA и Intermediate CA.
