@@ -26,6 +26,18 @@ Root Token: s.PW0umb9PEH33LkmowU5KFDmn
 
 3. Используя [PKI Secrets Engine](https://www.vaultproject.io/docs/secrets/pki), создайте Root CA и Intermediate CA.
 Обратите внимание на [дополнительные материалы](https://learn.hashicorp.com/tutorials/vault/pki-engine) по созданию CA в Vault, если с изначальной инструкцией возникнут сложности.
+```
+vagrant@vagrant:~$ openssl x509 -in CA_cert.crt -text
+...
+fRpcvUog2nW/Hs/DkzB1zln41j0tpD0vU6nEPIYofQy48kRFTNvJEmR4fBc9KZs5
+6bSdFw2a9q68
+-----END CERTIFICATE-----
+
+vagrant@vagrant:~$ openssl x509 -in CA_cert.crt -noout -dates
+notBefore=Jul 10 18:58:30 2021 GMT
+notAfter=Jun  1 06:58:51 2031 GMT
+```
+
 4. Согласно этой же инструкции, подпишите Intermediate CA csr на сертификат для тестового домена (например, `netology.example.com` если действовали согласно инструкции).
 5. Поднимите на localhost nginx, сконфигурируйте default vhost для использования подписанного Vault Intermediate CA сертификата и выбранного вами домена. Сертификат из Vault подложить в nginx руками.
 6. Модифицировав `/etc/hosts` и [системный trust-store](http://manpages.ubuntu.com/manpages/focal/en/man8/update-ca-certificates.8.html), добейтесь безошибочной с точки зрения HTTPS работы curl на ваш тестовый домен (отдающийся с localhost). Рекомендуется добавлять в доверенные сертификаты Intermediate CA. Root CA добавить было бы правильнее, но тогда при конфигурации nginx потребуется включить в цепочку Intermediate, что выходит за рамки лекции. Так же, пожалуйста, не добавляйте в доверенные сам сертификат хоста.
