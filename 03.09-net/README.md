@@ -18,24 +18,31 @@ Vault v1.7.3 (5d517c864c8f10385bf65627891bc7ef55f5e827)
 ```
 vagrant@vagrant:~$ vault server -dev -dev-listen-address="0.0.0.0:8200"
 ...
-Unseal Key: w1t/HaZHW78y15081pEmP8ozfogNnOioJi3NdEtLRDE=
-Root Token: s.PW0umb9PEH33LkmowU5KFDmn
+Unseal Key: owJmKb5IWbF6iWT1amI1j28DEZRlzT27o+5n/zF9Y4k=
+Root Token: s.8HJWBe6FaMClfLdtEwNUUdoS
 ```
 
 ![Screenshot from 2021-07-10 23-40-29](https://user-images.githubusercontent.com/72273610/125171853-59c1f100-e1d8-11eb-9cf5-530370fb140d.png)
 
 3. Используя [PKI Secrets Engine](https://www.vaultproject.io/docs/secrets/pki), создайте Root CA и Intermediate CA.
 Обратите внимание на [дополнительные материалы](https://learn.hashicorp.com/tutorials/vault/pki-engine) по созданию CA в Vault, если с изначальной инструкцией возникнут сложности.
-```
-vagrant@vagrant:~$ openssl x509 -in CA_cert.crt -text
-...
-fRpcvUog2nW/Hs/DkzB1zln41j0tpD0vU6nEPIYofQy48kRFTNvJEmR4fBc9KZs5
-6bSdFw2a9q68
------END CERTIFICATE-----
 
-vagrant@vagrant:~$ openssl x509 -in CA_cert.crt -noout -dates
-notBefore=Jul 10 18:58:30 2021 GMT
-notAfter=Jun  1 06:58:51 2031 GMT
+Задаем переменные, инициализируем PKI.
+
+```
+vagrant@vagrant:~$ VAULT_ADDR=http://127.0.0.1:8200
+vagrant@vagrant:~$ export VAULT_ADDR
+vagrant@vagrant:~$ VAULT_TOKEN=s.8HJWBe6FaMClfLdtEwNUUdoS
+vagrant@vagrant:~$ export VAULT_TOKEN
+vagrant@vagrant:~$ vault secrets enable pki
+Success! Enabled the pki secrets engine at: pki/
+```
+    3.1. Создаем Root CA. 
+Задаем время действия сертификата.
+
+```
+vagrant@vagrant:~$ vault secrets tune -max-lease-ttl=87600h pki
+Success! Tuned the secrets engine at: pki/
 ```
 
 4. Согласно этой же инструкции, подпишите Intermediate CA csr на сертификат для тестового домена (например, `netology.example.com` если действовали согласно инструкции).
