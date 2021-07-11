@@ -32,8 +32,10 @@ Root Token: s.8HJWBe6FaMClfLdtEwNUUdoS
 ```
 vagrant@vagrant:~$ VAULT_ADDR=http://127.0.0.1:8200
 vagrant@vagrant:~$ export VAULT_ADDR
+
 vagrant@vagrant:~$ VAULT_TOKEN=s.8HJWBe6FaMClfLdtEwNUUdoS
 vagrant@vagrant:~$ export VAULT_TOKEN
+
 vagrant@vagrant:~$ vault secrets enable pki
 Success! Enabled the pki secrets engine at: pki/
 ```
@@ -53,6 +55,19 @@ vagrant@vagrant:~$ vault write -field=certificate pki/root/generate/internal com
 vagrant@vagrant:~$ vault write pki/config/urls issuing_certificates="$VAULT_ADDR/v1/pki/ca" crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
 Success! Data written to: pki/config/urls
 ```
+Проверяем:
+```
+vagrant@vagrant:~$ openssl x509 -in CA_cert.crt -text
+...
+oz9LD/RNhA3otNqUrPVRJIjASsEiTiuAGK1O01ROfJlr1D9hvQ+kqB/C5YmDGtCx
++DutoRyS7eBA
+-----END CERTIFICATE-----
+
+vagrant@vagrant:~$ openssl x509 -in CA_cert.crt -noout -dates
+notBefore=Jul 11 20:15:59 2021 GMT
+notAfter=Jul  9 20:16:27 2031 GMT
+```
+
 3.2. Создаем Intermidiate CA.  
 Инициализируем PKI.
 ```
@@ -63,10 +78,21 @@ Success! Tuned the secrets engine at: pki_int/
 ```
 Генерируем Intermidiate и создаем запрос `CSR`. Сохраняем его в `pki_intermediate.csr`.
 ```
-vault write -format=json pki_int/intermediate/generate/internal common_name="example.com Intermediate Authority" | jq -r '.data.csr' > pki_intermediate.csr
+vagrant@vagrant:~$ vault write -format=json pki_int/intermediate/generate/internal common_name="netology.example.com Intermediate Authority" | jq -r '.data.csr' > pki_intermediate.csr
 ```
 
 4. Согласно этой же инструкции, подпишите Intermediate CA csr на сертификат для тестового домена (например, `netology.example.com` если действовали согласно инструкции).
+
+Подписываем Intermidiate сертификат приватным ключем root CA и сохраняем сгенерированный сертификат как `intermediate.cert.pem`.
+```
+vagrant@vagrant:~$ vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr format=pem_bundle ttl="43800h" | jq -r '.data.certificate' > intermediate.cert.pem
+```
+После подписания CSR и возвращения от root CA сертификата, импортируем его:
+```
+vagrant@vagrant:~$ vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
+Success! Data written to: pki_int/intermediate/set-signed
+```
+
 5. Поднимите на localhost nginx, сконфигурируйте default vhost для использования подписанного Vault Intermediate CA сертификата и выбранного вами домена. Сертификат из Vault подложить в nginx руками.
 6. Модифицировав `/etc/hosts` и [системный trust-store](http://manpages.ubuntu.com/manpages/focal/en/man8/update-ca-certificates.8.html), добейтесь безошибочной с точки зрения HTTPS работы curl на ваш тестовый домен (отдающийся с localhost). Рекомендуется добавлять в доверенные сертификаты Intermediate CA. Root CA добавить было бы правильнее, но тогда при конфигурации nginx потребуется включить в цепочку Intermediate, что выходит за рамки лекции. Так же, пожалуйста, не добавляйте в доверенные сам сертификат хоста.
 7. [Ознакомьтесь](https://letsencrypt.org/ru/docs/client-options/) с протоколом ACME и CA Let's encrypt. Если у вас есть во владении доменное имя с платным TLS-сертификатом, который возможно заменить на LE, или же без HTTPS вообще, попробуйте воспользоваться одним из предложенных клиентов, чтобы сделать веб-сайт безопасным (или перестать платить за коммерческий сертификат).
