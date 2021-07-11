@@ -37,12 +37,33 @@ vagrant@vagrant:~$ export VAULT_TOKEN
 vagrant@vagrant:~$ vault secrets enable pki
 Success! Enabled the pki secrets engine at: pki/
 ```
-    3.1. Создаем Root CA. 
-Задаем время действия сертификата.
 
+3.1. Создаем Root CA. 
+Задаем время действия сертификата.
 ```
 vagrant@vagrant:~$ vault secrets tune -max-lease-ttl=87600h pki
 Success! Tuned the secrets engine at: pki/
+```
+Генерируем самоподписанный CA сертификат и приватный ключ.
+```
+vagrant@vagrant:~$ vault write -field=certificate pki/root/generate/internal common_name="example.com" ttl=87600h > CA_cert.crt
+```
+Прописываем пути для CA и CRL (certificate revocation list)
+```
+vagrant@vagrant:~$ vault write pki/config/urls issuing_certificates="$VAULT_ADDR/v1/pki/ca" crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
+Success! Data written to: pki/config/urls
+```
+3.2. Создаем Intermidiate CA.  
+Инициализируем PKI.
+```
+vagrant@vagrant:~$ vault secrets enable -path=pki_int pki
+Success! Enabled the pki secrets engine at: pki_int/
+vagrant@vagrant:~$ vault secrets tune -max-lease-ttl=43800h pki_int
+Success! Tuned the secrets engine at: pki_int/
+```
+Генерируем Intermidiate и создаем запрос `CSR`. Сохраняем его в `pki_intermediate.csr`.
+```
+vault write -format=json pki_int/intermediate/generate/internal common_name="example.com Intermediate Authority" | jq -r '.data.csr' > pki_intermediate.csr
 ```
 
 4. Согласно этой же инструкции, подпишите Intermediate CA csr на сертификат для тестового домена (например, `netology.example.com` если действовали согласно инструкции).
