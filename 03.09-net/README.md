@@ -99,7 +99,7 @@ Success! Data written to: pki_int/roles/example-dot-com
 ```
 vagrant@vagrant:~$ vault write pki_int/issue/example-dot-com common_name="netology.example.com" ttl="24h"
 ```
-Сохраняем все три сертификата.
+Сохраняем все три сертификата и ключ в отдельные файлы.
 
 
 5. Поднимите на localhost nginx, сконфигурируйте default vhost для использования подписанного Vault Intermediate CA сертификата и выбранного вами домена. Сертификат из Vault подложить в nginx руками.
