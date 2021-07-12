@@ -99,16 +99,69 @@ Success! Data written to: pki_int/roles/example-dot-com
 ```
 vagrant@vagrant:~$ vault write pki_int/issue/example-dot-com common_name="netology.example.com" ttl="24h"
 ```
+Сохраняем все три сертификата.
 
 
 5. Поднимите на localhost nginx, сконфигурируйте default vhost для использования подписанного Vault Intermediate CA сертификата и выбранного вами домена. Сертификат из Vault подложить в nginx руками.
+
+
+Объединяем 3 сертификата, полученные на предыдущем пункте.
+```
+cat cert.crt iss_cert.crt chain_ca.crt >bundle.crt
+```
+Добавляем сертификат в nginx.
+```
+vagrant@vagrant:~$ sudo nano /etc/nginx/sites-enabled/default
+listen 443 ssl default_server;
+listen [::]:443 ssl default_server;
+ssl_certificate /home/vagrant/bundle.crt;
+ssl_certificate_key /home/vagrant/netology.example.com.key;
+```
+
+```
+vagrant@vagrant:~$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+```
+vagrant@vagrant:~$ sudo systemctl reload nginx
+vagrant@vagrant:~$ sudo systemctl status nginx
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sun 2021-07-11 20:49:26 UTC; 24h ago
+```
+
 6. Модифицировав `/etc/hosts` и [системный trust-store](http://manpages.ubuntu.com/manpages/focal/en/man8/update-ca-certificates.8.html), добейтесь безошибочной с точки зрения HTTPS работы curl на ваш тестовый домен (отдающийся с localhost). Рекомендуется добавлять в доверенные сертификаты Intermediate CA. Root CA добавить было бы правильнее, но тогда при конфигурации nginx потребуется включить в цепочку Intermediate, что выходит за рамки лекции. Так же, пожалуйста, не добавляйте в доверенные сам сертификат хоста.
 
+Прописываем наш домен на localhost и пробуем подключиться по https.
 ```
 root@vagrant:/home/vagrant# echo 127.0.0.1 netology.example.com >> /etc/hosts
 root@vagrant:/home/vagrant# host netology.example.com
 netology.example.com has address 127.0.0.1
+root@vagrant:/home/vagrant# curl -I https://netology.example.com
+curl: (60) SSL certificate problem: unable to get local issuer certificate
 ```
+
+Делаем символьную сылку на наш Intermediate сертификат и обновляем trust-store.
+```
+root@vagrant:/home/vagrant# ln -s /home/vagrant/intermediate.cert.crt /usr/local/share/ca-certificates/intermediate.cert.crt
+root@vagrant:/home/vagrant# update-ca-certificates
+Updating certificates in /etc/ssl/certs...
+rehash: warning: skipping duplicate certificate in netology.example.com.crt
+1 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+```
+
+Проверяем:
+```
+root@vagrant:/home/vagrant# curl -I https://netology.example.com | head -n1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0   612    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+HTTP/1.1 200 OK
+```
+
 7. [Ознакомьтесь](https://letsencrypt.org/ru/docs/client-options/) с протоколом ACME и CA Let's encrypt. Если у вас есть во владении доменное имя с платным TLS-сертификатом, который возможно заменить на LE, или же без HTTPS вообще, попробуйте воспользоваться одним из предложенных клиентов, чтобы сделать веб-сайт безопасным (или перестать платить за коммерческий сертификат).
 
 **Дополнительное задание вне зачета.** Вместо ручного подкладывания сертификата в nginx, воспользуйтесь [consul-template](https://medium.com/hashicorp-engineering/pki-as-a-service-with-hashicorp-vault-a8d075ece9a) для автоматического подтягивания сертификата из Vault.
