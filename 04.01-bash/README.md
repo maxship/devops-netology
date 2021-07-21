@@ -86,15 +86,16 @@ Wed 21 Jul 2021 09:17:24 AM UTC
 ```bash
 vagrant@vagrant:~$ nano hw_4.3_curl_script.sh
 
-#!/bin/bash 
+#!/bin/bash
 		arr_ip=(127.0.0.1 173.194.222.113 87.250.250.242)
 		for j in {1..5}
 		do
 			for i in ${arr_ip[@]}
-			do 
+			do
 				date >> curl_1.log
 				echo $i >> curl_1.log
-				curl -I $i 80 >> curl_1.log
+				curl -I $i 80
+				echo код завершения: $? >> curl_1.log
 			done
 		done
 
