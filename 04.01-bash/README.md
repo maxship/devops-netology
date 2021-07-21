@@ -14,17 +14,17 @@
 	* Почему?
 
     ```
-    vagrant@vagrant:~$ echo $c
+    vagrant@vagrant:~$ echo $c #Переменные заданы неявно, поэтому получаем просто строку. Операция сложения будет выполняться только в случае, если все три переменные задекларированы как целые числа.
     a+b
-    vagrant@vagrant:~$ echo $d
+    vagrant@vagrant:~$ echo $d #Здесь bash также интерпретирует значения переменных как строки, т.к они не задекларированы как целые числа. В отличие от первого варианта, здесь используется символ $, поэтому в выводе имеем значения переменных, а не их обозначение.
     1+2
-    vagrant@vagrant:~$ echo $e
+    vagrant@vagrant:~$ echo $e #Здесь сначала выполняется конструкция ($a+$b), потом она подставляется в $(). А эта конструкция уже записывает результат функции во внутренних скобках в переменную.
     3
     ```
     
 
 2. На нашем локальном сервере упал сервис и мы написали скрипт, который постоянно проверяет его доступность, записывая дату проверок до тех пор, пока сервис не станет доступным. В скрипте допущена ошибка, из-за которой выполнение не может завершиться, при этом место на Жёстком Диске постоянно уменьшается. Что необходимо сделать, чтобы его исправить:
-	```bash
+```bash
 	while ((1==1)
 	do
 	curl https://localhost:4757
@@ -33,34 +33,51 @@
 	date >> curl.log
 	fi
 	done
-	```
-~/curl_script.sh
+```
+
+Создадим файл со скриптом.
 ```bash
-#!/bin/bash
-        while ((1==1))
+vagrant@vagrant:~$ touch curl_script.sh
+vagrant@vagrant:~$ chmod u+x curl_script.sh
+vagrant@vagrant:~$ nano curl_script.sh
+
+#!/bin/bash 
+        while ((1==1)) #Добавляем недостающую скобку
         do
-        curl http://localhost:80
+        curl http://netology.example.com #Для проверку работоспособности скрипта используем созданный ранее тестовый домен на localhost
         if (($? != 0))
           then
         	date >> curl.log
-        fi
-        if (($? == 0))
-          then
-          	break
+        	sleep 1 #Для наглядности будем делать опрос каждую секунду
+        else 
+          break #При получении кода 0 скрипт прерывается
         fi
         done
 ```
-```
-sudo systemctl start nginx
-sudo systemctl start nginx
+Останавливаем веб сервер и запускаем скрипт. Параллельно в другом терминале снова запускаем сервер и смотрим логи.
+```bash
+vagrant@vagrant:~$ sudo systemctl stop nginx
+vagrant@vagrant:~$ bash curl_script.sh
+curl: (7) Failed to connect to netology.example.com port 80: Connection refused
+...
+curl: (7) Failed to connect to netology.example.com port 80: Connection refused
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+....
+</html>
 
-vagrant@vagrant:~$ df /home
-Filesystem                 1K-blocks    Used Available Use% Mounted on
-/dev/mapper/vgvagrant-root  64284292 2300228  58688832   4% /
-vagrant@vagrant:~$ df /home
-Filesystem                 1K-blocks    Used Available Use% Mounted on
-/dev/mapper/vgvagrant-root  64284292 2300492  58688568   4% /
+vagrant@vagrant:~$ sudo systemctl start nginx
+vagrant@vagrant:~$ cat curl.log
+Wed 21 Jul 2021 09:17:19 AM UTC
+Wed 21 Jul 2021 09:17:20 AM UTC
+Wed 21 Jul 2021 09:17:21 AM UTC
+Wed 21 Jul 2021 09:17:22 AM UTC
+Wed 21 Jul 2021 09:17:23 AM UTC
+Wed 21 Jul 2021 09:17:24 AM UTC
 ```
+Скрипт отработал успешно.
 
 3. Необходимо написать скрипт, который проверяет доступность трёх IP: 192.168.0.1, 173.194.222.113, 87.250.250.242 по 80 порту и записывает результат в файл log. Проверять доступность необходимо пять раз для каждого узла.
 
