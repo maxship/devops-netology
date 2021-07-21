@@ -84,14 +84,14 @@ Wed 21 Jul 2021 09:17:24 AM UTC
 
 
 ```bash
-vagrant@vagrant:~$ nano hw_4.3_curl_script.sh
+vagrant@vagrant:~$ nano hw_4.1.3_curl_script.sh
 
 #!/bin/bash
-		arr_ip=(127.0.0.1 173.194.222.113 87.250.250.242)
-		for j in {1..5}
+		arr_ip=(127.0.0.1 173.194.222.113 87.250.250.242) #Задаем массив из IP адресов
+		for j in {1..5} #Повторяем 5 раз
 		do
-			for i in ${arr_ip[@]}
-			do
+			for i in ${arr_ip[@]} #Выполняем для каждого элемента массива
+			do #Записываем в лог дату, IP адрес и код завершения команды curl
 				date >> curl_1.log
 				echo $i >> curl_1.log
 				curl -I $i 80
@@ -100,8 +100,16 @@ vagrant@vagrant:~$ nano hw_4.3_curl_script.sh
 		done
 
 vagrant@vagrant:~$ chmod u+x curl_script.sh
-vagrant@vagrant:~$ ~/hw_4.3_curl_script.sh
+vagrant@vagrant:~$ ~/hw_4.1.3_curl_script.sh
 
+vagrant@vagrant:~$ cat curl_1.log
+Wed 21 Jul 2021 04:25:40 PM UTC
+127.0.0.1
+код завершения: 7
+...
+Wed 21 Jul 2021 04:25:42 PM UTC
+87.250.250.242
+код завершения: 7
 ```
 
 4. Необходимо дописать скрипт из предыдущего задания так, чтобы он выполнялся до тех пор, пока один из узлов не окажется недоступным. Если любой из узлов недоступен - IP этого узла пишется в файл error, скрипт прерывается
