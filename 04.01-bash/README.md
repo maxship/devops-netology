@@ -83,24 +83,25 @@ Wed 21 Jul 2021 09:17:24 AM UTC
 3. Необходимо написать скрипт, который проверяет доступность трёх IP: 192.168.0.1, 173.194.222.113, 87.250.250.242 по 80 порту и записывает результат в файл log. Проверять доступность необходимо пять раз для каждого узла.
 
 
-	```bash
-	vagrant@vagrant:~$ nano hw_4.3_curl_script.sh
- 	
-	#!/bin/bash 
- 			arr_ip=(127.0.0.1 173.194.222.113 87.250.250.242)
- 			for j in {1..5}
- 			do
-				for i in ${arr_ip[@]}
-				do 
-					date >> curl_1.log
-					echo $i >> curl_1.log
-					curl -I $i 80 >> curl_1.log
-				done
+```bash
+vagrant@vagrant:~$ nano hw_4.3_curl_script.sh
+
+#!/bin/bash 
+		arr_ip=(127.0.0.1 173.194.222.113 87.250.250.242)
+		for j in {1..5}
+		do
+			for i in ${arr_ip[@]}
+			do 
+				date >> curl_1.log
+				echo $i >> curl_1.log
+				curl -I $i 80 >> curl_1.log
 			done
-	vagrant@vagrant:~$ chmod u+x curl_script.sh
- 
- 	vagrant@vagrant:~$ ~/hw_4.3_curl_script.sh
-	```
+		done
+
+vagrant@vagrant:~$ chmod u+x curl_script.sh
+vagrant@vagrant:~$ ~/hw_4.3_curl_script.sh
+
+```
 
 4. Необходимо дописать скрипт из предыдущего задания так, чтобы он выполнялся до тех пор, пока один из узлов не окажется недоступным. Если любой из узлов недоступен - IP этого узла пишется в файл error, скрипт прерывается
 
