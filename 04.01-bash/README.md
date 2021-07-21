@@ -85,7 +85,6 @@ Wed 21 Jul 2021 09:17:24 AM UTC
 
 ```bash
 vagrant@vagrant:~$ nano hw_4.1.3_curl_script.sh
-
 #!/bin/bash
 		arr_ip=(127.0.0.1 173.194.222.113 87.250.250.242) #Задаем массив из IP адресов
 		for j in {1..5} #Повторяем 5 раз
@@ -98,11 +97,11 @@ vagrant@vagrant:~$ nano hw_4.1.3_curl_script.sh
 				echo код завершения: $? >> curl_1.log
 			done
 		done
-
-vagrant@vagrant:~$ chmod u+x curl_script.sh
+		
+vagrant@vagrant:~$ chmod u+x hw_4.1.3_curl_script.sh
 vagrant@vagrant:~$ ~/hw_4.1.3_curl_script.sh
-
 vagrant@vagrant:~$ cat curl_1.log
+
 Wed 21 Jul 2021 04:25:40 PM UTC
 127.0.0.1
 код завершения: 7
@@ -113,6 +112,65 @@ Wed 21 Jul 2021 04:25:42 PM UTC
 ```
 
 4. Необходимо дописать скрипт из предыдущего задания так, чтобы он выполнялся до тех пор, пока один из узлов не окажется недоступным. Если любой из узлов недоступен - IP этого узла пишется в файл error, скрипт прерывается
+
+```bash
+vagrant@vagrant:~$ nano hw_4.1.4_curl_script.sh
+#!/bin/bash
+arr_ip=(127.0.0.1 77.88.8.8 213.180.206.248) #Задаем IP адреса
+while ((1==1)) #Запускаем бесконечный цикл
+do
+t=0 #Флаг для прерывания скрипта
+    for x in ${arr_ip[@]} #Цикл по IP адресам
+    do
+        curl $x
+        if (($? == 0)) #Если код завершения равен 0, то пишем данные в curl_2.log
+        then
+            echo код завершения: $? >> curl_2.log
+            echo $x >> curl_2.log
+            date >> curl_2.log
+        else #Если код не равен 0, пишем в error_2.log
+            echo код завершения: $? >> error_2.log
+            t=1 #Меняем флаг для прерывания скрипта
+            date >> error_2.log
+            echo $x >> error_2.log
+        fi
+    done
+        if (($t == 1)) #Если флаг равен 1, прерываем выполнение скрипта
+        then
+            break
+        else
+            sleep 3
+        fi
+done
+
+vagrant@vagrant:~$ chmod u+x hw_4.1.4_curl_script.sh
+
+
+```
+Проверяем работоспособность. Через несколько секунд после запуска скрипта останавливаем локальный веб сервер и смотрим логи.
+```bash
+vagrant@vagrant:~$ ~/hw_4.1.4_curl_script.sh
+vagrant@vagrant:~$ cat curl_2.log
+127.0.0.1
+Wed 21 Jul 2021 06:30:13 PM UTC
+код завершения: 0
+77.88.8.8
+Wed 21 Jul 2021 06:30:13 PM UTC
+код завершения: 0
+213.180.206.248
+Wed 21 Jul 2021 06:30:13 PM UTC
+код завершения: 0
+77.88.8.8
+Wed 21 Jul 2021 06:30:16 PM UTC
+код завершения: 0
+213.180.206.248
+Wed 21 Jul 2021 06:30:16 PM UTC
+
+vagrant@vagrant:~$ cat error_2.log
+код завершения: 1
+Wed 21 Jul 2021 06:30:16 PM UTC
+127.0.0.1
+```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
 
