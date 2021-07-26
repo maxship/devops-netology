@@ -10,10 +10,44 @@ Timeout (tcp tcpfin udp): 900 120 300
 
 2. На лекции мы познакомились отдельно с ipvs и отдельно с keepalived. Воспользовавшись этими знаниями, совместите технологии вместе (VIP должен подниматься демоном keepalived). Приложите конфигурационные файлы, которые у вас получились, и продемонстрируйте работу получившейся конструкции. Используйте для директора отдельный хост, не совмещая его с риалом! Подобная схема возможна, но выходит за рамки рассмотренного на лекции.
 
+
 Запустим ВМ с IP адресами:  
 172.28.128.10, 172.28.128.60 - реальные сервера;  
 172.28.128.90, 172.28.128.120 - хосты LVS + keepalived;  
-172.28.128.150 - клиент;  
+172.28.128.150 - клиент. 
+
+Конфигурация `Vagranfile`:  
+```ruby
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+boxes = {
+  'netology1' => '10',
+  'netology2' => '60',
+  'netology3' => '90',
+  'netology4' => '120',
+  'netology5' => '150',
+}
+
+Vagrant.configure("2") do |config|
+  config.vm.network "private_network", virtualbox__intnet: true, auto_config: false
+  config.vm.box = "bento/ubuntu-20.04"
+
+  boxes.each do |k, v|
+    config.vm.define k do |node|
+      node.vm.provision "shell" do |s|
+        s.inline = "hostname $1;"\
+          "ip addr add $2 dev eth1;"\
+          "ip link set dev eth1 up;"\
+          "sudo apt-get update;"\
+		  "sudo apt-get -y install nginx;"
+        s.args = [k, "172.28.128.#{v}/24"]
+      end
+    end
+  end
+
+end
+```
 
 Проверим работоспособность nginx:
 ```bash
