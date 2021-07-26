@@ -137,7 +137,7 @@ TCP  172.28.128.200:80                  51      306        0    20349        0
   -> 172.28.128.10:80                    0        0        0        0        0
   -> 172.28.128.60:80                   51      306        0    20349        0
 ```
-Сервисы работают, но весь трафик почему-то идет на сервер netology2. Возможно, неправильно понял настройку real серверов в части ARP запросов?
+Сервисы работают, но весь трафик почему-то идет на сервер netology2. Возможно, неправильно сделал предварительную настройку real серверов?
 
 Проверим работоспособность keepalived. Для этого вырубим службу на мастере (netology3).
 ```bash
@@ -152,7 +152,7 @@ root@netology4:/home/vagrant# systemctl status keepalived.service
 Jul 26 11:15:32 netology4 Keepalived_vrrp[16157]: (RH_1) Backup received priority 0 advertisement
 Jul 26 11:15:33 netology4 Keepalived_vrrp[16157]: (RH_1) Entering MASTER STATE
 ```
-Видим, что состояние MASTER теперь на netology4. Снова отправляем с сервера запросы на VIP.
+Видим, что состояние MASTER теперь установилось на netology4. Снова отправляем с клиента запросы на VIP.
 
 ```bash
 vagrant@netology5:~$ for i in {1..50}; do curl -I -s 172.28.128.200>/dev/null; done
