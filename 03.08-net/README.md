@@ -137,9 +137,6 @@ Jul 26 11:07:03 netology3 Keepalived_healthcheckers[22525]: Activating healthche
 Jul 26 11:07:03 netology3 Keepalived_healthcheckers[22525]: Activating healthchecker for service [172.28.128.60]:tcp:80 for VS [172.28.128.200]:tcp:80
 Jul 26 11:07:03 netology3 Keepalived_healthcheckers[22525]: Activating BFD healthchecker
 Jul 26 11:07:03 netology3 Keepalived_vrrp[22526]: (RH_1) received lower priority (99) advert from 172.28.128.120 - discarding
-Jul 26 11:07:04 netology3 Keepalived_vrrp[22526]: (RH_1) received lower priority (99) advert from 172.28.128.120 - discarding
-Jul 26 11:07:05 netology3 Keepalived_vrrp[22526]: (RH_1) received lower priority (99) advert from 172.28.128.120 - discarding
-Jul 26 11:07:06 netology3 Keepalived_vrrp[22526]: (RH_1) received lower priority (99) advert from 172.28.128.120 - discarding
 Jul 26 11:07:06 netology3 Keepalived_vrrp[22526]: (RH_1) Entering MASTER STATE
 Jul 26 11:07:08 netology3 Keepalived_healthcheckers[22525]: TCP connection to [172.28.128.60]:tcp:80 success.
 Jul 26 11:07:11 netology3 Keepalived_healthcheckers[22525]: TCP connection to [172.28.128.10]:tcp:80 success.
