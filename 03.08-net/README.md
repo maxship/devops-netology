@@ -207,6 +207,64 @@ TCP  172.28.128.200:80                  50      300        0    19950        0
 
 Видим, что keepalived действительно переключидся на BACKUP. LVS по прежнему переправляет все на один сервер (пока не могу понять почему).
 
+### Альтернативное решение
+
+В моем первоначальном решении демон LVS поднимался через конфиг keepalived. В чем причина неработающего round-robin я так и не выяснил.
+Вместо этого убрал из конфига настройку LVS:
+```
+global_defs {
+   script_user root
+   enable_script_security
+}
+
+vrrp_script chk_nginx {
+ script "systemctl status nginx"
+ interval 2 }
+
+vrrp_instance VRRP_1 {
+    state MASTER
+    interface eth1
+    virtual_router_id 50
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass netology
+    }
+    virtual_ipaddress {
+        172.28.128.200/32 dev eth1
+    }
+        track_script { chk_nginx }
+}
+```
+И настроил LVS вручную на мастере и бэкапе:
+```
+root@netology4:/home/vagrant# ipvsadm -A -t 172.28.128.200:80 -s rr
+root@netology4:/home/vagrant# ipvsadm -a -t 172.28.128.200:80 -r 172.28.128.10:80 -g -w 1
+root@netology4:/home/vagrant# ipvsadm -a -t 172.28.128.200:80 -r 172.28.128.60:80 -g -w 1
+root@netology4:/home/vagrant# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -> RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  172.28.128.200:80 rr
+  -> 172.28.128.10:80             Route   1      0          0
+  -> 172.28.128.60:80             Route   1      0          0
+```
+После этого при проверке работоспособности трафик стал делиться пополам.
+```
+vagrant@netology5:~$ for i in {1..50}; do curl -I -s 172.28.128.200>/dev/null; done
+
+vagrant@netology1:~$ wc -l /var/log/nginx/access.log
+409 /var/log/nginx/access.log
+vagrant@netology1:~$ wc -l /var/log/nginx/access.log
+434 /var/log/nginx/access.log
+
+vagrant@netology2:~$ wc -l /var/log/nginx/access.log
+719 /var/log/nginx/access.log
+vagrant@netology2:~$ wc -l /var/log/nginx/access.log
+744 /var/log/nginx/access.log
+```
+
 
 3. В лекции мы использовали только 1 VIP адрес для балансировки. У такого подхода несколько отрицательных моментов, один из которых – невозможность активного использования нескольких хостов (1 адрес может только переехать с master на standby). Подумайте, сколько адресов оптимально использовать, если мы хотим без какой-либо деградации выдерживать потерю 1 из 3 хостов при входящем трафике 1.5 Гбит/с и физических линках хостов в 1 Гбит/с? Предполагается, что мы хотим задействовать 3 балансировщика в активном режиме (то есть не 2 адреса на 3 хоста, один из которых в обычное время простаивает).
 
