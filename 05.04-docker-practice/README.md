@@ -50,6 +50,30 @@ RUN snap install ponysay
 ENTRYPOINT ["/usr/bin/ponysay"]
 CMD ["Hey, netology”]
 ```
+```
+FROM archlinux:latest
+
+RUN pacman -Sy --noconfirm git
+
+RUN mkdir /home/build && \
+chgrp nobody /home/build && \
+chmod g+ws /home/build && \
+setfacl -m u::rwx,g::rwx /home/build && \
+setfacl -d --set u::rwx,g::rwx,o::- /home/build
+
+RUN git clone https://aur.archlinux.org/snapd.git && cd snapd
+
+RUN -u nobody makepkg -sri
+
+RUN systemctl enable --now snapd.socket
+
+RUN ln -s /var/lib/snapd/snap /snap
+
+RUN snap install ponysay
+
+ENTRYPOINT ["/usr/bin/ponysay"]
+CMD ["Hey, netology”]
+```
 
 ```
 root@vagrant:/home/vagrant/docker_ponysay# docker build -t pony_arch -f df_pony_arch .
