@@ -25,6 +25,37 @@ CMD ["Hey, netology”]
 - Скриншот вывода командной строки после запуска контейнера из вашего базового образа
 - Ссылку на образ в вашем хранилище docker-hub
 
+
+
+```Dockerfile
+
+# Указываем образ
+FROM archlinux:latest
+
+# Устанавливаем git
+RUN pacman -Sy --noconfirm git
+
+# Скачиваем и устанавливаем snapd
+RUN git clone https://aur.archlinux.org/snapd.git && \
+    cd snapd && \
+    makepkg -si
+
+RUN systemctl enable --now snapd.socket
+
+RUN ln -s /var/lib/snapd/snap /snap
+
+# Устанавливаем пони
+RUN snap install ponysay
+
+ENTRYPOINT ["/usr/bin/ponysay"]
+CMD ["Hey, netology”]
+```
+
+```
+root@vagrant:/home/vagrant/docker_ponysay# docker build -t pony_arch -f df_pony_arch .
+```
+
+
 ## Задача 2 
 
 В данной задаче вы составите несколько разных Dockerfile для проекта Jenkins, опубликуем образ в `dockerhub.io` и посмотрим логи этих контейнеров.
