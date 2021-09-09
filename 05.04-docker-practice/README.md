@@ -28,56 +28,16 @@ CMD ["Hey, netology”]
 
 
 ```Dockerfile
-
-# Указываем образ
 FROM archlinux:latest
 
-# Устанавливаем git
-RUN pacman -Sy --noconfirm git
-
-# Скачиваем и устанавливаем snapd
-RUN git clone https://aur.archlinux.org/snapd.git && \
-    cd snapd && \
-    makepkg -si
-
-RUN systemctl enable --now snapd.socket
-
-RUN ln -s /var/lib/snapd/snap /snap
-
-# Устанавливаем пони
-RUN snap install ponysay
+RUN pacman -Syy --noconfirm ponysay
 
 ENTRYPOINT ["/usr/bin/ponysay"]
 CMD ["Hey, netology”]
 ```
-```
-FROM archlinux:latest
+![pony](https://user-images.githubusercontent.com/72273610/132704491-86b5dd46-c87e-4108-8a1e-dd195e8123ae.JPG)
 
-RUN pacman -Sy --noconfirm git
 
-RUN mkdir /home/build && \
-chgrp nobody /home/build && \
-chmod g+ws /home/build && \
-setfacl -m u::rwx,g::rwx /home/build && \
-setfacl -d --set u::rwx,g::rwx,o::- /home/build
-
-RUN git clone https://aur.archlinux.org/snapd.git && cd snapd
-
-RUN -u nobody makepkg -sri
-
-RUN systemctl enable --now snapd.socket
-
-RUN ln -s /var/lib/snapd/snap /snap
-
-RUN snap install ponysay
-
-ENTRYPOINT ["/usr/bin/ponysay"]
-CMD ["Hey, netology”]
-```
-
-```
-root@vagrant:/home/vagrant/docker_ponysay# docker build -t pony_arch -f df_pony_arch .
-```
 
 
 ## Задача 2 
