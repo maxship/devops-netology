@@ -25,7 +25,7 @@ CMD ["Hey, netology”]
 - Скриншот вывода командной строки после запуска контейнера из вашего базового образа
 - Ссылку на образ в вашем хранилище docker-hub
 
-
+Заменяем ubuntu на arch, и менеджер пакетов apt на pacman: 
 
 ```Dockerfile
 FROM archlinux:latest
@@ -35,9 +35,26 @@ RUN pacman -Syy --noconfirm ponysay
 ENTRYPOINT ["/usr/bin/ponysay"]
 CMD ["Hey, netology”]
 ```
+
+Собираем образ и запускаем контейнер.
+```
+root@vagrant:/home/vagrant/docker_ponysay# docker build -t pony_arch -f df_pony_arch .
+
+root@vagrant:/home/vagrant/docker_ponysay# docker run -it pony_arch
+```
+
 ![pony](https://user-images.githubusercontent.com/72273610/132704491-86b5dd46-c87e-4108-8a1e-dd195e8123ae.JPG)
 
 
+Пушим образ в репозиторий.
+```
+
+root@vagrant:/home/vagrant/docker_ponysay# docker tag pony_arch:latest moshipitsyn/pony_arch:ponysay
+root@vagrant:/home/vagrant/docker_ponysay# docker login docker.io
+root@vagrant:/home/vagrant/docker_ponysay# docker push moshipitsyn/pony_arch:ponysay
+```
+
+https://hub.docker.com/repository/docker/moshipitsyn/pony_arch
 
 
 ## Задача 2 
