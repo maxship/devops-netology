@@ -74,10 +74,28 @@ https://hub.docker.com/repository/docker/moshipitsyn/apache_test
 - Добавьте еще один файл в папку info на хостовой машине;
 - Подключитесь во второй контейнер и отобразите листинг и содержание файлов в /info контейнера.
 
----
+```
+vagrant@vagrant:~$ docker run -dt --name centos -v /home/vagrant/info:/share/info centos:latest
 
-### Как cдавать задание
+vagrant@vagrant:~$ docker run -dt --name debian -v /home/vagrant/info:/share/info debian:latest
 
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
+vagrant@vagrant:~$ docker ps
+CONTAINER ID   IMAGE           COMMAND       CREATED              STATUS              PORTS     NAMES
+9ec4b784a635   debian:latest   "bash"        4 seconds ago        Up 4 seconds                  debian
+a7d0c345bb2f   centos:latest   "/bin/bash"   About a minute ago   Up About a minute             centos
 
----
+vagrant@vagrant:~$ docker exec -ti centos bash
+[root@a7d0c345bb2f /]# echo "Test file" > /share/info/shared_file
+
+vagrant@vagrant:~$ docker exec -ti debian bash
+root@9ec4b784a635:/# cat /share/info/shared_file
+Test file
+
+vagrant@vagrant:~$ echo "Test file 2" > info/shared_file_2
+
+vagrant@vagrant:~$ docker exec -ti debian bash
+root@9ec4b784a635:/# cat /share/info/shared_file_2
+Test file 2
+
+```
+
