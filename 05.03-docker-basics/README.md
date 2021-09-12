@@ -44,6 +44,28 @@ Hey, Netology
 ```
 Опубликуйте созданный форк в своем репозитории и предоставьте ответ в виде ссылки на докерхаб-репо.
 
+```
+vagrant@vagrant:~$ docker pull httpd
+
+vagrant@vagrant:~$ docker run --name apache_test -p 8095:80 -v /home/vagrant/index.html:/usr/local/apache2/htdocs/index.html -d httpd
+
+vagrant@vagrant:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND              CREATED              STATUS              PORTS                                   NAMES
+08f77f950827   httpd     "httpd-foreground"   About a minute ago   Up About a minute   0.0.0.0:8095->80/tcp, :::8095->80/tcp   apache_test
+
+vagrant@vagrant:~$ docker commit 08f77f950827 moshipitsyn/apache_test:v1
+
+vagrant@vagrant:~$ docker login
+
+vagrant@vagrant:~$ docker images
+REPOSITORY                TAG       IMAGE ID       CREATED              SIZE
+moshipitsyn/apache_test   v1        d9da77d323dd   About a minute ago   138MB
+httpd                     latest    f34528d8e714   9 days ago           138MB
+
+vagrant@vagrant:~$ docker image push moshipitsyn/apache_test:v1
+```
+https://hub.docker.com/repository/docker/moshipitsyn/apache_test
+
 ## Задача 3 
 
 - Запустите первый контейнер из образа centos c любым тэгом в фоновом режиме, подключив папку info из текущей рабочей директории на хостовой машине в /share/info контейнера;
