@@ -126,14 +126,22 @@ vagrant@vagrant:~/jenkins$ docker run --name jenkins_amazon -dt jenkins_amazon:v
 FROM ubuntu:latest
 
 RUN apt-get update \
-  && apt install -y wget gnupg \
-  && apt install -y default-jdk \
-  && wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add - \
-  && sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list' \
-  && apt-get update \
-  && apt-get install -y jenkins
+  #&& apt install -y wget gnupg \
+  && apt install -y default-jdk
+  #&& wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add - \
+  #&& sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list' \
+  #&& apt-get update \
+  #&& apt-get install -y jenkins
 
-CMD ["/bin/bash"]
+ADD https://get.jenkins.io/war-stable/2.303.1/jenkins.war /root/
+
+WORKDIR /root
+
+EXPOSE 8096
+
+ENTRYPOINT ["java"]
+
+CMD ["-jar", "jenkins.war"]
 ```
 
 
