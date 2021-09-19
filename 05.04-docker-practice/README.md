@@ -112,7 +112,16 @@ vagrant@vagrant:~/jenkins$ docker run --name jenkins_amazon -dt jenkins_amazon:v
 5880d95c877dc78d646170af4a564f4b4807dfa760cb0254dc97f6c406886ad3
 ```
 
+```
+*************************************************************
 
+2021-09-19 09:20:45.459+0000 [id=28]    INFO    jenkins.InitReactorRunner$1#onAttained: Completed initialization
+2021-09-19 09:20:45.475+0000 [id=20]    INFO    hudson.WebAppMain$3#run: Jenkins is fully up and running
+2021-09-19 09:20:45.949+0000 [id=42]    INFO    h.m.DownloadService$Downloadable#load: Obtained the updated data file for hudson.tasks.Maven.MavenInstaller
+2021-09-19 09:20:45.950+0000 [id=42]    INFO    hudson.util.Retrier#start: Performed the action check updates server successfully at the attempt #1
+2021-09-19 09:20:45.953+0000 [id=42]    INFO    hudson.model.AsyncPeriodicWork#lambda$doRun$0: Finished Download metadata. 13,960 ms
+
+```
 ## Задача 3 
 
 В данном задании вы научитесь:
