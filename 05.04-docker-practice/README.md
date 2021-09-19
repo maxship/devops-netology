@@ -87,52 +87,36 @@ https://hub.docker.com/repository/docker/moshipitsyn/pony_arch
 Создайем докерфайл для первого образа.
 
 ```dockerfile
+
 FROM amazoncorretto:latest
 
-#Используем вариант установки из war файла (https://www.jenkins.io/doc/book/installing/)
+#Вариант установки из war файла (https://www.jenkins.io/doc/book/installing/)
 
 ADD https://get.jenkins.io/war-stable/2.303.1/jenkins.war /root/
 
 WORKDIR /root
 
-EXPOSE 8080
+EXPOSE 8095
 
 ENTRYPOINT ["java"]
 
 CMD ["-jar", "jenkins.war"]
-
 ```
 ```
 vagrant@vagrant:~/jenkins$ docker build -t jenkins_amazon:ver1 -f DF_jen_amazon .
-....
-Successfully built 2e4151bd9335
-Successfully tagged jenkins_amazon:ver1
-
-vagrant@vagrant:~/jenkins$ docker run --name jenkins_amazon -dt jenkins_amazon:ver1
-5880d95c877dc78d646170af4a564f4b4807dfa760cb0254dc97f6c406886ad3
+vagrant@vagrant:~/jenkins$ docker run --name jenkins_amazon -it -p 8095:8080 jenkins_amazon:ver1
 ```
 
-```
-*************************************************************
+![8095_2](https://user-images.githubusercontent.com/72273610/133925987-3c0ac28f-f42b-46f3-b806-8032d21a80ca.JPG)
 
-2021-09-19 09:20:45.459+0000 [id=28]    INFO    jenkins.InitReactorRunner$1#onAttained: Completed initialization
-2021-09-19 09:20:45.475+0000 [id=20]    INFO    hudson.WebAppMain$3#run: Jenkins is fully up and running
-2021-09-19 09:20:45.949+0000 [id=42]    INFO    h.m.DownloadService$Downloadable#load: Obtained the updated data file for hudson.tasks.Maven.MavenInstaller
-2021-09-19 09:20:45.950+0000 [id=42]    INFO    hudson.util.Retrier#start: Performed the action check updates server successfully at the attempt #1
-2021-09-19 09:20:45.953+0000 [id=42]    INFO    hudson.model.AsyncPeriodicWork#lambda$doRun$0: Finished Download metadata. 13,960 ms
+![8095](https://user-images.githubusercontent.com/72273610/133925989-56b4fb62-216d-4745-82c6-aa574e5e3878.JPG)
 
-```
 ```
 FROM ubuntu:latest
 
 RUN apt-get update \
-  #&& apt install -y wget gnupg \
   && apt install -y default-jdk
-  #&& wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add - \
-  #&& sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list' \
-  #&& apt-get update \
-  #&& apt-get install -y jenkins
-
+  
 ADD https://get.jenkins.io/war-stable/2.303.1/jenkins.war /root/
 
 WORKDIR /root
@@ -143,6 +127,15 @@ ENTRYPOINT ["java"]
 
 CMD ["-jar", "jenkins.war"]
 ```
+```
+vagrant@vagrant:~/jenkins$ docker build -t jenkins_ubuntu:ver2 -f DF_jen_ubuntu .
+vagrant@vagrant:~/jenkins$ docker run --name jenkins_ubuntu -it -p 8096:8080 jenkins_ubuntu:ver2
+```
+![8096_2](https://user-images.githubusercontent.com/72273610/133926039-aea553f1-d1ed-4a5c-b7d9-c8dd45ddd882.JPG)
+
+![8096](https://user-images.githubusercontent.com/72273610/133926041-45536352-3835-4854-8322-f8173d47e7be.JPG)
+
+
 
 
 ## Задача 3 
