@@ -84,6 +84,35 @@ https://hub.docker.com/repository/docker/moshipitsyn/pony_arch
 - Скриншоты веб-интерфейса Jenkins запущенных вами контейнеров (достаточно 1 скриншота на контейнер)
 - Ссылки на образы в вашем хранилище docker-hub
 
+Создайем докерфайл для первого образа.
+
+```dockerfile
+FROM amazoncorretto:latest
+
+#Используем вариант установки из war файла (https://www.jenkins.io/doc/book/installing/)
+
+ADD https://get.jenkins.io/war-stable/2.303.1/jenkins.war /root/
+
+WORKDIR /root
+
+EXPOSE 8080
+
+ENTRYPOINT ["java"]
+
+CMD ["-jar", "jenkins.war"]
+
+```
+```
+vagrant@vagrant:~/jenkins$ docker build -t jenkins_amazon:ver1 -f DF_jen_amazon .
+....
+Successfully built 2e4151bd9335
+Successfully tagged jenkins_amazon:ver1
+
+vagrant@vagrant:~/jenkins$ docker run --name jenkins_amazon -dt jenkins_amazon:ver1
+5880d95c877dc78d646170af4a564f4b4807dfa760cb0254dc97f6c406886ad3
+```
+
+
 ## Задача 3 
 
 В данном задании вы научитесь:
