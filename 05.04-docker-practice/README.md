@@ -84,7 +84,7 @@ https://hub.docker.com/repository/docker/moshipitsyn/pony_arch
 - Скриншоты веб-интерфейса Jenkins запущенных вами контейнеров (достаточно 1 скриншота на контейнер)
 - Ссылки на образы в вашем хранилище docker-hub
 
-Создайем докерфайл для первого образа.
+### Создайем докерфайл для первого образа.
 
 ```dockerfile
 
@@ -111,7 +111,10 @@ vagrant@vagrant:~/jenkins$ docker run --name jenkins_amazon -it -p 8095:8080 jen
 
 ![8095](https://user-images.githubusercontent.com/72273610/133925989-56b4fb62-216d-4745-82c6-aa574e5e3878.JPG)
 
-```
+
+### Создайем докерфайл для второго образа.
+
+```dockerfile
 FROM ubuntu:latest
 
 RUN apt-get update \
