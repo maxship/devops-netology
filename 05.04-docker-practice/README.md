@@ -122,6 +122,21 @@ vagrant@vagrant:~/jenkins$ docker run --name jenkins_amazon -dt jenkins_amazon:v
 2021-09-19 09:20:45.953+0000 [id=42]    INFO    hudson.model.AsyncPeriodicWork#lambda$doRun$0: Finished Download metadata. 13,960 ms
 
 ```
+```
+FROM ubuntu:latest
+
+RUN apt-get update \
+  && apt install -y wget gnupg \
+  && apt install -y default-jdk \
+  && wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add - \
+  && sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list' \
+  && apt-get update \
+  && apt-get install -y jenkins
+
+CMD ["/bin/bash"]
+```
+
+
 ## Задача 3 
 
 В данном задании вы научитесь:
