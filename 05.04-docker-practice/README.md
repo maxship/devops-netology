@@ -25,6 +25,8 @@ CMD ["Hey, netology”]
 - Скриншот вывода командной строки после запуска контейнера из вашего базового образа
 - Ссылку на образ в вашем хранилище docker-hub
 
+---
+
 Заменяем ubuntu на arch, и менеджер пакетов apt на pacman: 
 
 ```Dockerfile
@@ -83,6 +85,8 @@ https://hub.docker.com/repository/docker/moshipitsyn/pony_arch
 - Скриншоты логов запущенных вами контейнеров (из командной строки)
 - Скриншоты веб-интерфейса Jenkins запущенных вами контейнеров (достаточно 1 скриншота на контейнер)
 - Ссылки на образы в вашем хранилище docker-hub
+
+---
 
 ### Создайем докерфайл для первого образа.
 
@@ -264,4 +268,7 @@ Keep-Alive: timeout=5
 ```
 
 ![node_curl](https://user-images.githubusercontent.com/72273610/134154138-3816ce60-f206-41de-84ad-2a96a68b0cb5.JPG)
+
+![node_net](https://user-images.githubusercontent.com/72273610/134154947-2dfd8d8c-8a78-4335-a8a0-5e8f5126eed0.JPG)
+
 
