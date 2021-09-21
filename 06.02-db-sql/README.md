@@ -15,7 +15,8 @@
 ---
 
 ```
-vagrant@vagrant:~/postgresql$ docker run --name postgres -e POSTGRES_PASSWORD=postgres -it --rm -v db-data:/var/lib/postgresql/data -v db-backup:/backup -p 8095:5432 postgres:12 bash
+vagrant@vagrant:~/postgresql$ docker run --name psql_server -d --rm -e POSTGRES_PASSWORD=psql -p 5432:5432 \
+-v db-data:/var/lib/postgresql/data -v db-backup:/etc/backup postgres
 ```
 ## Задача 2
 
