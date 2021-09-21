@@ -37,6 +37,26 @@ Type "help" for help.
 
 postgres=#
 ```
+```docker-compose
+
+version: '3'
+services:
+  db:
+    container_name: pg_container
+    image: "postgres"
+    restart: always
+    environment:
+      - POSTGRES_USER=psql
+      - POSTGRES_PASSWORD=psql
+      - POSTGRES_DB=test_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+volumes:
+  pg_data: {}
+```
+
 ## Задача 2
 
 В БД из задачи 1: 
