@@ -170,6 +170,8 @@ https://hub.docker.com/r/moshipitsyn/jenkins_amazon
 
 ---
 
+Докер-файл:
+
 ```dockerfile
 FROM node:latest
 
@@ -186,6 +188,7 @@ WORKDIR /usr/local/bin
 
 CMD npm start
 ```
+
 Создаем образ и запускаем контейнер.
 
 ```
@@ -193,6 +196,10 @@ vagrant@vagrant:~/nodejs$ docker build -t node_npm:v1 -f DF_nodejs_npm .
 
 vagrant@vagrant:~/nodejs$ docker run --name node_npm -it --rm -p 3000:3000 node_npm:v1
 ```
+Проверяем сервис с хоста.
+
+![node_scr](https://user-images.githubusercontent.com/72273610/134154319-51556023-cf47-400c-a381-6bf488f44b3f.JPG)
+
 Запускаем контейнер с убунту, устанавливаем утилиту curl.
 
 ```
@@ -207,7 +214,8 @@ vagrant@vagrant:~/nodejs$ docker network connect net_npm ubuntu_curl
 
 vagrant@vagrant:~/nodejs$ docker network connect net_npm node_npm
 ```
-Смотрим состояние сети
+
+Смотрим параметры сети, узнаем ip-адрес сервера nodejs.
 
 ```
 vagrant@vagrant:~/nodejs$ docker network inspect net_npm
@@ -254,3 +262,6 @@ Date: Tue, 21 Sep 2021 10:16:33 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 ```
+
+![node_curl](https://user-images.githubusercontent.com/72273610/134154138-3816ce60-f206-41de-84ad-2a96a68b0cb5.JPG)
+
