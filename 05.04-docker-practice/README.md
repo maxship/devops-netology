@@ -138,7 +138,11 @@ vagrant@vagrant:~/jenkins$ docker run --name jenkins_ubuntu -it -p 8096:8080 jen
 
 ![8096](https://user-images.githubusercontent.com/72273610/133926041-45536352-3835-4854-8322-f8173d47e7be.JPG)
 
+### Обрызы на Dockerhub:
 
+https://hub.docker.com/r/moshipitsyn/jenkins_ubuntu
+
+https://hub.docker.com/r/moshipitsyn/jenkins_amazon
 
 
 ## Задача 3 
