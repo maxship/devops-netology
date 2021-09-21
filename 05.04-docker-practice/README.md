@@ -204,7 +204,7 @@ vagrant@vagrant:~/nodejs$ docker run --name node_npm -it --rm -p 3000:3000 node_
 
 ![node_scr](https://user-images.githubusercontent.com/72273610/134154319-51556023-cf47-400c-a381-6bf488f44b3f.JPG)
 
-Запускаем контейнер с убунту, устанавливаем утилиту curl.
+Запускаем контейнер ubuntu, предварительно добавив в образ утилиту curl.
 
 ```
 vagrant@vagrant:~/nodejs$ docker run --name ubuntu_curl -dt --rm --publish-all ubuntu_curl
