@@ -173,7 +173,8 @@ https://hub.docker.com/r/moshipitsyn/jenkins_amazon
 ```dockerfile
 FROM node:latest
 
-# Добавляем в образ файлы установки из https://github.com/simplicitesoftware/nodejs-demo. Предварительно в файле app.js заменен 'localhost' на '0.0.0.0'
+# Добавляем в образ файлы установки из https://github.com/simplicitesoftware/nodejs-demo.
+# Предварительно в файле app.js заменен 'localhost' на '0.0.0.0'.
 
 COPY nodejs-demo /usr/local/bin
 
@@ -185,13 +186,71 @@ WORKDIR /usr/local/bin
 
 CMD npm start
 ```
+Создаем образ и запускаем контейнер.
 
 ```
 vagrant@vagrant:~/nodejs$ docker build -t node_npm:v1 -f DF_nodejs_npm .
-...
-Successfully built 86f2a77ecac0
-Successfully tagged node_npm:v1
+
+vagrant@vagrant:~/nodejs$ docker run --name node_npm -it --rm -p 3000:3000 node_npm:v1
 ```
+Запускаем контейнер с убунту, устанавливаем утилиту curl.
+
+```
+vagrant@vagrant:~/nodejs$ docker run --name ubuntu_curl -dt --rm --publish-all ubuntu_curl
+```
+Создаем новую сеть и подключаем к ней оба контейнера.
+
+```
+vagrant@vagrant:~/nodejs$ docker network create -d bridge net_npm
+
+vagrant@vagrant:~/nodejs$ docker network connect net_npm ubuntu_curl
+
+vagrant@vagrant:~/nodejs$ docker network connect net_npm node_npm
+```
+Смотрим состояние сети
+
+```
+vagrant@vagrant:~/nodejs$ docker network inspect net_npm
+[
+    {
+        "Name": "net_npm",
+......
+        "Containers": {
+            "02623d71ba575b6b9ee97e2d7294382a8b1716494638f84c0d78e9d5fd58d600": {
+                "Name": "ubuntu_curl",
+                "EndpointID": "95fa5fa1da0abc87e2774e68e34ee48a02dba18e6fa00f7bcfd97690400d268d",
+                "MacAddress": "02:42:ac:13:00:02",
+                "IPv4Address": "172.19.0.2/16",
+                "IPv6Address": ""
+            },
+            "47a08a683c4483cdeb478031a03d40a46e0add77ae1c80f4cd8e6da2f3687bdf": {
+                "Name": "node_npm",
+                "EndpointID": "056bfc89604dbc1e456dd90a18d62555010b68966fc9cd418b49d5bbf6a8061d",
+                "MacAddress": "02:42:ac:13:00:03",
+                "IPv4Address": "172.19.0.3/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
 ```
 
+Заходим в контейнер с убунтой и проверяем доступность приложения npm.
+
+```
+vagrant@vagrant:~/nodejs$ docker exec -ti ubuntu_curl bash
+
+root@02623d71ba57:/# curl -I 172.19.0.3:3000
+HTTP/1.1 200 OK
+Cache-Control: private, no-cache, no-store, no-transform, must-revalidate
+Expires: -1
+Pragma: no-cache
+Content-Type: text/html; charset=utf-8
+Content-Length: 527202
+ETag: W/"80b62-tsCV4CalCNGk8OT00a+2m+rHwZw"
+Date: Tue, 21 Sep 2021 10:16:33 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
 ```
