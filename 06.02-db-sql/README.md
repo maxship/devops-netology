@@ -12,6 +12,11 @@
 
 Приведите получившуюся команду или docker-compose манифест.
 
+---
+
+```
+vagrant@vagrant:~/postgresql$ docker run --name postgres -e POSTGRES_PASSWORD=postgres -it --rm -v db-data:/var/lib/postgresql/data -v db-backup:/backup -p 8095:5432 postgres:12 bash
+```
 ## Задача 2
 
 В БД из задачи 1: 
