@@ -13,10 +13,44 @@
 Приведите получившуюся команду или docker-compose манифест.
 
 ---
+```
+docker network create net_psql
+```
 
 ```
-vagrant@vagrant:~/postgresql$ docker run --name psql_server -d --rm -e POSTGRES_PASSWORD=psql -p 5432:5432 \
--v db-data:/var/lib/postgresql/data -v db-backup:/etc/backup postgres
+vagrant@vagrant:~/postgresql$ docker run --name psql_server -d --rm -e POSTGRES_PASSWORD=psql --network net_psql \
+-h psql_server -p 5432:5432 -v db-data:/var/lib/postgresql/data -v db-backup:/etc/backup postgres
+```
+Установим в контейнер ubuntu psql, подключим к созданной сети и запустим оттуда утилиту psql.
+
+```
+vagrant@vagrant:~/postgresql$ docker run --name ubuntu --rm -dt --publish-all ubuntu:psql
+vagrant@vagrant:~/postgresql$ docker network connect net_psql ubuntu
+
+vagrant@vagrant:~/postgresql$ docker network inspect net_psql
+....
+        "Name": "net_psql",
+....
+        "Containers": {
+....
+                "Name": "psql_server",
+                "IPv4Address": "172.20.0.2/16",
+....
+                "Name": "ubuntu",
+                "IPv4Address": "172.20.0.4/16",
+....
+```
+Заходим в убунту под пользователем postgres.
+```
+vagrant@vagrant:~/postgresql$ docker exec -u postgres -ti ubuntu bash
+
+```
+
+
+```
+vagrant@vagrant:~/postgresql$ docker run --name psql_serv -e POSTGRES_PASSWORD=psql -it --rm --network net_psql -h psql_serv -v db-data:/var/lib/postgresql/data -v db-backup:/etc/backup -p 5432:543
+2 postgres:12 bash
+root@psql_serv:/# psql -h psql_serv -U postgres
 ```
 ## Задача 2
 
