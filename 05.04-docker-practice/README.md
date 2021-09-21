@@ -169,3 +169,41 @@ https://hub.docker.com/r/moshipitsyn/jenkins_amazon
 - Скриншот вызова утилиты curl с успешным ответом
 
 ---
+
+```dockerfile
+FROM node:latest
+
+COPY nodejs-demo /usr/local/bin
+
+RUN cd /usr/local/bin && npm install
+
+EXPOSE 3000
+
+WORKDIR /usr/local/bin
+
+ENTRYPOINT ["bash"]
+
+CMD npm start
+
+FROM node:latest
+
+COPY nodejs-demo /usr/local/bin
+
+RUN cd /usr/local/bin/ && npm install
+
+EXPOSE 3000
+
+ENTRYPOINT ["/bin/bash"]
+
+CMD [ "npm start"]
+```
+
+```
+vagrant@vagrant:~/nodejs$ docker build -t node_npm:v1 -f DF_nodejs_npm .
+...
+Successfully built 86f2a77ecac0
+Successfully tagged node_npm:v1
+```
+```
+
+```
