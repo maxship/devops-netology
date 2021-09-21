@@ -13,10 +13,21 @@
 Приведите получившуюся команду или docker-compose манифест.
 
 ---
+
+Запустил контейнер postgres:
 ```
-vagrant@vagrant:~$ docker run --name psql_serv -e POSTGRES_PASSWORD=password -dt --rm -p 5432:5432 postgres:12
+vagrant@vagrant:~$ docker run --name psql_serv -e POSTGRES_PASSWORD=password -it --rm -p 5432:5432 -v db-backup:/backup postgres:12 bash
+```
+Внутри пробовал запустить psql c разными параметрами, но каждый раз получал что-то вроде этого:
+
+```
+root@925ef52950f2:/# psql -U postgres
+psql: error: could not connect to server: No such file or directory
+        Is the server running locally and accepting
+        connections on Unix domain socket "/var/run/postgresql/.s.PGSQL.5432"?
 ```
 
+В итоге пришлось установить его в ОС хоста и подключиться к контейнеру извне:
 ```
 vagrant@vagrant:~$ psql -h localhost -p 5432 -U postgres
 Password for user postgres:
