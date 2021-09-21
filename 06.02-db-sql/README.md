@@ -16,7 +16,8 @@
 
 Запустил контейнер postgres:
 ```
-vagrant@vagrant:~$ docker run --name psql_serv -e POSTGRES_PASSWORD=password -it --rm -p 5432:5432 -v db-backup:/backup postgres:12 bash
+vagrant@vagrant:~$ docker run --name psql_serv -e POSTGRES_PASSWORD=password -it --rm \
+-p 5432:5432 -v db-backup:/backup postgres:12 bash
 ```
 Внутри пробовал запустить psql c разными параметрами, но каждый раз получал что-то вроде этого:
 
