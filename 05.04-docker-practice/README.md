@@ -173,6 +173,8 @@ https://hub.docker.com/r/moshipitsyn/jenkins_amazon
 ```dockerfile
 FROM node:latest
 
+# Добавляем в образ файлы установки из https://github.com/simplicitesoftware/nodejs-demo. Предварительно в файле app.js заменен 'localhost' на '0.0.0.0'
+
 COPY nodejs-demo /usr/local/bin
 
 RUN cd /usr/local/bin && npm install
@@ -181,21 +183,7 @@ EXPOSE 3000
 
 WORKDIR /usr/local/bin
 
-ENTRYPOINT ["bash"]
-
 CMD npm start
-
-FROM node:latest
-
-COPY nodejs-demo /usr/local/bin
-
-RUN cd /usr/local/bin/ && npm install
-
-EXPOSE 3000
-
-ENTRYPOINT ["/bin/bash"]
-
-CMD [ "npm start"]
 ```
 
 ```
