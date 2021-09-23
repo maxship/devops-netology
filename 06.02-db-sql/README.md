@@ -104,7 +104,8 @@ services:
       PGDATA: /data/postgres
       POSTGRES_DB: db_1
     volumes:
-       - postgres:/data/postgres
+       - postgres_data:/data/postgres
+       - postgres_backup:/etc/backup
     ports:
       - "5432:5432"
     networks:
@@ -131,7 +132,8 @@ networks:
     driver: bridge
 
 volumes:
-    postgres:
+    postgres_data:
+    postgres_backup:
     pgadmin:
 ```
 
