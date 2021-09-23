@@ -57,6 +57,15 @@ volumes:
   pg_data: {}
 ```
 
+---
+
+```
+docker run --rm -it --name psql -e POSTGRES_USER=psql -e POSTGRES_PASSWORD=password -v /home/vagrant/postgresql/db-data:/var/lib/postgresql/data
+ -v /home/vagrant/postgresql/db-backup:/etc/backup -p 5432:5432 postgres bash
+```
+
+
+
 ## Задача 2
 
 В БД из задачи 1: 
