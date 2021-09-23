@@ -16,7 +16,7 @@
 
 Создал docker-compose.yml файл для запуска PostgreSQL + pgAdmin (web-интерфейс).
 
-```
+```yml
 version: '3.5'
 
 services:
@@ -25,7 +25,9 @@ services:
     image: postgres:12
     environment:
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      # Если не задана переменная с названием первой БД, то она по умолчанию равна POSTGRES_USER
+      POSTGRES_PASSWORD: password      
+      # Задаем новую директорию для хранения данных
       PGDATA: /data/postgres
     volumes:
        - psql_data:/data/postgres
