@@ -63,7 +63,30 @@ volumes:
 docker run --rm -it --name psql -e POSTGRES_USER=psql -e POSTGRES_PASSWORD=password -v /home/vagrant/postgresql/db-data:/var/lib/postgresql/data
  -v /home/vagrant/postgresql/db-backup:/etc/backup -p 5432:5432 postgres bash
 ```
+```
+version: '3.5'
 
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql
+      PGDATA: /data/postgres
+      POSTGRES_DB: test_db_1
+    volumes:
+       - /home/vagrant/postgresql/db-data:/data/postgres
+       - /home/vagrant/postgresql/db-backup:/etc/backup
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8095:8080"
+```
 
 
 ## Задача 2
