@@ -29,6 +29,7 @@ services:
       PGDATA: /data/postgres
     volumes:
        - psql_data:/data/postgres
+       - psql_backup:/etc/backup
     ports:
       - "5432:5432"
     networks:
@@ -57,6 +58,7 @@ networks:
 
 volumes:
     psql_data:
+    psql_backup:
     pgadmin:
 ```
 
