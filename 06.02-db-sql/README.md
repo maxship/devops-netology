@@ -15,81 +15,6 @@
 ---
 
 Запустил контейнер postgres:
-```
-vagrant@vagrant:~$ docker run --name psql_serv -e POSTGRES_PASSWORD=password -it --rm \
--p 5432:5432 -v db-backup:/backup postgres:12 bash
-```
-Внутри пробовал запустить psql c разными параметрами, но каждый раз получал что-то вроде этого:
-
-```
-root@925ef52950f2:/# psql -U postgres
-psql: error: could not connect to server: No such file or directory
-        Is the server running locally and accepting
-        connections on Unix domain socket "/var/run/postgresql/.s.PGSQL.5432"?
-```
-
-В итоге пришлось установить его в ОС хоста и подключиться к контейнеру извне:
-```
-vagrant@vagrant:~$ psql -h localhost -p 5432 -U postgres
-Password for user postgres:
-psql (12.8 (Ubuntu 12.8-0ubuntu0.20.04.1))
-Type "help" for help.
-
-postgres=#
-```
-```docker-compose
-
-version: '3'
-services:
-  db:
-    container_name: pg_container
-    image: "postgres"
-    restart: always
-    environment:
-      - POSTGRES_USER=psql
-      - POSTGRES_PASSWORD=psql
-      - POSTGRES_DB=test_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-volumes:
-  pg_data: {}
-```
-
----
-
-```
-docker run --rm -it --name psql -e POSTGRES_USER=psql -e POSTGRES_PASSWORD=password -v /home/vagrant/postgresql/db-data:/var/lib/postgresql/data
- -v /home/vagrant/postgresql/db-backup:/etc/backup -p 5432:5432 postgres bash
-```
-```
-version: '3.5'
-
-services:
-  postgres:
-    container_name: postgres_container
-    image: postgres
-    environment:
-      POSTGRES_USER: psql
-      POSTGRES_PASSWORD: psql
-      PGDATA: /data/postgres
-      POSTGRES_DB: test_db_1
-    volumes:
-       - /home/vagrant/postgresql/db-data:/data/postgres
-       - /home/vagrant/postgresql/db-backup:/etc/backup
-    ports:
-      - "5432:5432"
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8095:8080"
-```
----
-
-Working:
 
 ```
 version: '3.5'
@@ -99,13 +24,11 @@ services:
     container_name: postgres_container
     image: postgres
     environment:
-      POSTGRES_USER: psql
-      POSTGRES_PASSWORD: psql
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
-      POSTGRES_DB: db_1
     volumes:
-       - postgres_data:/data/postgres
-       - postgres_backup:/etc/backup
+       - psql_data:/data/postgres
     ports:
       - "5432:5432"
     networks:
@@ -116,6 +39,7 @@ services:
     container_name: pgadmin_container
     image: dpage/pgadmin4
     environment:
+      PGADMIN_DEFAULT_EMAIL: admin@psql.com
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
@@ -132,8 +56,7 @@ networks:
     driver: bridge
 
 volumes:
-    postgres_data:
-    postgres_backup:
+    psql_data:
     pgadmin:
 ```
 
