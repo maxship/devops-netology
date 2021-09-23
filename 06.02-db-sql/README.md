@@ -14,7 +14,7 @@
 
 ---
 
-Запустил контейнер postgres:
+Создал docker-compose.yml файл для запуска PostgreSQL + pgAdmin (web-интерфейс).
 
 ```
 version: '3.5'
@@ -22,7 +22,7 @@ version: '3.5'
 services:
   postgres:
     container_name: postgres_container
-    image: postgres
+    image: postgres:12
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -62,8 +62,18 @@ volumes:
     pgadmin:
 ```
 
-
-
+Запуск в фоне:
+```
+vagrant@vagrant:~/postgresql$ docker-compose up -d
+```
+Для работы через встроенную утилиту psql с хоста:
+```
+vagrant@vagrant:~/postgresql$ psql -h localhost -p 5432 -U user
+```
+Остановка и удаление контейнеров и томов:
+```
+vagrant@vagrant:~/postgresql$ docker-compose down -v
+```
 ## Задача 2
 
 В БД из задачи 1: 
