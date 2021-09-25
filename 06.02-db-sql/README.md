@@ -125,7 +125,7 @@ CREATE TABLE clients (
     "заказ" integer);
 
 # Устанавливаем внешнй ключ на поле "заказ"    
-ALTER TABLE clients ADD FOREIGN KEY ("заказ") REFERENCES orders
+ALTER TABLE clients ADD FOREIGN KEY ("заказ") REFERENCES orders;
 
 # Создаем индекс
 CREATE INDEX country_i ON clients ("страна проживания");
@@ -133,11 +133,58 @@ CREATE INDEX country_i ON clients ("страна проживания");
 # Создаем обычного пользователя
 CREATE USER test_simple_user WITH PASSWORD 'password';
 
-
-
+GRANT SELECT, INSERT, UPDATE, DELETE ON clients, orders TO test_simple_user;
 ```
 
-
+Подключимся к БД через консольную утилиту psql.
+```
+vagrant@vagrant:~/postgresql$ psql -h localhost -p 5432 -U test_admin_user -d test_db
+```
+Список БД:
+```
+test_db=> \l
+                                 List of databases
+   Name    | Owner | Encoding |  Collate   |   Ctype    |     Access privileges
+-----------+-------+----------+------------+------------+---------------------------
+ admin     | admin | UTF8     | en_US.utf8 | en_US.utf8 |
+ postgres  | admin | UTF8     | en_US.utf8 | en_US.utf8 |
+ template0 | admin | UTF8     | en_US.utf8 | en_US.utf8 | =c/admin                 +
+           |       |          |            |            | admin=CTc/admin
+ template1 | admin | UTF8     | en_US.utf8 | en_US.utf8 | =c/admin                 +
+           |       |          |            |            | admin=CTc/admin
+ test_db   | admin | UTF8     | en_US.utf8 | en_US.utf8 | =Tc/admin                +
+           |       |          |            |            | admin=CTc/admin          +
+           |       |          |            |            | test_admin_user=CTc/admin
+(5 rows)
+```
+Описание таблиц:
+```
+test_db=> \d+
+                                List of relations
+ Schema |      Name      |   Type   |      Owner      |    Size    | Description
+--------+----------------+----------+-----------------+------------+-------------
+ public | clients        | table    | test_admin_user | 8192 bytes |
+ public | clients_id_seq | sequence | test_admin_user | 8192 bytes |
+ public | orders         | table    | test_admin_user | 16 kB      |
+ public | orders_id_seq  | sequence | test_admin_user | 8192 bytes |
+ public | orders_price   | view     | test_admin_user | 0 bytes    |
+(5 rows)
+```
+Права доступа:
+```
+test_db=> \dp
+                                              Access privileges
+ Schema |      Name      |   Type   |            Access privileges            | Column privileges | Policies
+--------+----------------+----------+-----------------------------------------+-------------------+----------
+ public | clients        | table    | test_admin_user=arwdDxt/test_admin_user+|                   |
+        |                |          | test_simple_user=arwd/test_admin_user   |                   |
+ public | clients_id_seq | sequence |                                         |                   |
+ public | orders         | table    | test_admin_user=arwdDxt/test_admin_user+|                   |
+        |                |          | test_simple_user=arwd/test_admin_user   |                   |
+ public | orders_id_seq  | sequence |                                         |                   |
+ public | orders_price   | view     |                                         |                   |
+(5 rows)
+```
 
 ## Задача 3
 
