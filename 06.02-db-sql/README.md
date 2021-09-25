@@ -401,3 +401,81 @@ width - ожидаемый размер строк.
 
 Приведите список операций, который вы применяли для бэкапа данных и восстановления. 
 
+---
+
+Заходим в контейнер postrges и делаем дамп.
+```
+vagrant@vagrant:~/postgresql$ docker exec -ti postgres_container bash
+
+root@94eb2931c97c:/etc/backup# pg_dump test_db -U admin > /etc/backup/backup_1
+```
+Останавливаем запущенные контейнеры.
+```
+vagrant@vagrant:~/postgresql$ docker-compose down
+Stopping postgres_container ... done
+Stopping pgadmin_container  ... done
+Removing postgres_container ... done
+Removing pgadmin_container  ... done
+Removing network postgresql_postgres
+```
+Запускаем заново.
+```
+vagrant@vagrant:~/postgresql$ docker-compose up -d
+Creating network "postgresql_postgres" with driver "bridge"
+Creating postgres_container ... done
+Creating pgadmin_container  ... done
+```
+
+Подключаемся к контейнеру и восстанавливаем БД.
+```
+vagrant@vagrant:~/postgresql$ docker exec -ti postgres_container bash
+
+root@15c90b7c3157:/# psql -U admin < /etc/backup/backup_1
+SET
+SET
+SET
+SET
+SET
+ set_config
+------------
+
+(1 row)
+
+SET
+SET
+SET
+SET
+SET
+SET
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE VIEW
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COPY 5
+COPY 5
+ setval
+--------
+      5
+(1 row)
+
+ setval
+--------
+      5
+(1 row)
+
+ALTER TABLE
+ALTER TABLE
+CREATE INDEX
+ALTER TABLE
+GRANT
+```
