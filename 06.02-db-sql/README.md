@@ -114,15 +114,21 @@ GRANT ALL PRIVILEGES ON DATABASE test_db TO test_admin_user;
 
 # Создаем таблицы
 CREATE TABLE orders (
-	id serial primary key,
-	наименование text,
-    цена integer);
+    id serial primary key,
+    "наименование" text,
+    "цена" integer);
 
 CREATE TABLE clients (
-    id serial primary key,
-    фамилия text,
-    страна проживания text index,
-    заказ foreign key orders);
+    id serial primary key, 
+    "фамилия" text,
+    "страна проживания" text,
+    "заказ" integer);
+
+# Устанавливаем внешнй ключ на поле "заказ"    
+ALTER TABLE clients ADD FOREIGN KEY ("заказ") REFERENCES orders
+
+# Создаем индекс
+CREATE INDEX country_i ON clients ("страна проживания");
 
 # Создаем обычного пользователя
 CREATE USER test_simple_user WITH PASSWORD 'password';
@@ -162,6 +168,20 @@ CREATE USER test_simple_user WITH PASSWORD 'password';
 - приведите в ответе:
     - запросы 
     - результаты их выполнения.
+
+
+```sql
+
+INSERT INTO orders (наименование, цена) VALUES
+    ('Шоколад', 10),
+    ('Книга', 10),
+    ('Принтер', 3000),
+    ('Монитор', 7000),
+    ('Гитара', 4000);
+    
+
+
+```
 
 ## Задача 4
 
