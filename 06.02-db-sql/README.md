@@ -24,7 +24,7 @@ services:
     container_name: postgres_container
     image: postgres:12
     environment:
-      POSTGRES_USER: user
+      POSTGRES_USER: admin
       # Если не задана переменная с названием первой БД, то она по умолчанию равна POSTGRES_USER
       POSTGRES_PASSWORD: password      
       # Задаем новую директорию для хранения данных
@@ -101,6 +101,26 @@ vagrant@vagrant:~/postgresql$ docker-compose down -v
 - описание таблиц (describe)
 - SQL-запрос для выдачи списка пользователей с правами над таблицами test_db
 - список пользователей с правами над таблицами test_db
+
+---
+
+```sql
+#создаем пользователя с админскими правами и тестовую БД
+CREATE USER test_admin_user WITH PASSWORD 'password';
+
+CREATE DATABASE test_db;
+
+GRANT ALL PRIVILEGES ON DATABASE test_db TO test_admin_user;
+
+
+#создаем обычного пользователя
+CREATE USER test_simple_user WITH PASSWORD 'password';
+
+
+
+```
+
+
 
 ## Задача 3
 
