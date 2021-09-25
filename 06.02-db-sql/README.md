@@ -112,7 +112,7 @@ CREATE DATABASE test_db;
 
 GRANT ALL PRIVILEGES ON DATABASE test_db TO test_admin_user;
 
-# Создаем таблицы
+# Создаем таблицы, устанавливаем внешнй ключ на поле "заказ"
 CREATE TABLE orders (
     id serial primary key,
     "наименование" text,
@@ -122,10 +122,10 @@ CREATE TABLE clients (
     id serial primary key, 
     "фамилия" text,
     "страна проживания" text,
-    "заказ" integer);
+    "заказ" integer,
+    FOREIGN KEY ("заказ") REFERENCES orders (id)
+    );
 
-# Устанавливаем внешнй ключ на поле "заказ"    
-ALTER TABLE clients ADD FOREIGN KEY ("заказ") REFERENCES orders;
 
 # Создаем индекс
 CREATE INDEX country_i ON clients ("страна проживания");
@@ -255,12 +255,36 @@ INSERT INTO orders (наименование, цена) VALUES
     
 INSERT INTO clients ("фамилия","страна проживания") VALUES
     ('Иванов Иван Иванович', 'USA'),
-	  ('Петров Петр Петрович', 'Canada'),
-	  ('Иоганн Себастьян Бах', 'Japan'),
-	  ('Ронни Джеймс Дио', 'Russia'),
-	  ('Ritchie Blackmore', 'Russia');
+    ('Петров Петр Петрович', 'Canada'),
+    ('Иоганн Себастьян Бах', 'Japan'),
+    ('Ронни Джеймс Дио', 'Russia'),
+    ('Ritchie Blackmore', 'Russia');
 
 ```
+```
+test_db=> SELECT * FROM orders;
+ id | наименование | цена
+----+--------------+------
+  1 | Шоколад      |   10
+  2 | Книга        |   10
+  3 | Принтер      | 3000
+  4 | Монитор      | 7000
+  5 | Гитара       | 4000
+(5 rows)
+
+test_db=> SELECT * FROM clients;
+ id |       фамилия        | страна проживания | заказ
+----+----------------------+-------------------+-------
+  1 | Иванов Иван Иванович | USA               |
+  2 | Петров Петр Петрович | Canada            |
+  3 | Иоганн Себастьян Бах | Japan             |
+  4 | Ронни Джеймс Дио     | Russia            |
+  5 | Ritchie Blackmore    | Russia            |
+(5 rows)
+
+```
+
+
 
 ## Задача 4
 
