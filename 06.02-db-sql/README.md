@@ -105,15 +105,26 @@ vagrant@vagrant:~/postgresql$ docker-compose down -v
 ---
 
 ```sql
-#создаем пользователя с админскими правами и тестовую БД
+# Создаем пользователя с админскими правами и тестовую БД
 CREATE USER test_admin_user WITH PASSWORD 'password';
 
 CREATE DATABASE test_db;
 
 GRANT ALL PRIVILEGES ON DATABASE test_db TO test_admin_user;
 
+# Создаем таблицы
+CREATE TABLE orders (
+	id serial primary key,
+	наименование text,
+    цена integer);
 
-#создаем обычного пользователя
+CREATE TABLE clients (
+    id serial primary key,
+    фамилия text,
+    страна проживания text index,
+    заказ foreign key orders);
+
+# Создаем обычного пользователя
 CREATE USER test_simple_user WITH PASSWORD 'password';
 
 
