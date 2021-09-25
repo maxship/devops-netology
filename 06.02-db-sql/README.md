@@ -266,7 +266,7 @@ INSERT INTO clients ("фамилия","страна проживания") VALUE
 ```
 
 Смотрим вывод.
-```
+```sql
 test_db=> SELECT * FROM orders;
  id | наименование | цена
 ----+--------------+------
@@ -286,10 +286,22 @@ test_db=> SELECT * FROM clients;
   4 | Ронни Джеймс Дио     | Russia            |
   5 | Ritchie Blackmore    | Russia            |
 (5 rows)
-
 ```
 
+Количество записей:
+```sql
+test_db=> SELECT COUNT(*) FROM orders;
+ count
+-------
+     5
+(1 row)
 
+test_db=> SELECT COUNT(*) FROM clients;
+ count
+-------
+     5
+(1 row)
+```
 
 ## Задача 4
 
@@ -320,7 +332,7 @@ UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименов
 UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование" = 'Гитара')
     WHERE "фамилия" = 'Иоганн Себастьян Бах';
 ```
-```
+```sql
 test_db=> SELECT * FROM clients;
  id |       фамилия        | страна проживания | заказ
 ----+----------------------+-------------------+-------
@@ -331,6 +343,28 @@ test_db=> SELECT * FROM clients;
   3 | Иоганн Себастьян Бах | Japan             |     5
 (5 rows)
 ```
+Пользователи, оформившие заказ:
+```sql
+test_db=> SELECT "фамилия" FROM clients WHERE "заказ" IS NOT NULL;
+       фамилия
+----------------------
+ Иванов Иван Иванович
+ Петров Петр Петрович
+ Иоганн Себастьян Бах
+(3 rows)
+```
+Запрос к обеим таблицам:
+```sql
+test_db=> SELECT "фамилия", "наименование"
+test_db-> FROM clients c
+test_db-> INNER JOIN orders o ON o.id = c."заказ";
+       фамилия        | наименование
+----------------------+--------------
+ Иванов Иван Иванович | Книга
+ Петров Петр Петрович | Монитор
+ Иоганн Себастьян Бах | Гитара
+(3 rows)
+```
 
 ## Задача 5
 
@@ -338,6 +372,22 @@ test_db=> SELECT * FROM clients;
 (используя директиву EXPLAIN).
 
 Приведите получившийся результат и объясните что значат полученные значения.
+
+---
+
+```sql
+test_db=> EXPLAIN SELECT "фамилия" FROM clients WHERE "заказ" IS NOT NULL;
+                        QUERY PLAN
+-----------------------------------------------------------
+ Seq Scan on clients  (cost=0.00..18.10 rows=806 width=32)
+   Filter: ("заказ" IS NOT NULL)
+(2 rows)
+
+```
+Значение cost - приблизительная стоимость запуска (время, через которое начнется вывод данных) и общая стоимость (если будут возвращены все доступные строки).  
+rows - ожидаемое число строк.  
+width - ожидаемый размер строк.  
+
 
 ## Задача 6
 
