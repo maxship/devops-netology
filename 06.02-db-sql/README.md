@@ -112,7 +112,7 @@ CREATE DATABASE test_db;
 
 GRANT ALL PRIVILEGES ON DATABASE test_db TO test_admin_user;
 
-# Создаем таблицы, устанавливаем внешнй ключ на поле "заказ"
+# Создаем таблицы, устанавливаем внешний ключ на поле "заказ"
 CREATE TABLE orders (
     id serial primary key,
     "наименование" text,
@@ -323,7 +323,7 @@ test_db=> SELECT COUNT(*) FROM clients;
 
 ---
 
-Добавляем в столбец "заказ" таблицы clients id заказа из связанной таблицы orders.
+Добавляем в столбец "заказ" таблицы clients id заказов из связанной таблицы orders.
 ```sql
 UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование" = 'Книга')
     WHERE "фамилия" = 'Иванов Иван Иванович';
