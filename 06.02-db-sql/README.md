@@ -185,6 +185,8 @@ test_db=> \dp
  public | orders_price   | view     |                                         |                   |
 (5 rows)
 ```
+
+Поля таблиц:
 ```
 test_db=> \d clients
                                   Table "public.clients"
@@ -242,8 +244,9 @@ Referenced by:
 - приведите в ответе:
     - запросы 
     - результаты их выполнения.
+---
 
-
+Заполняем таблицы:
 ```sql
 
 INSERT INTO orders (наименование, цена) VALUES
@@ -261,6 +264,8 @@ INSERT INTO clients ("фамилия","страна проживания") VALUE
     ('Ritchie Blackmore', 'Russia');
 
 ```
+
+Смотрим вывод.
 ```
 test_db=> SELECT * FROM orders;
  id | наименование | цена
@@ -304,6 +309,9 @@ test_db=> SELECT * FROM clients;
  
 Подсказка - используйте директиву `UPDATE`.
 
+---
+
+Добавляем в столбец "заказ" таблицы clients id заказа из связанной таблицы orders.
 ```sql
 UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование" = 'Книга')
     WHERE "фамилия" = 'Иванов Иван Иванович';
