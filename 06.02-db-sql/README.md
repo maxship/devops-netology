@@ -185,6 +185,33 @@ test_db=> \dp
  public | orders_price   | view     |                                         |                   |
 (5 rows)
 ```
+```
+test_db=> \d clients
+                                  Table "public.clients"
+      Column       |  Type   | Collation | Nullable |               Default
+-------------------+---------+-----------+----------+-------------------------------------
+ id                | integer |           | not null | nextval('clients_id_seq'::regclass)
+ фамилия           | text    |           |          |
+ страна проживания | text    |           |          |
+ заказ             | integer |           |          |
+Indexes:
+    "clients_pkey" PRIMARY KEY, btree (id)
+    "country_i" btree ("страна проживания")
+Foreign-key constraints:
+    "clients_заказ_fkey" FOREIGN KEY ("заказ") REFERENCES orders(id)
+
+test_db=> \d orders
+                               Table "public.orders"
+    Column    |  Type   | Collation | Nullable |              Default
+--------------+---------+-----------+----------+------------------------------------
+ id           | integer |           | not null | nextval('orders_id_seq'::regclass)
+ наименование | text    |           |          |
+ цена         | integer |           |          |
+Indexes:
+    "orders_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "clients" CONSTRAINT "clients_заказ_fkey" FOREIGN KEY ("заказ") REFERENCES orders(id)
+```
 
 ## Задача 3
 
@@ -226,7 +253,12 @@ INSERT INTO orders (наименование, цена) VALUES
     ('Монитор', 7000),
     ('Гитара', 4000);
     
-
+INSERT INTO clients ("фамилия","страна проживания") VALUES
+    ('Иванов Иван Иванович', 'USA'),
+	  ('Петров Петр Петрович', 'Canada'),
+	  ('Иоганн Себастьян Бах', 'Japan'),
+	  ('Ронни Джеймс Дио', 'Russia'),
+	  ('Ritchie Blackmore', 'Russia');
 
 ```
 
