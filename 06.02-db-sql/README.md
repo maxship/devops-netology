@@ -479,3 +479,16 @@ CREATE INDEX
 ALTER TABLE
 GRANT
 ```
+Проверяем:
+```
+test_db-> \d
+                  List of relations
+ Schema |      Name      |   Type   |      Owner
+--------+----------------+----------+-----------------
+ public | clients        | table    | test_admin_user
+ public | clients_id_seq | sequence | test_admin_user
+ public | orders         | table    | test_admin_user
+ public | orders_id_seq  | sequence | test_admin_user
+ public | orders_price   | view     | test_admin_user
+(5 rows)
+```
