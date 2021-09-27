@@ -112,17 +112,29 @@ CREATE DATABASE
 db_0=# \c test_database
 You are now connected to database "test_database" as user "test_admin".
 ```
-Скопируем бэкап в том для бэкапов на хосте.
+Скопируем файл в папку для бэкапов на хосте и восстановим из него БД.
 ```
-vagrant@vagrant:~/postgres13$ sudo wget -P ~/postgres13/pg_13_backup/ https://github.com/netology-code/virt-homeworks/blob/fae98b4670c1249ae
-574148e98c8fe48a1869416/06-db-04-postgresql/test_data/test_dump.sql
+vagrant@vagrant:~/postgres13/pg_13_backup$ sudo curl -OL https://raw.githubusercontent.com/netology-code/virt-homeworks/master/06-db-04-post
+gresql/test_data/test_dump.sql
 
 vagrant@vagrant:~/postgres13$ docker exec -ti postgres_13_container bash
 
-root@17577c715cfe:/# psql --set ON_ERROR_STOP=on test_database < /etc/backup/test_dump.sql
-
-
+root@17577c715cfe:/# psql -U test_admin test_database < /etc/backup/test_dump.sql
 ```
+Подключаемся к восстановленной БД.
+```
+root@17577c715cfe:/# psql -U test_admin -d test_database
+
+test_database=# \dt
+          List of relations
+ Schema |  Name  | Type  |   Owner
+--------+--------+-------+------------
+ public | orders | table | test_admin
+(1 row)
+```
+
+
+
 ## Задача 3
 
 Архитектор и администратор БД выяснили, что ваша таблица orders разрослась до невиданных размеров и
