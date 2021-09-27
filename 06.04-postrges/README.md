@@ -16,7 +16,7 @@
 - выхода из psql
 
 ---
-
+Compose файл:
 ```yml
 version: '3.5'
 
@@ -29,35 +29,7 @@ services:
       POSTGRES_PASSWORD: mypassword
       PGDATA: /data/postgres
       POSTGRES_DB: db_0
-    volumes:
-       - pg_13_data:/data/postgres
-       - pg_13_backup:/etc/backup
-    ports:
-      - "5432:5432"
-    networks:
-      - pg_13_net
-    restart: unless-stopped
-
-networks:
-  pg_13_net:
-    driver: bridge
-
-volumes:
-    pg_13_data:
-    pg_13_backup:
-```
-```yml
-version: '3.5'
-
-services:
-  postgres:
-    container_name: postgres_13_container
-    image: postgres:13
-    environment:
-      POSTGRES_USER: test_admin
-      POSTGRES_PASSWORD: mypassword
-      PGDATA: /data/postgres
-      POSTGRES_DB: db_0
+# монтируем локальные директории на хосте в контейнер      
     volumes:
        - ./pg_13_data:/data/postgres
        - ./pg_13_backup:/etc/backup
