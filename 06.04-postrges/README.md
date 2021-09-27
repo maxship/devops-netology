@@ -15,6 +15,53 @@
 - вывода описания содержимого таблиц
 - выхода из psql
 
+---yml
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres_13_container
+    image: postgres:13
+    environment:
+      POSTGRES_USER: test_admin
+      POSTGRES_PASSWORD: mypassword
+      PGDATA: /data/postgres
+      POSTGRES_DB: db_0
+    volumes:
+       - pg_13_data:/data/postgres
+       - pg_13_backup:/etc/backup
+    ports:
+      - "5432:5432"
+    networks:
+      - pg_13_net
+    restart: unless-stopped
+
+networks:
+  pg_13_net:
+    driver: bridge
+
+volumes:
+    pg_13_data:
+    pg_13_backup:
+```
+
+Запускаем контейнер и заходим в psql под указанным в docker-compose пользователем.
+```
+vagrant@vagrant:~/postgres13$ docker-compose up -d
+Creating network "postgres13_pg_13_net" with driver "bridge"
+Creating volume "postgres13_pg_13_data" with default driver
+Creating volume "postgres13_pg_13_backup" with default driver
+Creating postgres_13_container ... done
+
+vagrant@vagrant:~/postgres13$ docker exec -ti postgres_13_container psql -U test_admin -d db_0
+psql (13.4 (Debian 13.4-1.pgdg110+1))
+Type "help" for help.
+
+db_0=#
+```
+```
+
+```
 ## Задача 2
 
 Используя `psql` создайте БД `test_database`.
