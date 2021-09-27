@@ -70,7 +70,7 @@ vagrant@vagrant:~/postgresql$ docker-compose up -d
 ```
 Для работы через встроенную утилиту psql с хоста:
 ```
-vagrant@vagrant:~/postgresql$ psql -h localhost -p 5432 -U admin
+vagrant@vagrant:~/postgresql$ psql -h localhost -p 5432 -U admin -d admin
 ```
 Остановка и удаление контейнеров и томов:
 ```
