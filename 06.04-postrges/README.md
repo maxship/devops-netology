@@ -15,7 +15,9 @@
 - вывода описания содержимого таблиц
 - выхода из psql
 
----yml
+---
+
+```yml
 version: '3.5'
 
 services:
@@ -48,10 +50,6 @@ volumes:
 Запускаем контейнер и заходим в psql под указанным в docker-compose пользователем.
 ```
 vagrant@vagrant:~/postgres13$ docker-compose up -d
-Creating network "postgres13_pg_13_net" with driver "bridge"
-Creating volume "postgres13_pg_13_data" with default driver
-Creating volume "postgres13_pg_13_backup" with default driver
-Creating postgres_13_container ... done
 
 vagrant@vagrant:~/postgres13$ docker exec -ti postgres_13_container psql -U test_admin -d db_0
 psql (13.4 (Debian 13.4-1.pgdg110+1))
@@ -59,9 +57,15 @@ Type "help" for help.
 
 db_0=#
 ```
-```
 
-```
+Управляющие команды:
+
+`\l` - вывод списка БД;  
+`\c [ dbname [ username ] [ host ] [ port ] | conninfo ]` - подключениe к БД;  
+`\dt` - вывода списка таблиц;  
+`\d [имя таблицы]` - вывод описания содержимого таблицы;  
+`\q` - выход из psql;  
+
 ## Задача 2
 
 Используя `psql` создайте БД `test_database`.
