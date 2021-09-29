@@ -117,22 +117,28 @@ test_database=# \dt
 
 Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
 
+---
+
+Согласно документации, преобразовать обычную таблицу в секционированную и наоборот нельзя, поэтому разбиение по определенному критерию нужно закладывать заранее при проектировании таблиц.
+В нашем случае таблица с данными уже существует, поэтому придется проделать некоторые промежуточные операции.
+
 ```sql
-
+# Начало транзакции
 BEGIN;
-
+# Нереименовываем изначальную таблицу.
 ALTER TABLE orders RENAME TO orders_old;
-
+# Создаем новую таблицу `orders`, но уже с разбиением на части в зависимости от значений в столбце `price`.
 CREATE TABLE orders (id serial NOT NULL, title character varying(80) NOT NULL, price integer DEFAULT 0) PARTITION BY RANGE (price);
-
+# Создаем 2 секции. Верхняя и нижняя граница смежных диапазонов совпадаютт, т.к верхняя граница не попадает в выборку.
 CREATE TABLE orders_1 PARTITION OF orders FOR VALUES FROM (500) TO (MAXVALUE);
 
 CREATE TABLE orders_2 PARTITION OF orders FOR VALUES FROM (0) TO (500);
-
+# Копируем данные.
 INSERT INTO orders SELECT * FROM orders_old;
-
+# Завершаем транзакцию
 COMMIT;
 
+# Старую таблицу можно удалить.
 DROP DATABASE orders_old;
 ```
 ```sql
