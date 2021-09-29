@@ -122,9 +122,39 @@ test_database=# ALTER TABLE orders RENAME TO orders_old;
 
 test_database=# CREATE TABLE orders (id serial NOT NULL, title character varying(80) NOT NULL, price integer DEFAULT 0) PARTITION BY RANGE (price);
 
-test_database=# CREATE TABLE orders_0_to_498 PARTITION OF orders FOR VALUES FROM (0) TO (498);
+test_database=# CREATE TABLE orders_1 PARTITION OF orders FOR VALUES FROM (500) TO (MAXVALUE);
 
-test_database=# CREATE TABLE orders_from_499 PARTITION OF orders FOR VALUES FROM (499) TO (MAXVALUE);
+test_database=# CREATE TABLE orders_2 PARTITION OF orders FOR VALUES FROM (0) TO (500);
+
+test_database=# INSERT INTO orders SELECT * FROM orders_old;
+
+test_database=# DROP DATABASE orders_old;
+
+test_database=# \d orders
+                              Partitioned table "public.orders"
+ Column |         Type          | Collation | Nullable |               Default
+--------+-----------------------+-----------+----------+-------------------------------------
+ id     | integer               |           | not null | nextval('orders_id_seq1'::regclass)
+ title  | character varying(80) |           | not null |
+ price  | integer               |           |          | 0
+Partition key: RANGE (price)
+Number of partitions: 2 (Use \d+ to list them.)
+
+
+test_database=# SELECT * FROM orders;
+ id |        title         | price
+----+----------------------+-------
+  1 | War and peace        |   100
+  3 | Adventure psql time  |   300
+  4 | Server gravity falls |   300
+  5 | Log gossips          |   123
+  7 | Me and my bash-pet   |   499
+  2 | My little database   |   500
+  6 | WAL never lies       |   900
+  8 | Dbiezdmin            |   501
+(8 rows)
+
+
 
 ```
 
