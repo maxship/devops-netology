@@ -139,8 +139,10 @@ INSERT INTO orders SELECT * FROM orders_old;
 COMMIT;
 
 # Старую таблицу можно удалить.
-DROP DATABASE orders_old;
+DROP TABLE orders_old;
 ```
+
+Проверяем что получилось:
 ```sql
 test_database=# \d orders
                               Partitioned table "public.orders"
@@ -185,7 +187,6 @@ test_database=# select * from orders_2;
   7 | Me and my bash-pet   |   499
 (5 rows)
 
-
 ```
 
 
@@ -197,3 +198,23 @@ test_database=# select * from orders_2;
 Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?
 
 ---
+Заходим в контейнер и запускаем `pg_dump`. Проверяем папку с бэкапами.
+```
+vagrant@vagrant:~/postgres13$ docker exec -ti postgres_13_container bash
+root@17577c715cfe:/# pg_dump test_database -U test_admin > /etc/backup/backup_test_database_1
+root@17577c715cfe:/# ls /etc/backup/
+backup_test_database_1  test_dump.sql
+
+```
+
+Попробовал сделать столбец `title` уникальным для всей иерархии и отдельно для секционированной таблицы, postgres выдает такое:
+```
+test_database=# ALTER TABLE orders ADD UNIQUE (title);
+ERROR:  unique constraint on partitioned table must include all partitioning columns
+DETAIL:  UNIQUE constraint on table "orders" lacks column "price" which is part of the partition key.
+
+test_database=# ALTER TABLE ONLY orders ADD UNIQUE (title);
+ERROR:  unique constraint on partitioned table must include all partitioning columns
+DETAIL:  UNIQUE constraint on table "orders" lacks column "price" which is part of the partition key.
+```
+Пока не могу понять в чем причина.
