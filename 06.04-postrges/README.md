@@ -117,19 +117,25 @@ test_database=# \dt
 
 Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
 
+```sql
+
+BEGIN;
+
+ALTER TABLE orders RENAME TO orders_old;
+
+CREATE TABLE orders (id serial NOT NULL, title character varying(80) NOT NULL, price integer DEFAULT 0) PARTITION BY RANGE (price);
+
+CREATE TABLE orders_1 PARTITION OF orders FOR VALUES FROM (500) TO (MAXVALUE);
+
+CREATE TABLE orders_2 PARTITION OF orders FOR VALUES FROM (0) TO (500);
+
+INSERT INTO orders SELECT * FROM orders_old;
+
+COMMIT;
+
+DROP DATABASE orders_old;
 ```
-test_database=# ALTER TABLE orders RENAME TO orders_old;
-
-test_database=# CREATE TABLE orders (id serial NOT NULL, title character varying(80) NOT NULL, price integer DEFAULT 0) PARTITION BY RANGE (price);
-
-test_database=# CREATE TABLE orders_1 PARTITION OF orders FOR VALUES FROM (500) TO (MAXVALUE);
-
-test_database=# CREATE TABLE orders_2 PARTITION OF orders FOR VALUES FROM (0) TO (500);
-
-test_database=# INSERT INTO orders SELECT * FROM orders_old;
-
-test_database=# DROP DATABASE orders_old;
-
+```sql
 test_database=# \d orders
                               Partitioned table "public.orders"
  Column |         Type          | Collation | Nullable |               Default
