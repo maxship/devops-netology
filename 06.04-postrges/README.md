@@ -117,6 +117,19 @@ test_database=# \dt
 
 Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
 
+```
+test_database=# ALTER TABLE orders RENAME TO orders_old;
+
+test_database=# CREATE TABLE orders (id serial NOT NULL, title character varying(80) NOT NULL, price integer DEFAULT 0) PARTITION BY RANGE (price);
+
+test_database=# CREATE TABLE orders_0_to_498 PARTITION OF orders FOR VALUES FROM (0) TO (498);
+
+test_database=# CREATE TABLE orders_from_499 PARTITION OF orders FOR VALUES FROM (499) TO (MAXVALUE);
+
+```
+
+
+
 ## Задача 4
 
 Используя утилиту `pg_dump` создайте бекап БД `test_database`.
