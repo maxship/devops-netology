@@ -37,7 +37,7 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: password
     volumes:
       - ./data:/var/lib/mysql
       - ./backup:/etc/backup
