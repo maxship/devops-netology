@@ -26,6 +26,7 @@
 
 ---
 
+Создаем docker-compose:
 ```yml
 # Use root/example as user/password credentials
 version: '3.5'
@@ -39,19 +40,18 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
     volumes:
+# подключаем директории хоста для данных и бэкапов
       - ./data:/var/lib/mysql
       - ./backup:/etc/backup
 # файл с настройками
       - ./my.cnf:/etc/mysql/my.cnf
 
-#  adminer:
-#    image: adminer
-#    restart: always
-#    ports:
-#      - 8080:8080
 ```
 
-
+Скачиваем файл дампа с гитхаба в директорию для бэкапов.
+```
+vagrant@vagrant:~/mysql/backup$ sudo curl -OL https://raw.githubusercontent.com/maxship/devops-netology/main/06.03-db-mysql/test_damp.sql
+```
 
 ## Задача 2
 
