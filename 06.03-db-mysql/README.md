@@ -24,6 +24,35 @@
 
 В следующих заданиях мы будем продолжать работу с данным контейнером.
 
+---
+
+```yml
+# Use root/example as user/password credentials
+version: '3.5'
+
+services:
+
+  db:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - ./data:/var/lib/mysql
+      - ./backup:/etc/backup
+# файл с настройками
+      - ./my.cnf:/etc/mysql/my.cnf
+
+#  adminer:
+#    image: adminer
+#    restart: always
+#    ports:
+#      - 8080:8080
+```
+
+
+
 ## Задача 2
 
 Создайте пользователя test в БД c паролем test-pass, используя:
