@@ -55,9 +55,11 @@ RUN groupadd -g 1000 elasticsearch && \
 
 COPY elasticsearch.yml elasticsearch-7.15.0/config/
 
-RUN chmod -R 755 /elasticsearch-7.15.0/jdk/bin/java
+RUN chmod -R 777 /elasticsearch-7.15.0/jdk/
 
 USER elasticsearch
+
+ENV PATH=$PATH:/elasticsearch-7.15.0/bin
 
 EXPOSE 9200 9300
 
