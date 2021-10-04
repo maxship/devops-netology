@@ -72,6 +72,16 @@ mysql> SHOW DATABASES;
 +--------------------+
 5 rows in set (0.00 sec)
 
+mysql> \u test_db
+
+mysql> SHOW TABLES FROM test_db;
++-------------------+
+| Tables_in_test_db |
++-------------------+
+| orders            |
++-------------------+
+1 row in set (0.00 sec)
+
 mysql> \s
 --------------
 mysql  Ver 8.0.26 for Linux on x86_64 (MySQL Community Server - GPL)
@@ -98,6 +108,27 @@ Threads: 2  Questions: 45  Slow queries: 0  Opens: 158  Flush tables: 3  Open ta
 --------------
 ```
 
+Выведем список столбцов в таблице 'orders' и затем строки, удовлетворяющие условию 'price' > 300.
+```
+mysql> SHOW COLUMNS FROM orders;
++-------+--------------+------+-----+---------+----------------+
+| Field | Type         | Null | Key | Default | Extra          |
++-------+--------------+------+-----+---------+----------------+
+| id    | int unsigned | NO   | PRI | NULL    | auto_increment |
+| title | varchar(80)  | NO   |     | NULL    |                |
+| price | int          | YES  |     | NULL    |                |
++-------+--------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM orders WHERE price > 300;
++----+----------------+-------+
+| id | title          | price |
++----+----------------+-------+
+|  2 | My little pony |   500 |
++----+----------------+-------+
+1 row in set (0.00 sec)
+
+```
 ## Задача 2
 
 Создайте пользователя test в БД c паролем test-pass, используя:
