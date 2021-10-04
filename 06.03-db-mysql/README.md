@@ -28,13 +28,14 @@
 
 Создаем docker-compose:
 ```yml
-# Use root/example as user/password credentials
+# пользователь по умолчанию - root
 version: '3.5'
 
 services:
 
   db:
     image: mysql:latest
+# плагин авторизации по умолчанию
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
@@ -53,6 +54,50 @@ services:
 vagrant@vagrant:~/mysql/backup$ sudo curl -OL https://raw.githubusercontent.com/maxship/devops-netology/main/06.03-db-mysql/test_damp.sql
 ```
 
+Восстанавливаем БД.
+```
+mysql> CREATE DATABASE test_db;
+
+root@15587a0c8bdd:/# mysql -u root -p test_db < /etc/backup/test_damp.sql
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| test_db            |
++--------------------+
+5 rows in set (0.00 sec)
+
+mysql> \s
+--------------
+mysql  Ver 8.0.26 for Linux on x86_64 (MySQL Community Server - GPL)
+
+Connection id:          15
+Current database:
+Current user:           root@localhost
+SSL:                    Not in use
+Current pager:          stdout
+Using outfile:          ''
+Using delimiter:        ;
+Server version:         8.0.26 MySQL Community Server - GPL
+Protocol version:       10
+Connection:             Localhost via UNIX socket
+Server characterset:    utf8mb4
+Db     characterset:    utf8mb4
+Client characterset:    latin1
+Conn.  characterset:    latin1
+UNIX socket:            /var/run/mysqld/mysqld.sock
+Binary data as:         Hexadecimal
+Uptime:                 3 days 12 hours 32 min 12 sec
+
+Threads: 2  Questions: 45  Slow queries: 0  Opens: 158  Flush tables: 3  Open tables: 76  Queries per second avg: 0.000
+--------------
+```
+
 ## Задача 2
 
 Создайте пользователя test в БД c паролем test-pass, используя:
@@ -68,6 +113,11 @@ vagrant@vagrant:~/mysql/backup$ sudo curl -OL https://raw.githubusercontent.com/
     
 Используя таблицу INFORMATION_SCHEMA.USER_ATTRIBUTES получите данные по пользователю `test` и 
 **приведите в ответе к задаче**.
+
+```
+root@15587a0c8bdd:/# mysql -u root -p
+
+```
 
 ## Задача 3
 
