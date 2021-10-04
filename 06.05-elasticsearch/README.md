@@ -49,8 +49,25 @@ RUN shasum -a 512 -c elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 && \
     tar -xzf elasticsearch-7.15.0-linux-x86_64.tar.gz && \
     cd elasticsearch-7.15.0/
 
+RUN groupadd -g 1000 elasticsearch && \
+    useradd elasticsearch -u 1000 -g 1000
+
+COPY elasticsearch.yml elasticsearch-7.15.0/config/
+
+USER elasticsearch
+
+EXPOSE 9200 9300
+
 CMD bash
 ```
+
+```yml
+cluster.name: "es-cluster"
+network.host: 0.0.0.0
+```
+
+
+
 ```
 vagrant@vagrant:~/elastic$ docker build -t es:test1 -f elastic_df .
 ```
