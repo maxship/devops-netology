@@ -34,7 +34,6 @@
 ---
 
 ```
-# v3
 
 FROM centos:7
 
@@ -68,112 +67,50 @@ EXPOSE 9200 9300
 CMD bash
 ```
 
+При первых попытках запуска elasticsearch выдавал ошибки, для устранения которых потребовалось изменить настройки виртуальной машины и нонфига elasticsearch.yml.
 ```
 vagrant@vagrant:~$ sudo sysctl -w vm.max_map_count=262144
 vm.max_map_count = 262144
 ```
-
-
 ```yml
 cluster.name: "es-cluster"
 node.name: "netology_test"
 network.host: 0.0.0.0
-```
-```
-vagrant@vagrant:~/elastic$ docker run --rm -it es:test1 bash
-
-[elasticsearch@3f05d33e2b3b /]$ ./bin/elasticsearch
+cluster.initial_master_nodes: netology_test
 ```
 
-
+После этих исправлений собираем образ заново.
 ```
 vagrant@vagrant:~/elastic$ docker build -t es:test1 -f elastic_df .
 ```
 
-```yml
-# ======================== Elasticsearch Configuration =========================
-#
-# NOTE: Elasticsearch comes with reasonable defaults for most settings.
-#       Before you set out to tweak and tune the configuration, make sure you
-#       understand what are you trying to accomplish and the consequences.
-#
-# The primary way of configuring a node is via this file. This template lists
-# the most important settings you may want to configure for a production cluster.
-#
-# Please consult the documentation for further information on configuration options:
-# https://www.elastic.co/guide/en/elasticsearch/reference/index.html
-#
-# ---------------------------------- Cluster -----------------------------------
-#
-# Use a descriptive name for your cluster:
-#
-#cluster.name: my-application
-#
-# ------------------------------------ Node ------------------------------------
-#
-# Use a descriptive name for the node:
-#
-#node.name: node-1
-#
-# Add custom attributes to the node:
-#
-#node.attr.rack: r1
-#
-# ----------------------------------- Paths ------------------------------------
-#
-# Path to directory where to store the data (separate multiple locations by comma):
-#
-#path.data: /path/to/data
-#
-# Path to log files:
-#
-#path.logs: /path/to/logs
-#
-# ----------------------------------- Memory -----------------------------------
-#
-# Lock the memory on startup:
-#
-#bootstrap.memory_lock: true
-#
-# Make sure that the heap size is set to about half the memory available
-# on the system and that the owner of the process is allowed to use this
-# limit.
-#
-# Elasticsearch performs poorly when the system is swapping the memory.
-#
-# ---------------------------------- Network -----------------------------------
-#
-# By default Elasticsearch is only accessible on localhost. Set a different
-# address here to expose this node on the network:
-#
-#network.host: 192.168.0.1
-#
-# By default Elasticsearch listens for HTTP traffic on the first free port it
-# finds starting at 9200. Set a specific HTTP port here:
-#
-#http.port: 9200
-#
-# For more information, consult the network module documentation.
-#
-# --------------------------------- Discovery ----------------------------------
-#
-# Pass an initial list of hosts to perform discovery when this node is started:
-# The default list of hosts is ["127.0.0.1", "[::1]"]
-#
-#discovery.seed_hosts: ["host1", "host2"]
-#
-# Bootstrap the cluster using an initial set of master-eligible nodes:
-#
-#cluster.initial_master_nodes: ["node-1", "node-2"]
-#
-# For more information, consult the discovery and cluster formation module documentation.
-#
-# ---------------------------------- Various -----------------------------------
-#
-# Require explicit names when deleting indices:
-#
-#action.destructive_requires_name: true
+Запускаем контейнер.
 ```
+vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 es:test1 elasticsearch
+```
+
+Тестим.
+```
+vagrant@vagrant:~/elastic$ curl -X GET localhost:9200/
+{
+  "name" : "netology_test",
+  "cluster_name" : "es-cluster",
+  "cluster_uuid" : "SdNb_NEHSd-djtQz2-sE3w",
+  "version" : {
+    "number" : "7.15.0",
+    "build_flavor" : "default",
+    "build_type" : "tar",
+    "build_hash" : "79d65f6e357953a5b3cbcc5e2c7c21073d89aa29",
+    "build_date" : "2021-09-16T03:05:29.143308416Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.9.0",
+    "minimum_wire_compatibility_version" : "6.8.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+```
+
 
 ## Задача 2
 
