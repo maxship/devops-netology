@@ -101,7 +101,7 @@ vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 es:test1 elasticsearc
 
 Тестим.
 ```
-vagrant@vagrant:~/elastic$ curl -X GET localhost:9200/
+vagrant@vagrant:~$ curl -X GET http://localhost:9200/
 {
   "name" : "netology_test",
   "cluster_name" : "es-cluster",
