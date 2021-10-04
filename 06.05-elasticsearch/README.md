@@ -34,6 +34,39 @@
 ---
 
 ```dockerfile
+# v2
+FROM centos:7
+
+WORKDIR /
+
+RUN yum -y install wget && \
+    yum -y install perl-Digest-SHA
+
+
+ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz .
+ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 .
+
+RUN shasum -a 512 -c elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 && \
+    tar -xzf elasticsearch-7.15.0-linux-x86_64.tar.gz && \
+    cd elasticsearch-7.15.0/
+
+RUN groupadd -g 1000 elasticsearch && \
+    useradd elasticsearch -u 1000 -g 1000
+
+COPY elasticsearch.yml elasticsearch-7.15.0/config/
+
+RUN chmod -R 755 /elasticsearch-7.15.0/jdk/bin/java
+
+USER elasticsearch
+
+EXPOSE 9200 9300
+
+CMD bash
+```
+
+
+```dockerfile
+# v1
 FROM centos:7
 
 WORKDIR /
@@ -65,7 +98,11 @@ CMD bash
 cluster.name: "es-cluster"
 network.host: 0.0.0.0
 ```
+```
+vagrant@vagrant:~/elastic$ docker run --rm -it es:test1 bash
 
+[elasticsearch@3f05d33e2b3b /]$ ./bin/elasticsearch
+```
 
 
 ```
