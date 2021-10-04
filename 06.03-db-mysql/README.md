@@ -284,15 +284,18 @@ mysql> SHOW PROFILE FOR QUERY 9;
 
 ---
 
-```
+```yml
 [mysqld]
 pid-file        = /var/run/mysqld/mysqld.pid
 socket          = /var/run/mysqld/mysqld.sock
 datadir         = /var/lib/mysql
 secure-file-priv= NULL
+
+# Мои настройки
+
 # Размер буфера кеширования 30% от размера оперативки в 2 Гб, кратный innodb_buffer_pool_chunk_size=128M
 innodb_buffer_pool_size=640M
-# Размер файла лога операций (общий размер логов х2)
+# Размер файла лога операций (общий размер логов равен innodb_log_file_size*2)
 innodb_log_file_size=100M
 # Размер буфера для незакоммиченных транзакций
 innodb_log_buffer_size=1M
