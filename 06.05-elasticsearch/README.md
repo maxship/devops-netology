@@ -68,7 +68,7 @@ ENV PATH=$PATH:/elasticsearch-7.15.0/bin
 
 EXPOSE 9200 9300
 
-CMD bash
+CMD elasticsearch
 ```
 
 При первых попытках запуска elasticsearch выдавал ошибки, для устранения которых потребовалось изменить настройки виртуальной машины и нонфига elasticsearch.yml.
