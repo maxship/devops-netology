@@ -200,7 +200,7 @@ mysql> SHOW PROFILES;
 2 rows in set, 1 warning (0.00 sec)
 ```
 Меняем движок, повторяем те же запросы и сравниваем время выполнения.
-```
+```sql
 mysql> SET default_storage_engine==MyISAM;
 
 mysql> SHOW PROFILES;
@@ -218,8 +218,56 @@ mysql> SHOW PROFILES;
 |        9 | 0.00026900 | SELECT * FROM orders WHERE price > 300
 +----------+------------+--------------------------------------------------+
 9 rows in set, 1 warning (0.00 sec)
+```
+Посмотрим подробнее, за счет чего такая разнича во времени выполнения, на примере запроса 'SELECT * FROM orders WHERE price > 300'.
 
 ```
+mysql> SHOW PROFILE FOR QUERY 3;
++----------------------+----------+
+| Status               | Duration |
++----------------------+----------+
+| starting             | 0.000064 |
+| checking permissions | 0.000011 |
+| Opening tables       | 0.000075 |
+| init                 | 0.000005 |
+| System lock          | 0.000006 |
+| optimizing           | 0.000004 |
+| statistics           | 0.000012 |
+| preparing            | 0.000016 |
+| executing            | 0.000049 |
+| end                  | 0.000002 |
+| query end            | 0.000006 |
+| closing tables       | 0.000004 |
+| freeing items        | 0.000010 |
+| cleaning up          | 0.000028 |
++----------------------+----------+
+14 rows in set, 1 warning (0.00 sec)
+
+mysql> SHOW PROFILE FOR QUERY 9;
++--------------------------------+----------+
+| Status                         | Duration |
++--------------------------------+----------+
+| starting                       | 0.000079 |
+| Executing hook on transaction  | 0.000003 |
+| starting                       | 0.000009 |
+| checking permissions           | 0.000005 |
+| Opening tables                 | 0.000033 |
+| init                           | 0.000005 |
+| System lock                    | 0.000008 |
+| optimizing                     | 0.000003 |
+| statistics                     | 0.000014 |
+| preparing                      | 0.000015 |
+| executing                      | 0.000268 |
+| end                            | 0.000006 |
+| query end                      | 0.000003 |
+| waiting for handler commit     | 0.000008 |
+| closing tables                 | 0.000006 |
+| freeing items                  | 0.000009 |
+| cleaning up                    | 0.000010 |
++--------------------------------+----------+
+17 rows in set, 1 warning (0.00 sec)
+```
+
 
 ## Задача 4 
 
@@ -233,3 +281,7 @@ mysql> SHOW PROFILES;
 - Размер файла логов операций 100 Мб
 
 Приведите в ответе измененный файл `my.cnf`.
+
+---
+
+
