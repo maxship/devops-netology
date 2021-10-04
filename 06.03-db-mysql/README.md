@@ -155,7 +155,20 @@ CREATE USER 'test'@'localhost'
 ALTER USER 'test'@'localhost'
     WITH MAX_QUERIES_PER_HOUR 100
     ATTRIBUTE '{"fname": "James","lname": "Pretty"}';    
+    
+GRANT SELECT ON test_db.* TO 'test'@'localhost';
 ```
+```sql
+mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES
+    -> WHERE USER = 'test';
++------+-----------+---------------------------------------+
+| USER | HOST      | ATTRIBUTE                             |
++------+-----------+---------------------------------------+
+| test | localhost | {"fname": "James", "lname": "Pretty"} |
++------+-----------+---------------------------------------+
+1 row in set (0.00 sec)
+```
+
 
 ## Задача 3
 
