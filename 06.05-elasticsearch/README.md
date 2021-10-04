@@ -68,71 +68,15 @@ EXPOSE 9200 9300
 CMD bash
 ```
 
-```dockerfile
-# v2
-FROM centos:7
-
-WORKDIR /
-
-RUN yum -y install wget && \
-    yum -y install perl-Digest-SHA
-
-
-ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz .
-ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 .
-
-RUN shasum -a 512 -c elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 && \
-    tar -xzf elasticsearch-7.15.0-linux-x86_64.tar.gz && \
-    cd elasticsearch-7.15.0/
-
-RUN groupadd -g 1000 elasticsearch && \
-    useradd elasticsearch -u 1000 -g 1000
-
-COPY elasticsearch.yml elasticsearch-7.15.0/config/
-
-RUN chmod -R 777 /elasticsearch-7.15.0/jdk/
-
-USER elasticsearch
-
-ENV PATH=$PATH:/elasticsearch-7.15.0/bin
-
-EXPOSE 9200 9300
-
-CMD bash
+```
+vagrant@vagrant:~$ sudo sysctl -w vm.max_map_count=262144
+vm.max_map_count = 262144
 ```
 
-
-```dockerfile
-# v1
-FROM centos:7
-
-WORKDIR /
-
-RUN yum -y install wget && \
-    yum -y install perl-Digest-SHA
-
-
-ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz .
-ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 .
-
-RUN shasum -a 512 -c elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 && \
-    tar -xzf elasticsearch-7.15.0-linux-x86_64.tar.gz && \
-    cd elasticsearch-7.15.0/
-
-RUN groupadd -g 1000 elasticsearch && \
-    useradd elasticsearch -u 1000 -g 1000
-
-COPY elasticsearch.yml elasticsearch-7.15.0/config/
-
-USER elasticsearch
-
-EXPOSE 9200 9300
-
-CMD bash
-```
 
 ```yml
 cluster.name: "es-cluster"
+node.name: "netology_test"
 network.host: 0.0.0.0
 ```
 ```
