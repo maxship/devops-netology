@@ -33,29 +33,33 @@
 
 ---
 
-```
+```dockerfile
 
 FROM centos:7
 
 WORKDIR /
 
+# устанавливаем необходимое для установки дополнительное ПО
 RUN yum -y install wget && \
     yum -y install perl-Digest-SHA
 
-
+# создаем нового пользователя, т.к. из под рута ES не запускается.
 RUN groupadd -g 1000 elasticsearch && \
     useradd elasticsearch -u 1000 -g 1000
 
+# добавляем ссылки на официальные файлы установщика со встоенным jdk
 ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz .
 ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 .
 
+# проверяем целостность и устанавливаем
 RUN shasum -a 512 -c elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 && \
     tar -xzf elasticsearch-7.15.0-linux-x86_64.tar.gz && \
     cd elasticsearch-7.15.0/
 
+# копируем в образ заранее отредактированый файл настроек
 COPY elasticsearch.yml elasticsearch-7.15.0/config/
 
-#RUN chmod -R 777 /elasticsearch-7.15.0/jdk/
+# выставляем права
 RUN chown -R elasticsearch:elasticsearch /elasticsearch-7.15.0/
 
 USER elasticsearch
