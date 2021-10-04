@@ -31,6 +31,32 @@
 
 Далее мы будем работать с данным экземпляром elasticsearch.
 
+---
+
+```dockerfile
+FROM centos:7
+
+WORKDIR /
+
+RUN yum -y install wget && \
+    yum -y install perl-Digest-SHA
+
+
+ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz .
+ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 .
+
+RUN shasum -a 512 -c elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 && \
+    tar -xzf elasticsearch-7.15.0-linux-x86_64.tar.gz && \
+    cd elasticsearch-7.15.0/
+
+CMD bash
+```
+```
+vagrant@vagrant:~/elastic$ docker build -t es:test1 -f elastic_df .
+```
+
+
+
 ## Задача 2
 
 В этом задании вы научитесь:
