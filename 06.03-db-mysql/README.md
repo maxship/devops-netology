@@ -305,3 +305,22 @@ innodb_file_per_table=1
 innodb_io_capacity=1000
 ```
 
+После перезапуска контейнера проверяем настройки:
+```sql
+mysql> SELECT * FROM performance_schema.global_variables WHERE
+    ->     Variable_name LIKE 'innodb_buffer_pool_size' OR
+    ->     Variable_name LIKE 'innodb_log_file_size' OR
+    ->     Variable_name LIKE 'innodb_log_buffer_size' OR
+    ->     Variable_name LIKE 'innodb_file_per_table' OR
+    ->     Variable_name LIKE 'innodb_io_capacity';
++-------------------------+----------------+
+| VARIABLE_NAME           | VARIABLE_VALUE |
++-------------------------+----------------+
+| innodb_buffer_pool_size | 671088640      |
+| innodb_file_per_table   | ON             |
+| innodb_io_capacity      | 1000           |
+| innodb_log_buffer_size  | 1048576        |
+| innodb_log_file_size    | 104857600      |
++-------------------------+----------------+
+5 rows in set (0.00 sec)
+```
