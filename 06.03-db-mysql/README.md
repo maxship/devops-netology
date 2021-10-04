@@ -55,7 +55,7 @@ vagrant@vagrant:~/mysql/backup$ sudo curl -OL https://raw.githubusercontent.com/
 ```
 
 Восстанавливаем БД, смотрим инфу о сервере.
-```
+```sql
 mysql> CREATE DATABASE test_db;
 
 root@15587a0c8bdd:/# mysql -u root -p test_db < /etc/backup/test_damp.sql
@@ -109,7 +109,7 @@ Threads: 2  Questions: 45  Slow queries: 0  Opens: 158  Flush tables: 3  Open ta
 ```
 
 Выведем список столбцов в таблице 'orders' и затем строки, удовлетворяющие условию 'price' > 300.
-```
+```sql
 mysql> SHOW COLUMNS FROM orders;
 +-------+--------------+------+-----+---------+----------------+
 | Field | Type         | Null | Key | Default | Extra          |
