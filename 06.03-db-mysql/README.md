@@ -55,7 +55,7 @@ vagrant@vagrant:~/mysql/backup$ sudo curl -OL https://raw.githubusercontent.com/
 ```
 
 Восстанавливаем БД, смотрим инфу о сервере.
-```sql
+```
 mysql> CREATE DATABASE test_db;
 
 root@15587a0c8bdd:/# mysql -u root -p test_db < /etc/backup/test_damp.sql
