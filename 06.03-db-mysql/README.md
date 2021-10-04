@@ -54,7 +54,7 @@ services:
 vagrant@vagrant:~/mysql/backup$ sudo curl -OL https://raw.githubusercontent.com/maxship/devops-netology/main/06.03-db-mysql/test_damp.sql
 ```
 
-Восстанавливаем БД.
+Восстанавливаем БД, смотрим инфу о сервере.
 ```
 mysql> CREATE DATABASE test_db;
 
@@ -145,9 +145,16 @@ mysql> SELECT * FROM orders WHERE price > 300;
 Используя таблицу INFORMATION_SCHEMA.USER_ATTRIBUTES получите данные по пользователю `test` и 
 **приведите в ответе к задаче**.
 
-```
-root@15587a0c8bdd:/# mysql -u root -p
+```sql
+CREATE USER 'test'@'localhost'
+    IDENTIFIED WITH mysql_native_password BY 'test-pass'
+    PASSWORD EXPIRE INTERVAL 180 DAY
+    FAILED_LOGIN_ATTEMPTS 3;
 
+
+ALTER USER 'test'@'localhost'
+    WITH MAX_QUERIES_PER_HOUR 100
+    ATTRIBUTE '{"fname": "James","lname": "Pretty"}';    
 ```
 
 ## Задача 3
