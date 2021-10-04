@@ -145,6 +145,8 @@ mysql> SELECT * FROM orders WHERE price > 300;
 Используя таблицу INFORMATION_SCHEMA.USER_ATTRIBUTES получите данные по пользователю `test` и 
 **приведите в ответе к задаче**.
 
+---
+
 ```sql
 CREATE USER 'test'@'localhost'
     IDENTIFIED WITH mysql_native_password BY 'test-pass'
@@ -180,6 +182,44 @@ mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES
 Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:
 - на `MyISAM`
 - на `InnoDB`
+
+---
+
+Включаем профайлинг, делаем несколько запросов, затем выводим историю.
+```sql
+mysql> SET profiling = 1;
+
+mysql> SHOW PROFILES;
++----------+------------+--------------------------------------------------+
+| Query_ID | Duration   | Query                                            |
++----------+------------+--------------------------------------------------+
+|        1 | 0.00534400 | SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES |
+|        2 | 0.00038550 | SELECT * FROM orders
+|        3 | 0.00052350 | SELECT * FROM orders WHERE price > 300
++----------+------------+--------------------------------------------------+
+2 rows in set, 1 warning (0.00 sec)
+```
+Меняем движок, повторяем те же запросы и сравниваем время выполнения.
+```
+mysql> SET default_storage_engine==MyISAM;
+
+mysql> SHOW PROFILES;
++----------+------------+--------------------------------------------------+
+| Query_ID | Duration   | Query                                            |
++----------+------------+--------------------------------------------------+
+|        1 | 0.00534400 | SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES |
+|        2 | 0.00038550 | SELECT * FROM orders 
+|        3 | 0.00052350 | SELECT * FROM orders WHERE price > 300
+|        4 | 0.00028925 | show engines                                     |
+|        5 | 0.00030400 | SET default_storage_engine=MyISAM                |
+|        6 | 0.00083300 | show engines                                     |
+|        7 | 0.00060000 | SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES |
+|        8 | 0.00048200 | SELECT * FROM orders
+|        9 | 0.00026900 | SELECT * FROM orders WHERE price > 300
++----------+------------+--------------------------------------------------+
+9 rows in set, 1 warning (0.00 sec)
+
+```
 
 ## Задача 4 
 
