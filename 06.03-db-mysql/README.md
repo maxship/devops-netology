@@ -219,7 +219,7 @@ mysql> SHOW PROFILES;
 +----------+------------+--------------------------------------------------+
 9 rows in set, 1 warning (0.00 sec)
 ```
-Посмотрим подробнее, за счет чего такая разнича во времени выполнения, на примере запроса 'SELECT * FROM orders WHERE price > 300'.
+Посмотрим подробнее, за счет чего такая разнича во времени выполнения, на примере запроса `SELECT * FROM orders WHERE price > 300`.
 
 ```
 mysql> SHOW PROFILE FOR QUERY 3;
@@ -284,4 +284,21 @@ mysql> SHOW PROFILE FOR QUERY 9;
 
 ---
 
+```
+[mysqld]
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+datadir         = /var/lib/mysql
+secure-file-priv= NULL
+# Размер буфера кеширования 30% от размера оперативки в 2 Гб, кратный innodb_buffer_pool_chunk_size=128M
+innodb_buffer_pool_size=640M
+# Размер файла лога операций (общий размер логов х2)
+innodb_log_file_size=100M
+# Размер буфера для незакоммиченных транзакций
+innodb_log_buffer_size=1M
+# Таблицы хранятся в отдельных файлах для компрессии таблиц
+innodb_file_per_table=1
+# Производительность I/O операций (по умолчанию 200)
+innodb_io_capacity=1000
+```
 
