@@ -83,6 +83,12 @@ network.host: 0.0.0.0
 cluster.initial_master_nodes: netology_test
 ```
 
+**!!! Еще нужно добавить**
+```yml
+path.data: /var/lib/elasticsearch # директория для хранения данных
+network.host: 127.0.0.1 # слушаем только локальный интерфейс
+```
+
 После этих исправлений собираем образ заново.
 ```
 vagrant@vagrant:~/elastic$ docker build -t es:test1 -f elastic_df .
