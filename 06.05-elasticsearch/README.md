@@ -178,6 +178,14 @@ vagrant@vagrant:~/elastic/data$ curl -X GET "localhost:9200/_cluster/health?pret
 При проектировании кластера elasticsearch нужно корректно рассчитывать количество реплик и шард,
 иначе возможна потеря данных индексов, вплоть до полной, при деградации системы.
 
+---
+
+```
+curl -X PUT "localhost:9200/ind-1 {"settings": {"index": {"number_of_shards": 1, "number_of_replicas": 0}}}"
+
+```
+
+
 ## Задача 3
 
 В данном задании вы научитесь:
