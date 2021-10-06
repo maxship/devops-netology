@@ -73,7 +73,7 @@ EXPOSE 9200 9300
 ENTRYPOINT ["elasticsearch"]
 ```
 
-При первых попытках запуска elasticsearch выдавал ошибки, для устранения которых потребовалось изменить настройки виртуальной машины и нонфига elasticsearch.yml.
+При первых попытках запуска elasticsearch выдавал ошибки, для устранения которых потребовалось изменить настройки виртуальной машины и elasticsearch.yml.
 ```
 vagrant@vagrant:~$ sudo sysctl -w vm.max_map_count=262144
 vm.max_map_count = 262144
