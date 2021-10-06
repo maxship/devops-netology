@@ -86,14 +86,12 @@ path.data: /var/lib/elasticsearch # директория для хранения
 vagrant@vagrant:~/elastic$ docker build -t es:test1 -f elastic_df .
 ```
 
-Запускаем контейнер.
+Запускаем контейнер и цепляем к нему директорию с данными и файл конфига.
 ```
-vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 es:test1
-```
-
-```
- -v "$(pwd)"/elasticsearch.yml:/elasticsearch-7.15.0/config/elasticsearch.yml \
- -v "$pwd"/data:/var/lib/elasticsearch 
+vagrant@vagrant:~/elastic$ docker run --rm -it -p 9200:9200 \
+> -v "$(pwd)"/data:/var/lib/elasticsearch \
+> -v "$(pwd)"/elasticsearch.yml:/elasticsearch-7.15.0/config/elasticsearch.yml \
+> es:test1
 ```
 
 
@@ -118,6 +116,13 @@ vagrant@vagrant:~$ curl -X GET http://localhost:9200/
   "tagline" : "You Know, for Search"
 }
 ```
+
+Пушим образ в репозиторий.
+```
+vagrant@vagrant:~/elastic/data$ docker tag es:test1 moshipitsyn/my_elasticsearch:latest
+vagrant@vagrant:~/elastic/data$ docker push moshipitsyn/my_elasticsearch:latest
+```
+
 
 
 ## Задача 2
