@@ -93,7 +93,7 @@ vagrant@vagrant:~/elastic$ docker build -t es:test1 -f elastic_df .
 
 Запускаем контейнер и цепляем к нему директорию с данными и файл конфига.
 ```
-vagrant@vagrant:~/elastic$ docker run --rm -it -p 9200:9200 \
+vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 \
 > -v "$(pwd)"/data:/var/lib/elasticsearch \
 > -v "$(pwd)"/elasticsearch.yml:/elasticsearch-7.15.0/config/elasticsearch.yml \
 > es:test1
