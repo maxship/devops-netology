@@ -39,28 +39,25 @@ FROM centos:7
 
 WORKDIR /
 
-# устанавливаем необходимое для установки дополнительное ПО
 RUN yum -y install wget && \
     yum -y install perl-Digest-SHA
 
-# создаем нового пользователя, т.к. из под рута ES не запускается.
+
 RUN groupadd -g 1000 elasticsearch && \
     useradd elasticsearch -u 1000 -g 1000
 
-# добавляем ссылки на официальные файлы установщика со встоенным jdk
-ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz .
-ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 .
+ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64>ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.15.0-linux-x86_64>
 
-# проверяем целостность и устанавливаем
 RUN shasum -a 512 -c elasticsearch-7.15.0-linux-x86_64.tar.gz.sha512 && \
     tar -xzf elasticsearch-7.15.0-linux-x86_64.tar.gz && \
     cd elasticsearch-7.15.0/
 
-# копируем в образ заранее отредактированый файл настроек
+RUN mkdir /var/lib/elasticsearch
+
 COPY elasticsearch.yml elasticsearch-7.15.0/config/
 
-# выставляем права
-RUN chown -R elasticsearch:elasticsearch /elasticsearch-7.15.0/
+RUN chown -R elasticsearch:elasticsearch /elasticsearch-7.15.0/ && \
+    chown -R elasticsearch:elasticsearch /var/lib/elasticsearch
 
 USER elasticsearch
 
@@ -68,7 +65,7 @@ ENV PATH=$PATH:/elasticsearch-7.15.0/bin
 
 EXPOSE 9200 9300
 
-CMD elasticsearch
+ENTRYPOINT ["elasticsearch"]
 ```
 
 При первых попытках запуска elasticsearch выдавал ошибки, для устранения которых потребовалось изменить настройки виртуальной машины и нонфига elasticsearch.yml.
@@ -81,12 +78,7 @@ cluster.name: "es-cluster"
 node.name: "netology_test"
 network.host: 0.0.0.0
 cluster.initial_master_nodes: netology_test
-```
-
-**!!! Еще нужно добавить**
-```yml
 path.data: /var/lib/elasticsearch # директория для хранения данных
-network.host: 127.0.0.1 # слушаем только локальный интерфейс
 ```
 
 После этих исправлений собираем образ заново.
@@ -96,8 +88,14 @@ vagrant@vagrant:~/elastic$ docker build -t es:test1 -f elastic_df .
 
 Запускаем контейнер.
 ```
-vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 es:test1 elasticsearch
+vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 es:test1
 ```
+
+```
+ -v "$(pwd)"/elasticsearch.yml:/elasticsearch-7.15.0/config/elasticsearch.yml \
+ -v "$pwd"/data:/var/lib/elasticsearch 
+```
+
 
 Тестим.
 ```
