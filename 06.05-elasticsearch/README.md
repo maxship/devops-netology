@@ -128,6 +128,7 @@ vagrant@vagrant:~/elastic/data$ docker tag es:test1 moshipitsyn/my_elasticsearch
 vagrant@vagrant:~/elastic/data$ docker push moshipitsyn/my_elasticsearch:latest
 ```
 
+https://hub.docker.com/repository/docker/moshipitsyn/my_elasticsearch
 
 
 ## Задача 2
