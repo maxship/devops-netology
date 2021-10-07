@@ -106,6 +106,24 @@ vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 \
 > -v "$(pwd)"/elasticsearch.yml:/elasticsearch-7.15.0/config/elasticsearch.yml \
 > moshipitsyn/my_elasticsearch:latest
 ```
+То же самое в docker-compose:
+
+```
+version: '3.5'
+
+services:
+
+  es:
+    container_name: elasticsearch
+    image: moshipitsyn/my_elasticsearch:latest
+    volumes:
+      - ./data:/var/lib/elasticsearch
+      - ./elasticsearch.yml:/elasticsearch-7.15.0/config/elasticsearch.yml
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: unless-stopped
+```
 
 Тестим.
 ```
