@@ -145,25 +145,6 @@ vagrant@vagrant:~$ curl -X GET http://localhost:9200/
   },
   "tagline" : "You Know, for Search"
 }
-
-vagrant@vagrant:~/elastic/data$ curl -X GET "localhost:9200/_cluster/health?pretty"
-{
-  "cluster_name" : "es-cluster",
-  "status" : "green",
-  "timed_out" : false,
-  "number_of_nodes" : 1,
-  "number_of_data_nodes" : 1,
-  "active_primary_shards" : 1,
-  "active_shards" : 1,
-  "relocating_shards" : 0,
-  "initializing_shards" : 0,
-  "unassigned_shards" : 0,
-  "delayed_unassigned_shards" : 0,
-  "number_of_pending_tasks" : 0,
-  "number_of_in_flight_fetch" : 0,
-  "task_max_waiting_in_queue_millis" : 0,
-  "active_shards_percent_as_number" : 100.0
-}
 ```
 
 
@@ -199,7 +180,7 @@ vagrant@vagrant:~/elastic/data$ curl -X GET "localhost:9200/_cluster/health?pret
 ---
 
 Добавляем индексы в соответствии с таблицей, выводим получившийся список.
-```
+```bash
 vagrant@vagrant:~/elastic$ export ES_URL=localhost:9200
 
 vagrant@vagrant:~/elastic$ curl -H 'Content-Type: application/json' \
@@ -222,9 +203,34 @@ yellow open   ind-3            J4LykfN9RoeB10aTkUMHUQ   4   2          0        
 yellow open   ind-2            0O7Tg81XQUikgA4C_SgVgw   2   1          0            0       416b           416b
 ```
 
+```
+vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cluster/health?pretty"
+{
+  "cluster_name" : "es-cluster",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 8,
+  "active_shards" : 8,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 10,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 44.44444444444444
+}
+
+```
 Видим, что состояние `green` только у первого индекса. У ind-2 и ind-3 статус `yellow`, что логично, т.к. в созданном ранее кластере всего одна нода с одним шардом, реплики отсутствуют.
 
+Удаляем индексы.
 
+```
+vagrant@vagrant:~/elastic$ curl -X DELETE "$ES_URL/ind-1,ind-2,ind-3"
+```
 
 ## Задача 3
 
