@@ -198,10 +198,32 @@ vagrant@vagrant:~/elastic/data$ curl -X GET "localhost:9200/_cluster/health?pret
 
 ---
 
+Добавляем индексы в соответствии с таблицей, выводим получившийся список.
 ```
-curl -X PUT "localhost:9200/ind-1 {"settings": {"index": {"number_of_shards": 1, "number_of_replicas": 0}}}"
+vagrant@vagrant:~/elastic$ export ES_URL=localhost:9200
 
+vagrant@vagrant:~/elastic$ curl -H 'Content-Type: application/json' \
+>-XPUT $ES_URL/ind-1 -d \
+>'{"settings":{"number_of_shards":1,"number_of_replicas":0}}'
+
+vagrant@vagrant:~/elastic$ curl -H 'Content-Type: application/json' \
+>-XPUT $ES_URL/ind-2 -d \
+>'{"settings":{"number_of_shards":2,"number_of_replicas":1}}'
+
+vagrant@vagrant:~/elastic$ curl -H 'Content-Type: application/json' \
+>-XPUT $ES_URL/ind-3 -d \
+>'{"settings":{"number_of_shards":4,"number_of_replicas":2}}'
+
+vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cat/indices?v"
+health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   .geoip_databases zSVNlsuuSE2yxgwexog1Nw   1   0         41           34     40.1mb         40.1mb
+green  open   ind-1            iZeYzE-wSQycBI53RR8dbw   1   0          0            0       208b           208b
+yellow open   ind-3            J4LykfN9RoeB10aTkUMHUQ   4   2          0            0       832b           832b
+yellow open   ind-2            0O7Tg81XQUikgA4C_SgVgw   2   1          0            0       416b           416b
 ```
+
+Видим, что состояние `green` только у первого индекса. У ind-2 и ind-3 статус `yellow`, что логично, т.к. в созданном ранее кластере всего одна нода с одним шардом, реплики отсутствуют.
+
 
 
 ## Задача 3
