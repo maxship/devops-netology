@@ -108,8 +108,8 @@ vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 \
 > -v "$(pwd)"/elasticsearch.yml:/elasticsearch-7.15.0/config/elasticsearch.yml \
 > moshipitsyn/my_elasticsearch:latest
 ```
-То же самое в docker-compose:
 
+То же самое добавил для удобства в docker-compose:
 ```
 version: '3.5'
 
