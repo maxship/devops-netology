@@ -263,12 +263,14 @@ vagrant@vagrant:~/elastic$ curl -X DELETE "$ES_URL/_all"
 - возможно вам понадобится доработать `elasticsearch.yml` в части директивы `path.repo` и перезапустить `elasticsearch`
 
 ---
+
+Заходим в контейнер и добавляем директорию для бэкапов.
 ```
 vagrant@vagrant:~/elastic$ docker exec -ti elasticsearch bash
 
 [elasticsearch@f87fae3dbebb /]$ mkdir /elasticsearch-7.15.0/snapshots
 ```
-Добавляем в файл настроек путь.
+Добавляем путь в файл настроек.
 ```yml
 cluster.name: "es-cluster"
 node.name: "netology_test"
@@ -277,10 +279,12 @@ cluster.initial_master_nodes: netology_test
 path.data: /var/lib/elasticsearch
 path.repo: /elasticsearch-7.15.0/snapshots # путь к бэкапам
 ```
+
 Перезапускаем контейнер
 ```
 vagrant@vagrant:~/elastic$ docker restart elasticsearch
 ```
+
 Регистрируем репозиторий `snapshot_repository`, добавляем папку `netology_backup` в подключенную ранее директорию для бэкапов.
 ```
 curl -H 'Content-Type: application/json' \
@@ -317,6 +321,7 @@ drwxr-xr-x 4 elasticsearch elasticsearch  4096 Oct  7 16:45 indices
 -rw-r--r-- 1 elasticsearch elasticsearch 27573 Oct  7 16:45 meta-TmgS39hjQTmvb554fZA5bQ.dat
 -rw-r--r-- 1 elasticsearch elasticsearch   442 Oct  7 16:45 snap-TmgS39hjQTmvb554fZA5bQ.dat
 ```
+
 Удаляем индекс `test`, создаем индекс `test-2`.
 ```
 curl -X DELETE "$ES_URL/test"
