@@ -180,7 +180,7 @@ vagrant@vagrant:~$ curl -X GET http://localhost:9200/
 ---
 
 Добавляем индексы в соответствии с таблицей, выводим получившийся список.
-```bash
+```
 vagrant@vagrant:~/elastic$ export ES_URL=localhost:9200
 
 vagrant@vagrant:~/elastic$ curl -H 'Content-Type: application/json' \
