@@ -183,17 +183,17 @@ vagrant@vagrant:~$ curl -X GET http://localhost:9200/
 ```
 vagrant@vagrant:~/elastic$ export ES_URL=localhost:9200
 
-vagrant@vagrant:~/elastic$ curl -H 'Content-Type: application/json' \
->-XPUT $ES_URL/ind-1 -d \
->'{"settings":{"number_of_shards":1,"number_of_replicas":0}}'
+curl -H 'Content-Type: application/json' \
+-XPUT $ES_URL/ind-1 -d \
+'{"settings":{"number_of_shards":1,"number_of_replicas":0}}'
 
-vagrant@vagrant:~/elastic$ curl -H 'Content-Type: application/json' \
->-XPUT $ES_URL/ind-2 -d \
->'{"settings":{"number_of_shards":2,"number_of_replicas":1}}'
+curl -H 'Content-Type: application/json' \
+-XPUT $ES_URL/ind-2 -d \
+'{"settings":{"number_of_shards":2,"number_of_replicas":1}}'
 
-vagrant@vagrant:~/elastic$ curl -H 'Content-Type: application/json' \
->-XPUT $ES_URL/ind-3 -d \
->'{"settings":{"number_of_shards":4,"number_of_replicas":2}}'
+curl -H 'Content-Type: application/json' \
+-XPUT $ES_URL/ind-3 -d \
+'{"settings":{"number_of_shards":4,"number_of_replicas":2}}'
 
 vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cat/indices?v"
 health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
@@ -229,7 +229,7 @@ vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cluster/health?pretty"
 Удаляем индексы.
 
 ```
-vagrant@vagrant:~/elastic$ curl -X DELETE "$ES_URL/ind-1,ind-2,ind-3"
+vagrant@vagrant:~/elastic$ curl -X DELETE "$ES_URL/_all"
 ```
 
 ## Задача 3
@@ -263,3 +263,83 @@ vagrant@vagrant:~/elastic$ curl -X DELETE "$ES_URL/ind-1,ind-2,ind-3"
 - возможно вам понадобится доработать `elasticsearch.yml` в части директивы `path.repo` и перезапустить `elasticsearch`
 
 ---
+```
+vagrant@vagrant:~/elastic$ docker exec -ti elasticsearch bash
+
+[elasticsearch@f87fae3dbebb /]$ mkdir /elasticsearch-7.15.0/snapshots
+```
+Добавляем в файл настроек путь.
+```yml
+cluster.name: "es-cluster"
+node.name: "netology_test"
+network.host: 0.0.0.0
+cluster.initial_master_nodes: netology_test
+path.data: /var/lib/elasticsearch
+path.repo: /elasticsearch-7.15.0/snapshots # путь к бэкапам
+```
+Перезапускаем контейнер
+```
+vagrant@vagrant:~/elastic$ docker restart elasticsearch
+```
+Регистрируем репозиторий `snapshot_repository`, добавляем папку `netology_backup` в подключенную ранее директорию для бэкапов.
+```
+curl -H 'Content-Type: application/json' \
+-X PUT "$ES_URL/_snapshot/snapshot_repository" -d \
+'{"type": "fs", "settings": {"location": "/elasticsearch-7.15.0/snapshots/netology_backup"}}'
+```
+
+Создаем тестовый индекс.
+```
+curl -H 'Content-Type: application/json' \
+-XPUT $ES_URL/test -d \
+'{"settings":{"number_of_shards":1,"number_of_replicas":0}}'
+
+vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cat/indices?v"
+health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   .geoip_databases zSVNlsuuSE2yxgwexog1Nw   1   0         41           34     40.1mb         40.1mb
+green  open   test             WF7k6XHbSEKWFlaYtxkd_A   1   0          0            0       208b           208b
+```
+
+Делаем снимок.
+```
+vagrant@vagrant:~/elastic$ curl -X PUT "$ES_URL/_snapshot/snapshot_repository/test_snapshot_1?wait_for_completion=true"
+```
+
+Смотрим список файлов.
+```
+vagrant@vagrant:~/elastic$ docker exec -ti elasticsearch bash
+
+[elasticsearch@f87fae3dbebb /]$ ls -l /elasticsearch-7.15.0/snapshots/netology_backup/
+total 44
+-rw-r--r-- 1 elasticsearch elasticsearch   833 Oct  7 16:45 index-0
+-rw-r--r-- 1 elasticsearch elasticsearch     8 Oct  7 16:45 index.latest
+drwxr-xr-x 4 elasticsearch elasticsearch  4096 Oct  7 16:45 indices
+-rw-r--r-- 1 elasticsearch elasticsearch 27573 Oct  7 16:45 meta-TmgS39hjQTmvb554fZA5bQ.dat
+-rw-r--r-- 1 elasticsearch elasticsearch   442 Oct  7 16:45 snap-TmgS39hjQTmvb554fZA5bQ.dat
+```
+Удаляем индекс `test`, создаем индекс `test-2`.
+```
+curl -X DELETE "$ES_URL/test"
+
+curl -H 'Content-Type: application/json' \
+-XPUT $ES_URL/test-2 -d \
+'{"settings":{"number_of_shards":1,"number_of_replicas":0}}'
+
+vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cat/indices?v"
+health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   test-2           RtoYziRYR1KXdpyEW9ehGw   1   0          0            0       208b           208b
+green  open   .geoip_databases zSVNlsuuSE2yxgwexog1Nw   1   0         41           34     40.1mb         40.1mb
+```
+
+Восстанавливаем состояние кластера из снимка.
+```
+curl -H 'Content-Type: application/json' \
+> -X POST "$ES_URL/_snapshot/snapshot_repository/test_snapshot_1/_restore" -d \
+> '{"include_global_state": true}'
+
+vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cat/indices?v"
+health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   test-2           RtoYziRYR1KXdpyEW9ehGw   1   0          0            0       208b           208b
+green  open   .geoip_databases vlOPNO4uRaa2hopGQWC5hA   1   0         41           34     40.1mb         40.1mb
+green  open   test             KxRVsvQ1TtelMD5IsBL33w   1   0          0            0       208b           208b
+```
