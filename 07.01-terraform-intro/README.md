@@ -52,6 +52,11 @@
 
 ---
 
+```shell
+vagrant@vagrant:~$ terraform --version
+Terraform v1.0.8
+on linux_amd64
+```
 
 ## Задача 3. Поддержка легаси кода. 
 
