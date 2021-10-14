@@ -83,8 +83,9 @@ on linux_amd64
 или виртуальной машине.
 
 ---
+Поскольку terraform представляет собой бинарный файл, то можно просто распаковать разные версии в отдельные папки и создать символьные ссылки.
 
-```
+```bash
 sudo mkdir -p /usr/local/tf/1.0.9
 sudo mkdir -p /usr/local/tf/0.15.5
 
@@ -103,11 +104,17 @@ sudo ln -s /usr/local/tf/0.15.5/terraform /usr/bin/terraform0155
 sudo chmod ugo+x /usr/bin/terraform*
 ```
 
+Проверяем:
 ```
 vagrant@vagrant:~$ terraform109 -version
 Terraform v1.0.9
 on linux_amd64
 
+vagrant@vagrant:~$ terraform0155 -version
+Terraform v0.15.5
+on linux_amd64
 
+Your version of Terraform is out of date! The latest version
+is 1.0.9. You can update by downloading from https://www.terraform.io/downloads.html
 ```
 
