@@ -59,6 +59,12 @@
 В виде результата этой задачи приложите вывод команды `terraform --version`.
 
 ---
+```
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt-get update && sudo apt-get install terraform
+```
 
 ```shell
 vagrant@vagrant:~$ terraform --version
@@ -77,3 +83,31 @@ on linux_amd64
 или виртуальной машине.
 
 ---
+
+```
+sudo mkdir -p /usr/local/tf/1.0.9
+sudo mkdir -p /usr/local/tf/0.15.5
+
+cd /usr/local/tf/1.0.9
+sudo wget https://releases.hashicorp.com/terraform/1.0.9/terraform_1.0.9_linux_amd64.zip
+sudo unzip terraform_1.0.9_linux_amd64.zip
+sudo rm terraform_1.0.9_linux_amd64.zip
+sudo ln -s /usr/local/tf/1.0.9/terraform /usr/bin/terraform109
+
+cd /usr/local/tf/0.15.5
+sudo wget https://releases.hashicorp.com/terraform/0.15.5/terraform_0.15.5_linux_arm64.zip
+sudo unzip terraform_0.15.5_linux_arm64.zip
+sudo rm terraform_0.15.5_linux_arm64.zip
+sudo ln -s /usr/local/tf/0.15.5/terraform /usr/bin/terraform0155
+
+sudo chmod ugo+x /usr/bin/terraform*
+```
+
+```
+vagrant@vagrant:~$ terraform109 -version
+Terraform v1.0.9
+on linux_amd64
+
+
+```
+
