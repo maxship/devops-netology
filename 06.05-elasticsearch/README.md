@@ -76,7 +76,7 @@ ENTRYPOINT ["elasticsearch"]
 ```
 
 При первых попытках запуска elasticsearch выдавал ошибки, для устранения которых потребовалось изменить настройки виртуальной машины и elasticsearch.yml.
-```
+```shell
 vagrant@vagrant:~$ sudo sysctl -w vm.max_map_count=262144
 vm.max_map_count = 262144
 ```
@@ -89,12 +89,12 @@ path.data: /var/lib/elasticsearch # директория для хранения
 ```
 
 После этих исправлений собираем образ заново.
-```
+```shell
 vagrant@vagrant:~/elastic$ docker build -t es:test1 -f elastic_df .
 ```
 
 Пушим образ в репозиторий.
-```
+```shell
 vagrant@vagrant:~/elastic/data$ docker tag es:test1 moshipitsyn/my_elasticsearch:latest
 vagrant@vagrant:~/elastic/data$ docker push moshipitsyn/my_elasticsearch:latest
 ```
@@ -102,7 +102,7 @@ vagrant@vagrant:~/elastic/data$ docker push moshipitsyn/my_elasticsearch:latest
 https://hub.docker.com/repository/docker/moshipitsyn/my_elasticsearch
 
 Запускаем контейнер и цепляем к нему директорию с данными и файл конфига.
-```
+```shell
 vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 \
 > -v "$(pwd)"/data:/var/lib/elasticsearch \
 > -v "$(pwd)"/elasticsearch.yml:/elasticsearch-7.15.0/config/elasticsearch.yml \
@@ -110,7 +110,7 @@ vagrant@vagrant:~/elastic$ docker run --rm -d -p 9200:9200 \
 ```
 
 То же самое добавил для удобства в docker-compose:
-```
+```yml
 version: '3.5'
 
 services:
@@ -182,7 +182,7 @@ vagrant@vagrant:~$ curl -X GET http://localhost:9200/
 ---
 
 Добавляем индексы в соответствии с таблицей, выводим получившийся список.
-```
+```shell
 vagrant@vagrant:~/elastic$ export ES_URL=localhost:9200
 
 curl -H 'Content-Type: application/json' \
@@ -205,7 +205,7 @@ yellow open   ind-3            J4LykfN9RoeB10aTkUMHUQ   4   2          0        
 yellow open   ind-2            0O7Tg81XQUikgA4C_SgVgw   2   1          0            0       416b           416b
 ```
 
-```
+```shell
 vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cluster/health?pretty"
 {
   "cluster_name" : "es-cluster",
@@ -230,7 +230,7 @@ vagrant@vagrant:~/elastic$ curl -X GET "$ES_URL/_cluster/health?pretty"
 
 Удаляем индексы.
 
-```
+```shell
 vagrant@vagrant:~/elastic$ curl -X DELETE "$ES_URL/_all"
 ```
 
@@ -267,7 +267,7 @@ vagrant@vagrant:~/elastic$ curl -X DELETE "$ES_URL/_all"
 ---
 
 Заходим в контейнер и добавляем директорию для бэкапов.
-```
+```shell
 vagrant@vagrant:~/elastic$ docker exec -ti elasticsearch bash
 
 [elasticsearch@f87fae3dbebb /]$ mkdir /elasticsearch-7.15.0/snapshots
@@ -283,19 +283,19 @@ path.repo: /elasticsearch-7.15.0/snapshots # путь к бэкапам
 ```
 
 Перезапускаем контейнер
-```
+```shell
 vagrant@vagrant:~/elastic$ docker restart elasticsearch
 ```
 
 Регистрируем репозиторий `snapshot_repository`, добавляем папку `netology_backup` в подключенную ранее директорию для бэкапов.
-```
+```shell
 curl -H 'Content-Type: application/json' \
 -X PUT "$ES_URL/_snapshot/snapshot_repository" -d \
 '{"type": "fs", "settings": {"location": "/elasticsearch-7.15.0/snapshots/netology_backup"}}'
 ```
 
 Создаем тестовый индекс.
-```
+```shell
 curl -H 'Content-Type: application/json' \
 -XPUT $ES_URL/test -d \
 '{"settings":{"number_of_shards":1,"number_of_replicas":0}}'
@@ -307,12 +307,12 @@ green  open   test             WF7k6XHbSEKWFlaYtxkd_A   1   0          0        
 ```
 
 Делаем снимок.
-```
+```shell
 vagrant@vagrant:~/elastic$ curl -X PUT "$ES_URL/_snapshot/snapshot_repository/test_snapshot_1?wait_for_completion=true"
 ```
 
 Смотрим список файлов.
-```
+```shell
 vagrant@vagrant:~/elastic$ docker exec -ti elasticsearch bash
 
 [elasticsearch@f87fae3dbebb /]$ ls -l /elasticsearch-7.15.0/snapshots/netology_backup/
@@ -325,7 +325,7 @@ drwxr-xr-x 4 elasticsearch elasticsearch  4096 Oct  7 16:45 indices
 ```
 
 Удаляем индекс `test`, создаем индекс `test-2`.
-```
+```shell
 curl -X DELETE "$ES_URL/test"
 
 curl -H 'Content-Type: application/json' \
@@ -339,7 +339,7 @@ green  open   .geoip_databases zSVNlsuuSE2yxgwexog1Nw   1   0         41        
 ```
 
 Восстанавливаем состояние кластера из снимка.
-```
+```shell
 curl -H 'Content-Type: application/json' \
 > -X POST "$ES_URL/_snapshot/snapshot_repository/test_snapshot_1/_restore" -d \
 > '{"include_global_state": true}'
