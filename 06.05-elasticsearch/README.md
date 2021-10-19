@@ -128,7 +128,7 @@ services:
 ```
 
 Тестим.
-```
+```shell
 vagrant@vagrant:~$ curl -X GET http://localhost:9200/
 {
   "name" : "netology_test",
