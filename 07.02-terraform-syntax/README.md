@@ -68,7 +68,10 @@ secret_key     ****************bsbG shared-credentials-file
  
 ---
 
-Получилась такая конфигурация:
+1. Для создания своего ami образа можно воспользоваться сервисом [EC2 Image Builder](https://eu-north-1.console.aws.amazon.com/imagebuilder/home?region=eu-north-1#/landingPage).
+
+2. [Ссылка на репозиторий с получившейся конфигурацией](https://github.com/maxship/devops-netology/tree/main/terraform).
+
 ```tf
 #versions.tf
 terraform {
