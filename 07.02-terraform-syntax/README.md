@@ -68,3 +68,77 @@ secret_key     ****************bsbG shared-credentials-file
  
 ---
 
+Получилась такая конфигурация:
+```tf
+#versions.tf
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.27"
+    }
+  }
+}
+```
+```tf
+#main.tf
+provider "aws" {
+  region  = "eu-north-1"
+  profile = "tf_admin_1"
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  filter {
+        name   = "name"
+        values = ["*-amd64-server-*"]
+    }
+  owners = ["099720109477"] # Canonical
+}
+
+resource "aws_instance" "ec2_instance" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "Test Ubuntu instance"
+  }
+}
+
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}
+```
+```tf
+#outputs.tf
+output "account_id" {
+  value = data.aws_caller_identity.current.account_id
+}
+
+output "caller_user" {
+  value = data.aws_caller_identity.current.user_id
+}
+
+output "aws_region" {
+  value = data.aws_region.current.name
+}
+
+output "instance_ip_addr" {
+  value = aws_instance.ec2_instance.private_ip
+  description = "The private IP address of the main server instance."
+}
+
+output "subnet_name" {
+  value = aws_instance.ec2_instance.subnet_id
+}
+```
+
+```
+Outputs:
+
+account_id = "233275083821"
+aws_region = "eu-north-1"
+caller_user = "AIDATMUCHJQW3I5ATZMZO"
+instance_ip_addr = "172.31.32.72"
+subnet_name = "subnet-b39b21c8"
+```
