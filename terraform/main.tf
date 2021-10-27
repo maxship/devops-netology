@@ -13,31 +13,45 @@ data "aws_ami" "ubuntu" { # ищем последнюю версию убунт�
   owners = ["099720109477"] # Canonical
 }
 
-locals { # блок переменных
+locals {                    # блок переменных
   ec2_instance_type_map = { # в зависимости от названия воркспейса назначаем тип инстанса ec2
-    stage = "t3.micro"
-    prod  = "t3.micro"
+    stage   = "t3.micro"    # везде указан один тип, чтобы при развертывании не вылезти за рамки бесплатного тарифа
+    prod    = "t3.micro"
+    default = "t3.micro"
   }
   ec2_instance_count_map = { # задаем количество запущенных инстансов в зависимости от воркспейса
-    stage =2
-    prod =0
+    stage   = 1
+    prod    = 2
+    default = 1
   }
 }
 resource "aws_instance" "ec2_instance" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = local.ec2_instance_type_map[terraform.workspace]
-  count = local.ec2_instance_count_map[terraform.workspace]
-  vpc_security_group_ids = [aws_security_group.my_ec2_instance.id]
+  count                  = local.ec2_instance_count_map[terraform.workspace] # количество запущеных инстансов
+  vpc_security_group_ids = [aws_security_group.ec2_instance_sg.id]
+  user_data              = file("apache2.sh") # вставлен скрипт, устанавливающий apache2
+  lifecycle {
+    create_before_destroy = true # перед изменением инстанса сначала создается новый, потом гасится старый
+  }
   tags = {
-    Name  = "Test Ubuntu instance 1"
+    Name  = "Web server ${count.index}"
     Owner = "Max Shipitsyn"
   }
-  user_data = file("apache2.sh")
+
 }
 
-resource "aws_security_group" "my_ec2_instance" {
-  name        = "My ec2 test security group"
-  description = "My first sg"
+/*resource "aws_instance" "ec2_instance_amazon" {
+  ami                    = ami-0d15082500b576303
+  instance_type          = "t3.micro"
+  tags = {
+    Name  = "Server "
+  }*/
+
+
+resource "aws_security_group" "ec2_instance_sg" {
+  name        = "ec2 test security group"
+  description = "Test security group"
   ingress {
     from_port   = 80
     protocol    = "tcp"
