@@ -1,4 +1,5 @@
 #main.tf
+
 provider "aws" {
   region  = "eu-north-1"
   profile = "tf_admin_1" # название профиля задано командой "aws configure" на локальной машине
@@ -29,43 +30,28 @@ resource "aws_instance" "ec2_instance" {
 
 }
 
-/*variable "instances" {
-  description = ""
-  type        = map(string)
-  prod     = {
-    instance_type           = "t2.micro",
-    instance_count = 2
-  }
-  stage     = {
-  instance_type           = "t2.micro",
-  instance_count = 2
-  }
-}*/
+resource "aws_instance" "ec2_test_foreach_instance" {  # тестовые инстансы для проверки работы цикла for_each
+  for_each = var.test_foreach_instances
+  instance_type = each.value.instance_type
+  ami = each.value.ami
+  tags = each.value.tags
+}
 
-
-/*resource "aws_instance" "ec2_instance_amazon" {
-  ami = ami-0d15082500b576303
-  instance_type = "t3.micro"
-  for_each = {
-    [terraform.workspace]   = 1
-  }
-
-
-  tags = {
-    Name = "Server "
-  }
-}*/
-
-resource "aws_security_group" "ec2_instance_sg" {
+resource "aws_security_group" "ec2_instance_sg" { # security group
   name        = "ec2 test security group"
   description = "Test security group"
-  ingress {
-    from_port   = 80
-    protocol    = "tcp"
-    to_port     = 80
-    cidr_blocks = ["0.0.0.0/0"]
+
+  dynamic "ingress" { # входящие соединения
+    for_each = ["80","443"]
+    content {
+      from_port   = ingress.value
+      protocol    = "tcp"
+      to_port     = ingress.value
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+
   }
-  egress {
+  egress {  # исходящие соединения
     from_port   = 0
     protocol    = "-1"
     to_port     = 0
