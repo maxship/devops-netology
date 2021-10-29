@@ -13,18 +13,6 @@ data "aws_ami" "ubuntu" { # ищем последнюю версию убунт�
   owners = ["099720109477"] # Canonical
 }
 
-locals {                    # блок переменных
-  ec2_instance_type_map = { # в зависимости от названия воркспейса назначаем тип инстанса ec2
-    stage   = "t3.micro"    # везде указан один тип, чтобы при развертывании не вылезти за рамки бесплатного тарифа
-    prod    = "t3.micro"
-    default = "t3.micro"
-  }
-  ec2_instance_count_map = { # задаем количество запущенных инстансов в зависимости от воркспейса
-    stage   = 1
-    prod    = 2
-    default = 1
-  }
-}
 resource "aws_instance" "ec2_instance" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = local.ec2_instance_type_map[terraform.workspace]
@@ -41,13 +29,32 @@ resource "aws_instance" "ec2_instance" {
 
 }
 
-/*resource "aws_instance" "ec2_instance_amazon" {
-  ami                    = ami-0d15082500b576303
-  instance_type          = "t3.micro"
-  tags = {
-    Name  = "Server "
-  }*/
+/*variable "instances" {
+  description = ""
+  type        = map(string)
+  prod     = {
+    instance_type           = "t2.micro",
+    instance_count = 2
+  }
+  stage     = {
+  instance_type           = "t2.micro",
+  instance_count = 2
+  }
+}*/
 
+
+/*resource "aws_instance" "ec2_instance_amazon" {
+  ami = ami-0d15082500b576303
+  instance_type = "t3.micro"
+  for_each = {
+    [terraform.workspace]   = 1
+  }
+
+
+  tags = {
+    Name = "Server "
+  }
+}*/
 
 resource "aws_security_group" "ec2_instance_sg" {
   name        = "ec2 test security group"
