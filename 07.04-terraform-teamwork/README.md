@@ -37,6 +37,19 @@ ___
 
 В качестве результата приложите ссылку на файлы `server.yaml` и `atlantis.yaml`.
 
+---
+Создаем нового пользователя github @maxship-atlantis, генерируем токен для входа.
+Запускаем докер-контейнер с атлантисом.
+
+```shell
+$ $ docker run --rm -d --name atlantis runatlantis/atlantis \
+server --gh-user=maxship-atlantis --gh-token=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 \
+--repo-allowlist=github.com/maxship/terraform-teamwork-example \
+-p 4141:4141
+```
+
+
+
 ## Задача 3. Знакомство с каталогом модулей. 
 
 1. В [каталоге модулей](https://registry.terraform.io/browse/modules) найдите официальный модуль от aws для создания
