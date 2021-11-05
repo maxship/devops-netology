@@ -39,14 +39,43 @@ ___
 
 ---
 Создаем нового пользователя github @maxship-atlantis, генерируем токен для входа.
-Запускаем докер-контейнер с атлантисом.
+Скачиваем и запускаем локальную версию атлантиса [https://github.com/runatlantis/atlantis/releases](https://github.com/runatlantis/atlantis/releases).
+Для того чтобы локально запущенный атлантис мог работать с репозиторием, привяжем локальные порты к сгенерированному утилитой `ngrok` адресу.
 
+Зарегистрировавшись и сгенерировав рандомный адрес, запустим `ngrok`
 ```shell
-$ $ docker run --rm -d --name atlantis runatlantis/atlantis \
-server --gh-user=maxship-atlantis --gh-token=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 \
---repo-allowlist=github.com/maxship/terraform-teamwork-example \
--p 4141:4141
+ngrok http 4141
 ```
+Полученный адрес записываем в переменую.
+```shell
+export URL="https://154b-92-124-135-190.ngrok.io"
+```
+Создаем ключ для вебхука
+```shell
+export SECRET="my_secret"
+```
+Добавляем в тестовый репозиторий гитхаба вебхук `https://154b-92-124-135-190.ngrok.io/events`.
+Задаем необходимые переменные.
+```shell
+export TOKEN="my_token"
+export USERNAME="maxship-atlantis"
+export REPO_ALLOWLIST="github.com/maxship/terraform-teamwork-example"
+```
+```shell
+export AWS_ACCESS_KEY_ID={my_key_id}
+export AWS_SECRET_ACCESS_KEY={my_key}
+```
+Запускаем атлантис.
+```shell
+atlantis server \
+--atlantis-url="$URL" \
+--gh-user="$USERNAME" \
+--gh-token="$TOKEN" \
+--gh-webhook-secret="$SECRET" \
+--repo-allowlist="$REPO_ALLOWLIST"
+```
+Создаем новую ветку, добавляем в файл `main.tf` пустой ресурс и делаем pull_request.
+
 
 
 
