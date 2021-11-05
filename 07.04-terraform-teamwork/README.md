@@ -76,6 +76,7 @@ atlantis server \
 ```
 Создаем новую ветку, добавляем в файл `main.tf` пустой ресурс и делаем pull_request.
 
+![pull_request](https://user-images.githubusercontent.com/72273610/140556756-62b0c7f8-260a-4fb4-8abb-92ff5f56573a.png)
 
 
 
