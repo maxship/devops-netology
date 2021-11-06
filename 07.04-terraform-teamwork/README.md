@@ -38,45 +38,46 @@ ___
 В качестве результата приложите ссылку на файлы `server.yaml` и `atlantis.yaml`.
 
 ---
-Создаем нового пользователя github @maxship-atlantis, генерируем токен для входа.
+Заходим в гитхаб, генерируем токен для входа.
 Скачиваем и запускаем локальную версию атлантиса [https://github.com/runatlantis/atlantis/releases](https://github.com/runatlantis/atlantis/releases).
-Для того чтобы локально запущенный атлантис мог работать с репозиторием, привяжем локальные порты к сгенерированному утилитой `ngrok` адресу.
+Атлантис мог работать с репозиторием, воспользуемся утилитой утилитой `ngrok` .
 
 Зарегистрировавшись и сгенерировав рандомный адрес, запустим `ngrok`
 ```shell
 ngrok http 4141
 ```
-Полученный адрес записываем в переменую.
+Полученный адрес записываем в файл серверного конфига `config.yaml`. Этот файл не обязателен - параметры можно задать переменными среды или непосредственно в консоли при запуске сервера.
+Туда же вводим токен гитхаба, секретный ключ для вебхука, имя пользователя гитхаба и путь к файлу настроек репозиториев `server.yaml`.
+
+
 ```shell
-export URL="https://154b-92-124-135-190.ngrok.io"
+gh-user: "maxship"
+atlantis-url: "https://6b49-92-124-135-190.ngrok.io"
+gh-token: "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"
+gh-webhook-secret: "oR1Og9YbF3RoexyvVbUkCAft1"
+repo-allowlist: "github.com/maxship/terraform-teamwork-example"
+repo-config:  "/home/max/devops/terraform-teamwork-example/server.yaml"
 ```
-Создаем ключ для вебхука
-```shell
-export SECRET="my_secret"
-```
-Добавляем в тестовый репозиторий гитхаба вебхук `https://154b-92-124-135-190.ngrok.io/events`.
-Задаем необходимые переменные.
-```shell
-export TOKEN="my_token"
-export USERNAME="maxship-atlantis"
-export REPO_ALLOWLIST="github.com/maxship/terraform-teamwork-example"
-```
+Добавляем в тестовый репозиторий гитхаба вебхук `https://6b49-92-124-135-190.ngrok.io`. Content type: application/json. Let me select individual events: Issue comments, PR, PR reviews, Pushes.
+
+Атлантис запущен в тестовом режиме - нужно помнить, что сгенерированный `ngrok` адрес будет работать только в текущей сессиии.
+
+Задаем необходимые для авторизации в AWS переменные среды.
+
 ```shell
 export AWS_ACCESS_KEY_ID={my_key_id}
 export AWS_SECRET_ACCESS_KEY={my_key}
 ```
-Запускаем атлантис.
-```shell
-atlantis server \
---atlantis-url="$URL" \
---gh-user="$USERNAME" \
---gh-token="$TOKEN" \
---gh-webhook-secret="$SECRET" \
---repo-allowlist="$REPO_ALLOWLIST"
-```
-Создаем новую ветку, добавляем в файл `main.tf` пустой ресурс и делаем pull_request.
 
-![pull_request](https://user-images.githubusercontent.com/72273610/140556756-62b0c7f8-260a-4fb4-8abb-92ff5f56573a.png)
+Запускаем атлантис.
+
+```shell
+$ atlantis server --config /home/max/devops/terraform-teamwork-example/config.yaml
+```
+Делаем pull_request.
+
+
+![pull_request](https://user-images.githubusercontent.com/72273610/140607021-bc95c1a5-9426-458c-bb50-5814f603b4b5.png)
 
 
 
