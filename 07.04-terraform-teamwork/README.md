@@ -131,3 +131,24 @@ $ atlantis server --config /home/max/devops/terraform-teamwork-example/config.ya
 В качестве результата задания приложите ссылку на созданный блок конфигураций. 
 
 ---
+
+В файл `main.tf` добавил блок:
+
+```terraform
+module "ec2_instance" {
+  source  = "terraform-aws-modules/ec2-instance/aws"
+  version = "~> 3.0"
+
+  name = "ec2_instance_by_module"
+
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = local.ec2_instance_type_map[terraform.workspace]
+  tags = {
+    Name  = "Instance created by aws-module"
+    Owner = "Max Shipitsyn"
+  }
+}
+```
+Внутри этого модуля используется один ресурс `aws_instance`, который ранее добавлялся напрямую. При использовании модуля по сути задаются все те же параметры + используется дополнительная прослойка. Поэтому в данном случае использование модуля нецелесообразно - он лишь вносит ненужное усложнение.
+
+[Ссылка на получившийся конфиг](https://github.com/maxship/devops-netology/tree/main/terraform)

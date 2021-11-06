@@ -14,6 +14,20 @@ data "aws_ami" "ubuntu" { # ищем последнюю версию убунт�
   owners = ["099720109477"] # Canonical
 }
 
+module "ec2_instance" {
+  source  = "terraform-aws-modules/ec2-instance/aws"
+  version = "~> 3.0"
+
+  name = "ec2_instance_by_module"
+
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = local.ec2_instance_type_map[terraform.workspace]
+  tags = {
+    Name  = "Instance created by aws-module"
+    Owner = "Max Shipitsyn"
+  }
+}
+
 resource "aws_instance" "ec2_instance" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = local.ec2_instance_type_map[terraform.workspace]
