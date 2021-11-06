@@ -53,7 +53,7 @@ ngrok http 4141
 ```shell
 gh-user: "maxship"
 atlantis-url: "https://6b49-92-124-135-190.ngrok.io"
-gh-token: "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"
+gh-token: {my-token}
 gh-webhook-secret: "oR1Og9YbF3RoexyvVbUkCAft1"
 repo-allowlist: "github.com/maxship/terraform-teamwork-example"
 repo-config:  "/home/max/devops/terraform-teamwork-example/server.yaml"
@@ -67,6 +67,44 @@ repo-config:  "/home/max/devops/terraform-teamwork-example/server.yaml"
 ```shell
 export AWS_ACCESS_KEY_ID={my_key_id}
 export AWS_SECRET_ACCESS_KEY={my_key}
+```
+Создаем файл настроек репозиториев на сервере.
+
+```yaml
+# server.yml
+# указываем репозиторий, разрешаем менять параметр workfflow (можно добавлять пользовательские команды)
+repos:
+- id: github.com/maxship/terraform-teamwork-example
+  allowed_overrides: [workflow]
+
+# В workflow используемом по-умолчанию, делаем так, что бы во время планирования не происходил `lock` состояния.
+workflows:
+  default:
+    plan:
+      steps:
+      - init:
+          extra_args: ["-lock=false"]
+      - plan:
+          extra_args: ["-lock=false"]
+    apply:
+      steps: [apply]
+```
+В корень тестового репозитория добавляем файл `atlantis.yaml`.
+
+```yaml
+# Включаем автоплан для обоих воркспейсов при изменении файлов .tf
+version: 3
+projects:
+- dir: .
+  workspace: stage
+  autoplan:
+    when_modified: [ "*.tf" ]
+    enabled: true
+- dir: .
+  workspace: prod
+  autoplan:
+    when_modified: [ "*.tf" ]
+    enabled: true
 ```
 
 Запускаем атлантис.
