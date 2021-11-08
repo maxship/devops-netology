@@ -150,6 +150,53 @@ $ go run multiplicity.go
 
 ---
 
+### Решение:
 
+При создании тестов возникли трудности.
+
+Для первой задачи упростил код, чтобы разобраться как работает тестирование:
+
+```go
+package main
+
+import "fmt"
+
+
+func foots (m float32) float32 {
+    output := m / 0.3048
+    return output
+
+}
+
+func main() {
+    fmt.Println(foots(3.525), "футов")
+}
+```
+
+Написал простой тест:
+
+```go
+package main
+
+import "testing"
+
+
+func testFoots(t *testing.T) {
+    var f float32
+    f = foots(3.525)
+    if f != 11.5649605 {
+        t.Error("Правильное значение 11.5649605, а получено ", f)
+    }
+}
+```
+При запуске вроде бы проверка проходит успешно:
+
+```shell
+$ go test
+testing: warning: no tests to run
+PASS
+ok      _/home/max/devops/devops-netology/07.05-golang/mfoots   0.001s
+```
+Но если я меняю значение условия `if f != 11.5649605` на любое другое, то проверка также завершается успешно, хотя не должна. В чем проблема, не понимаю.
 
 
