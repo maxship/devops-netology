@@ -62,6 +62,30 @@ go version go1.13.8 linux/amd64
 
 ---
 
+1. Немного изменив код, получил:
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Print("Ввести значение (в метрах): ")
+    var input float64
+    fmt.Scanf("%f", &input)
+
+    output := input / 0.3048
+
+    fmt.Println(output, "футов")
+}
+```
+```
+$ go run main.go
+Ввести значение (в метрах): 3
+9.84251968503937 футов
+```
+
+
 
 ## Задача 4. Протестировать код (не обязательно).
 
