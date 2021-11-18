@@ -5,40 +5,71 @@
 2. Создайте свой собственный публичный репозиторий на github с произвольным именем.
 3. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
 
+---
+Ссылка на новый репозиторий с ДЗ:
+[https://github.com/maxship/netology-8.1-ansible](https://github.com/maxship/netology-8.1-ansible)
+
 ## Основная часть
 1. Попробуйте запустить playbook на окружении из `test.yml`, зафиксируйте какое значение имеет факт `some_fact` для указанного хоста при выполнении playbook'a.
+
 ```shell
 max@MaxShip-Ryzen5-3600:~/devops/netology-8.1-ansible$ ansible-playbook site.yml -i inventory/test.yml
-[WARNING]: ansible.utils.display.initialize_locale has not been called, this may result in incorrectly calculated text widths that can cause Display to print
-incorrect line lengths
-
-PLAY [Print os facts] **********************************************************************************************************************************************
-
-TASK [Gathering Facts] *********************************************************************************************************************************************
-[DEPRECATION WARNING]: Distribution Ubuntu 20.04 on host localhost should use /usr/bin/python3, but is using /usr/bin/python for backward compatibility with prior 
-Ansible releases. A future Ansible release will default to using the discovered platform python for this host. See https://docs.ansible.com/ansible-
-core/2.11/reference_appendices/interpreter_discovery.html for more information. This feature will be removed in version 2.12. Deprecation warnings can be disabled 
-by setting deprecation_warnings=False in ansible.cfg.
-ok: [localhost]
-
-TASK [Print OS] ****************************************************************************************************************************************************
-ok: [localhost] => {
-    "msg": "Ubuntu"
-}
-
-TASK [Print fact] **************************************************************************************************************************************************
+....
+TASK [Print fact] *****************
 ok: [localhost] => {
     "msg": 12
 }
-
-PLAY RECAP *********************************************************************************************************************************************************
-localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+....
 ```
 
 2. Найдите файл с переменными (group_vars) в котором задаётся найденное в первом пункте значение и поменяйте его на 'all default fact'.
-3. Воспользуйтесь подготовленным (используется `docker`) или создайте собственное окружение для проведения дальнейших испытаний.
+
+`some_fact` для всех хостов задан в файле `group_vars/all/examp.yml`
+
+4. Воспользуйтесь подготовленным (используется `docker`) или создайте собственное окружение для проведения дальнейших испытаний.
+
+```shell
+$ docker run --name ubuntu -d --rm pycontribs/ubuntu sleep 999999 
+
+$ docker run --name centos7 -d --rm pycontribs/centos:7 sleep 999999
+
+$ docker ps
+CONTAINER ID   IMAGE                 COMMAND          CREATED          STATUS          PORTS     NAMES
+6c3a5a569ee2   pycontribs/centos:7   "sleep 999999"   28 seconds ago   Up 24 seconds             centos7
+bec59da15056   pycontribs/ubuntu     "sleep 999999"   2 minutes ago    Up 2 minutes              ubuntu
+```
+Для подключению к локальным контейнерам с помощью `ansible_connection: docker`, потребуется дополнительный плагин.
+```shell
+$ ansible-galaxy collection install community.docker
+```
+
 4. Проведите запуск playbook на окружении из `prod.yml`. Зафиксируйте полученные значения `some_fact` для каждого из `managed host`.
+
+```shell
+$ ansible-playbook site.yml -i inventory/prod.yml
+
+TASK [Print fact] **********************
+ok: [centos7] => {
+    "msg": "el"
+}
+ok: [ubuntu] => {
+    "msg": "deb"
+}
+```
+
 5. Добавьте факты в `group_vars` каждой из групп хостов так, чтобы для `some_fact` получились следующие значения: для `deb` - 'deb default fact', для `el` - 'el default fact'.
+
+```shell
+TASK [Print fact] *********************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+
+```
+
 6. Повторите запуск playbook на окружении `prod.yml`. Убедитесь, что выдаются корректные значения для всех хостов.
 7. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
 8. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
