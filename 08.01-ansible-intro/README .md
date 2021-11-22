@@ -161,8 +161,6 @@ ok: [centos7] => {
 
 [https://github.com/maxship/netology-8.1-ansible](https://github.com/maxship/netology-8.1-ansible)
 
----
-
 
 ## Необязательная часть
 
