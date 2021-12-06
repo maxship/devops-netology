@@ -4,6 +4,12 @@
 1. Создайте два пустых публичных репозитория в любом своём проекте: kibana-role и filebeat-role.
 2. Добавьте публичную часть своего ключа к своему профилю в github.
 
+---
+
+Создал 2 репозитория [kibana-role](https://github.com/maxship/kibana-role) и [filebeat-role](https://github.com/maxship/filebeat-role).
+
+Сделал в [репозитории предыдущего задания](https://github.com/maxship/netology-8.3-ansible-yandex) ветку [ROLES](https://github.com/maxship/netology-8.3-ansible-yandex/tree/ROLES) для переделки ранее созданного play в вариант с использованием roles.
+
 ## Основная часть
 
 Наша основная цель - разбить наш playbook на отдельные roles. Задача: сделать roles для elastic, kibana, filebeat и написать playbook для использования этих ролей. Ожидаемый результат: существуют два ваших репозитория с roles и один репозиторий с playbook.
