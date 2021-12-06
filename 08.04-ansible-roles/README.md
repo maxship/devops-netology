@@ -60,7 +60,7 @@ kibana_version: "{{  elk_stack_version  }}"
 elasticsearch_version: "{{  elk_stack_version  }}"
 filebeat_version: "{{  elk_stack_version  }}"
 ```
-Т.к. все сервисы elk обновляются одновременно, логично будет добавить дополнительную переменную с версией, так, чтобы она имела приоритет выше параметров, указанных по умолчанию.
+Т.к. все сервисы elk обновляются одновременно, логично будет добавить дополнительную переменную с версией, так, чтобы она имела приоритет выше параметров, указанных по умолчанию. Например, в `inventory/elk/group_vars/all.yml`.
 
 5. Перенести нужные шаблоны конфигов в `templates`.
 
@@ -80,7 +80,20 @@ $ ansible-galaxy role init filebeat-role
 ```
 
 7. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`. 
+
+```yml
+# filebeat-role/vars/main.yml
+---
+supported_systems: ['CentOS', 'Red Hat Enterprise Linux', 'Ubuntu', 'Debian']
+
+# filebeat-role/defaults/main.yml
+---
+filebeat_version: "7.14.0"
+filebeat_install_type: remote
+```
+
 8. Перенести нужные шаблоны конфигов в `templates`.
+
 ```yml
 # filebeat-role/templates/filebeat.yml.j2
 output.elasticsearch:
@@ -102,7 +115,7 @@ filebeat.config.modules.path: ${path.config}/modules.d/*.yml
 12. Переработайте playbook на использование roles.
 
 
-При запуске плейбука получл такую ошибку:
+При запуске плейбука получил такую ошибку:
 ```
 TASK [kibana-role : Copy Kibana to managed node] ********************************
 task path: /home/max/devops/netology-8.3-ansible-yandex/kibana-role/tasks/download_yum.yml:11
