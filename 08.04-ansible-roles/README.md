@@ -41,18 +41,54 @@ $ ansible-galaxy role init kibana-role
 
 4. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`. 
 
+```yml
+# kibana-role/vars/main.yml
+---
+supported_systems: ['CentOS', 'Red Hat Enterprise Linux', 'Ubuntu', 'Debian']
+
+# kibana-role/defaults/main.yml
+---
+kibana_version: "7.14.0"
+kibana_install_type: remote
+
+# inventory/elk/group_vars/all.yml
+---
+elk_stack_version: "7.15.2"
+ansible_connection: ssh
+ansible_user: maxship
+kibana_version: "{{  elk_stack_version  }}"
+elasticsearch_version: "{{  elk_stack_version  }}"
+filebeat_version: "{{  elk_stack_version  }}"
+```
+Т.к. все сервисы elk обновляются одновременно, логично будет добавить дополнительную переменную с версией, так, чтобы она имела приоритет выше параметров, указанных по умолчанию.
 
 5. Перенести нужные шаблоны конфигов в `templates`.
 
+```yml
+# kibana-role/templates/kibana.yml.j2
+server.port: 5601
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["http://{{ hostvars['el-instance']['ansible_facts']['default_ipv4']['address'] }}:9200"]
+kibana.index: ".kibana"
+```
 
 6. Создать новый каталог с ролью при помощи `ansible-galaxy role init filebeat-role`.
 
+```
+$ ansible-galaxy role init filebeat-role
+- Role filebeat-role was created successfully
+```
 
 7. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`. 
-
-
 8. Перенести нужные шаблоны конфигов в `templates`.
-
+```yml
+# filebeat-role/templates/filebeat.yml.j2
+output.elasticsearch:
+  hosts: ["http://{{ hostvars['el-instance']['ansible_facts']['default_ipv4']['address'] }}:9200"]
+setup.kibana:
+  host: "http://{{ hostvars['kibana-instance']['ansible_facts']['default_ipv4']['address'] }}:5601"
+filebeat.config.modules.path: ${path.config}/modules.d/*.yml
+```
 
 9. Описать в `README.md` обе роли и их параметры.
 
@@ -65,6 +101,17 @@ $ ansible-galaxy role init kibana-role
 
 12. Переработайте playbook на использование roles.
 
+
+При запуске плейбука получл такую ошибку:
+```
+TASK [kibana-role : Copy Kibana to managed node] ********************************
+task path: /home/max/devops/netology-8.3-ansible-yandex/kibana-role/tasks/download_yum.yml:11
+diff skipped: source file size is greater than 104448
+```
+Для исправления снял ограничение в `/etc/ansible/ansible.cfg`:
+```
+max_diff_size = 0 
+```
 
 13. Выложите playbook в репозиторий.
 
