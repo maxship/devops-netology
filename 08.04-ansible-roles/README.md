@@ -125,6 +125,14 @@ diff skipped: source file size is greater than 104448
 ```
 max_diff_size = 0 
 ```
+```
+$ ansible-playbook site.yml -i inventory/elk --diff -vv
+.....
+PLAY RECAP **********************************************************************
+app-instance               : ok=9    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+el-instance                : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+kibana-instance            : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0 
+```
 
 13. Выложите playbook в репозиторий.
 
