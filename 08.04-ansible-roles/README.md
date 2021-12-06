@@ -23,17 +23,52 @@
        name: elastic 
    ```
 2. При помощи `ansible-galaxy` скачать себе эту роль.
+
+Скачал role в директорию внутри пректа (дириктория `roles/elasticsearch-role` создается автоматически по параметру `name` в файле `requirements.yml`).
+```
+$ ansible-galaxy install -r requirements.yml -p roles
+Starting galaxy role install process
+- extracting elasticsearch-role to /home/max/devops/netology-8.3-ansible-yandex/roles/elasticsearch-role
+- elasticsearch-role (2.0.0) was installed successfully
+```
+
 3. Создать новый каталог с ролью при помощи `ansible-galaxy role init kibana-role`.
+
+```
+$ ansible-galaxy role init kibana-role
+- Role kibana-role was created successfully
+```
+
 4. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`. 
+
+
 5. Перенести нужные шаблоны конфигов в `templates`.
+
+
 6. Создать новый каталог с ролью при помощи `ansible-galaxy role init filebeat-role`.
+
+
 7. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`. 
+
+
 8. Перенести нужные шаблоны конфигов в `templates`.
+
+
 9. Описать в `README.md` обе роли и их параметры.
+
+
 10. Выложите все roles в репозитории. Проставьте тэги, используя семантическую нумерацию.
+
+
 11. Добавьте roles в `requirements.yml` в playbook.
+
+
 12. Переработайте playbook на использование roles.
+
+
 13. Выложите playbook в репозиторий.
+
+
 14. В ответ приведите ссылки на оба репозитория с roles и одну ссылку на репозиторий с playbook.
 
 ## Необязательная часть
