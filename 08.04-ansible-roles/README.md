@@ -108,14 +108,59 @@ filebeat.config.modules.path: ${path.config}/modules.d/*.yml
 
 10. Выложите все roles в репозитории. Проставьте тэги, используя семантическую нумерацию.
 
+Проставил теги и загрузил их в репозитории:
 
-11. Добавьте roles в `requirements.yml` в playbook.
+```sh
+$ git add *
+$ git commit -m "role created"
+$ git tag -a 1.0.0 -m "1st version"
+$ git show --pretty=oneline
+f0a9d2b2e8af4bd78c3ddf59aefea5dea89b26b7 (HEAD -> main, tag: 1.0.0) role created
+$ git push
+$ git push --tags
+```
+
+[https://github.com/maxship/filebeat-role/tree/1.0.0](https://github.com/maxship/filebeat-role/tree/1.0.0)
+
+[https://github.com/maxship/kibana-role/tree/1.0.0](https://github.com/maxship/kibana-role/tree/1.0.0)
 
 
-12. Переработайте playbook на использование roles.
+11.  Добавьте roles в `requirements.yml` в playbook.
 
+```yml
+---
+- src: git@github.com:netology-code/mnt-homeworks-ansible.git
+  scm: git
+  version: "2.0.0"
+  name: elasticsearch-role
+
+- src: git@github.com:maxship/kibana-role.git
+  scm: git
+  version: "2.0.0"
+  name: kibana-role
+
+- src: git@github.com:maxship/filebeat-role.git
+  scm: git
+  version: "2.0.0"
+  name: filebeat-role
+```
+
+12.  Переработайте playbook на использование roles.
+
+Загрузил роли из репозитория в директорию `roles` плейбука:
+
+```
+$ ansible-galaxy install -r requirements.yml -p roles
+Starting galaxy role install process
+- elasticsearch-role (2.0.0) is already installed, skipping.
+- extracting kibana-role to /home/max/devops/netology-8.3-ansible-yandex/roles/kibana-role
+- kibana-role (1.0.0) was installed successfully
+- extracting filebeat-role to /home/max/devops/netology-8.3-ansible-yandex/roles/filebeat-role
+- filebeat-role (1.0.0) was installed successfully
+```
 
 При запуске плейбука получил такую ошибку:
+
 ```
 TASK [kibana-role : Copy Kibana to managed node] ********************************
 task path: /home/max/devops/netology-8.3-ansible-yandex/kibana-role/tasks/download_yum.yml:11
@@ -139,6 +184,17 @@ kibana-instance            : ok=7    changed=0    unreachable=0    failed=0    s
 
 14. В ответ приведите ссылки на оба репозитория с roles и одну ссылку на репозиторий с playbook.
 
+**Ссылки на репозитории с ролями:**
+
+### [https://github.com/maxship/filebeat-role](https://github.com/maxship/filebeat-role)
+
+### [https://github.com/maxship/kibana-role](https://github.com/maxship/kibana-role)
+
+**Ссылка на репозиторий с плейбуком:**
+
+### [https://github.com/maxship/netology-8.3-ansible-yandex/tree/ROLES)](https://github.com/maxship/netology-8.3-ansible-yandex/tree/ROLES)
+
+
 ## Необязательная часть
 
 1. Проделайте схожие манипуляции для создания роли logstash.
@@ -148,8 +204,3 @@ kibana-instance            : ok=7    changed=0    unreachable=0    failed=0    s
 
 ---
 
-### Как оформить ДЗ?
-
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-
----
