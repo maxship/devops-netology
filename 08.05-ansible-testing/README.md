@@ -64,10 +64,17 @@ dependency:
   name: galaxy
 driver:
   name: docker
+# lint: ansible-lint
 platforms:
   - name: centos7
     image: docker.io/pycontribs/centos:7
     pre_build_image: true
+    exposed_ports:
+      - 5601/tcp
+      - 5601/udp
+    published_ports:
+      - 0.0.0.0:5601:5601/tcp
+      - 0.0.0.0:5601:5601/udp
   - name: centos8
     image: docker.io/pycontribs/centos:8
     pre_build_image: true
@@ -80,12 +87,13 @@ verifier:
   name: ansible
 
 # roles/kibana-role/tasks/install_dnf.yml
----
 # для установки требуется GPG ключ
+---
 - name: Download GPG-KEY
   become: true
   command: 
     cmd: "rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+  changed_when: false
 
 - name: Install Kibana
   become: true
@@ -95,7 +103,49 @@ verifier:
   notify: restart Kibana
 ```
 
+Предварительно запустил отдельно роль `elasticsrarch-role` на реальном сервере командой:
+
+```bash
+$ ansible-playbook -i inventory/elk/ site.yml --tags elastic
+```
+
+Пока не разобрался до конца как запустить эту зависимость автоматически в тестовом контейнере, поэтому сделал так. Еще в шаблоне конфигурации кибаны захардкодил ссылку на хост с эластиком.
+
+```yml
+# roles/kibana-role/templates/kibana.yml.j2
+server.port: 5601
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["http://62.84.115.18:9200"]
+kibana.index: ".kibana"
+```
+
+После этого выполнил 
+
+```bash
+$ molecule test
+
+TASK [kibana-role : Configure Kibana] ******************************************
+ok: [centos7]
+ok: [ubuntu]
+ok: [centos8]
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+centos8                    : ok=8    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+ubuntu                     : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+```
+
 4. Добавьте несколько assert'ов в verify.yml файл, для  проверки работоспособности kibana-role (проверка, что web отвечает, проверка логов, etc). Запустите тестирование роли повторно и проверьте, что оно прошло успешно.
+
+
+
+```yml
+  tasks:
+  - name: Verify kibana http
+    assert:
+      uri:
+        url: http://localhost:5601
+```
 
 5. Повторите шаги 2-4 для filebeat-role.
 
