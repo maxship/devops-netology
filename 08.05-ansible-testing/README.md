@@ -3,19 +3,28 @@
 ## Подготовка к выполнению
 
 1. Установите molecule: `pip3 install "molecule==3.4.0"`
-2. Соберите локальный образ на основе [Dockerfile](./Dockerfile)
 
-Установил молекулу, драйвер докера. Инициализировал дефолтный сценарий в существующей роли.
+В официальной документации настоятельно рекомендуется устанавливать молекулу в виртуальное окружнение, поэтому:
 
 ```bash
-$ pip3 install "molecule==3.4.0"
+$ sudo apt install python3.8-venv
+$ python3 -m venv ~/my_env
+$ source my_env/bin/activate
 
-$ python3 -m pip install --user "molecule[docker]"
+(my_env)$ python3 -m pip install --upgrade setuptools
+(my_env)$ python3 -m pip install "molecule[docker,lint]"
+```
+
+Инициализировал дефолтный сценарий в существующей роли.
+
+```bash
 
 $ molecule init scenario --role-name elasticsearch-role --driver-name docker
 INFO     Initializing new scenario default...
 INFO     Initialized scenario in /home/max/devops/netology-8.3-ansible-yandex/roles/elasticsearch-role/molecule/default successfully.
 ```
+
+2. Соберите локальный образ на основе [Dockerfile](./Dockerfile)
 
 ## Основная часть
 
@@ -60,25 +69,32 @@ INFO     Initialized scenario in /home/max/devops/netology-8.3-ansible-yandex/ro
 ```yml
 # roles/kibana-role/molecule/default/molecule.yml
 ---
+---
 dependency:
   name: galaxy
 driver:
   name: docker
-# lint: ansible-lint
 platforms:
-  - name: centos7
+# инстанс для эластика
+  - name: el-instance
+    groups: 
+      - elasticsearch
     image: docker.io/pycontribs/centos:7
     pre_build_image: true
-    exposed_ports:
-      - 5601/tcp
-      - 5601/udp
-    published_ports:
-      - 0.0.0.0:5601:5601/tcp
-      - 0.0.0.0:5601:5601/udp
+# инстансы для тестирования роли кибаны
+  - name: centos7
+    groups: 
+      - kibana
+    image: docker.io/pycontribs/centos:7
+    pre_build_image: true
   - name: centos8
+    groups: 
+      - kibana
     image: docker.io/pycontribs/centos:8
     pre_build_image: true
   - name: ubuntu
+    groups: 
+      - kibana
     image: docker.io/pycontribs/ubuntu:latest
     pre_build_image: true
 provisioner:
@@ -86,9 +102,25 @@ provisioner:
 verifier:
   name: ansible
 
-# roles/kibana-role/tasks/install_dnf.yml
-# для установки требуется GPG ключ
+# roles/kibana-role/molecule/default/converge.yml
 ---
+- name: Elastic role
+  hosts: elasticsearch
+  tasks:
+    - name: "Include elasticsearch-role"
+      include_role:
+        name: "elasticsearch-role"
+        
+- name: kibana role
+  hosts: kibana
+  tasks:
+    - name: "Include kibana-role"
+      include_role:
+        name: "kibana-role"
+
+# roles/kibana-role/tasks/install_dnf.yml
+---
+# для установки требуется GPG ключ
 - name: Download GPG-KEY
   become: true
   command: 
@@ -103,35 +135,15 @@ verifier:
   notify: restart Kibana
 ```
 
-Предварительно запустил отдельно роль `elasticsrarch-role` на реальном сервере командой:
-
-```bash
-$ ansible-playbook -i inventory/elk/ site.yml --tags elastic
-```
-
-Пока не разобрался до конца как запустить эту зависимость автоматически в тестовом контейнере, поэтому сделал так. Еще в шаблоне конфигурации кибаны захардкодил ссылку на хост с эластиком.
-
-```yml
-# roles/kibana-role/templates/kibana.yml.j2
-server.port: 5601
-server.host: "0.0.0.0"
-elasticsearch.hosts: ["http://62.84.115.18:9200"]
-kibana.index: ".kibana"
-```
-
 После этого выполнил 
 
 ```bash
 $ molecule test
 
-TASK [kibana-role : Configure Kibana] ******************************************
-ok: [centos7]
-ok: [ubuntu]
-ok: [centos8]
-
 PLAY RECAP *********************************************************************
 centos7                    : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
-centos8                    : ok=8    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+centos8                    : ok=8    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+el-instance                : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 ubuntu                     : ok=7    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 ```
 
