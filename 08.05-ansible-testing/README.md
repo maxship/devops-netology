@@ -137,8 +137,6 @@ ubuntu                     : ok=7    changed=0    unreachable=0    failed=0    s
 
 4. Добавьте несколько assert'ов в verify.yml файл, для  проверки работоспособности kibana-role (проверка, что web отвечает, проверка логов, etc). Запустите тестирование роли повторно и проверьте, что оно прошло успешно.
 
-
-
 ```yml
   tasks:
   - name: Verify kibana http
