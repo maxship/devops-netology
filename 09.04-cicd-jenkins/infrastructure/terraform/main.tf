@@ -13,9 +13,9 @@ provider "yandex" {
   zone      = "ru-central1-a"
 }
 
-# Инстанс Sonar
-resource "yandex_compute_instance" "sonar01" {
-  name = "sonar-01"
+# Инстанс jenkins-master
+resource "yandex_compute_instance" "jenkins-m" {
+  name = "jenkins-master"
   platform_id = "standard-v1"
   allow_stopping_for_update = true
 
@@ -31,24 +31,25 @@ resource "yandex_compute_instance" "sonar01" {
   }
 
   network_interface {
-    subnet_id = "${yandex_vpc_subnet.subnet01.id}"
+    subnet_id = "${yandex_vpc_subnet.subnet-01.id}"
     nat       = true
   }
 
   metadata = {
-    user-data = "${file("./meta.txt")}"
+    # user-data = "${file("./meta.txt")}"
+    ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
   }  
 }
 
-# Инстанс Nexus
-resource "yandex_compute_instance" "nexus01" {
-  name = "nexus-01"
+# Инстанс jenkins-agent
+resource "yandex_compute_instance" "jenkins-a" {
+  name = "jenkins-agent"
   platform_id = "standard-v1"
   allow_stopping_for_update = true
 
   resources {
     cores = 2
-    memory = 8
+    memory = 4
   }
 
   boot_disk {
@@ -58,24 +59,25 @@ resource "yandex_compute_instance" "nexus01" {
   }
 
   network_interface {
-    subnet_id = "${yandex_vpc_subnet.subnet01.id}"
+    subnet_id = "${yandex_vpc_subnet.subnet-01.id}"
     nat       = true
   }
 
   metadata = {
-    user-data = "${file("./meta.txt")}"
+    # user-data = "${file("./meta.txt")}"
+    ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
   }  
 }
 
-resource "yandex_vpc_network" "network01" {
+resource "yandex_vpc_network" "network-01" {
   name = "network-01"
 }
 
-resource "yandex_vpc_subnet" "subnet01" {
+resource "yandex_vpc_subnet" "subnet-01" {
   name       = "subnet-01"
   v4_cidr_blocks = ["10.2.0.0/16"]
   zone       = "ru-central1-a"
-  network_id = "${yandex_vpc_network.network01.id}"
+  network_id = "${yandex_vpc_network.network-01.id}"
 }
 
 # resource "yandex_vpc_security_group" "group01" {
