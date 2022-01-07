@@ -27,6 +27,7 @@ resource "yandex_compute_instance" "jenkins-m" {
   boot_disk {
     initialize_params {
       image_id = "fd88d018b9a937uli9bn" # Centos-7
+      size = 10
     }
   }
 
@@ -49,12 +50,13 @@ resource "yandex_compute_instance" "jenkins-a" {
 
   resources {
     cores = 2
-    memory = 4
+    memory = 8
   }
 
   boot_disk {
     initialize_params {
       image_id = "fd88d018b9a937uli9bn" # Centos-7
+      size = 20
     }
   }
 

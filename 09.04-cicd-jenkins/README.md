@@ -67,7 +67,7 @@ $ ssh centos@62.84.125.20
 
 4. Сделать первоначальную настройку.
 
-Отключил сборщики на мастере. Создал новый узел `agent-01`, прописал корень удаленной ФС как в плейбуке: `/opt/jenkins_agent/`, метки: `docker ansible python3`. Способ запуска: через выполнение команды `ssh 62.84.112.172 java -jar /opt/jenkins_agent/agent.jar` (IP созданного ранее хоста jenkins-agent).
+Отключил сборщики на мастере. Создал новый узел `agent-01`, прописал корень удаленной ФС так же как в плейбуке: `/opt/jenkins_agent/`, метки: `docker ansible python3`. Способ запуска: через выполнение команды `ssh 62.84.112.172 java -jar /opt/jenkins_agent/agent.jar` (IP созданного ранее хоста jenkins-agent).
 
 Смотрим логи:
 
@@ -89,7 +89,49 @@ Agent successfully connected and online
 
 1. Сделать Freestyle Job, который будет запускать `molecule test` из любого вашего репозитория с ролью.
 
+Item -> Freestyle Job. Label `ansible`. 
+Управление исходным кодом `Git`. 
+Credentials -> Add `git@github.com:maxship/kibana-role.git`. 
+Branch Specifier `*/main`.
+Additional Behaviours `Check out for sub-directory`: `kibana-role`.
+Сборка -> Выполнить команду shell:
 
+  ```sh
+  cd kibana-role
+  mkdir molecule/default/files
+  pip3 install -r test-requirements.txt
+  molecule test
+  ```
+Сам файл `test-requirements.txt` лежит в корне репозитория, и содержит список того, что требуется установить в среду:
+
+```
+molecule==3.4.0
+molecule_docker==0.3.3
+ansible<3
+docker
+selinux
+ansible-lint
+yamllint
+```
+
+При загрузке зависимых ролей galaxy возникла ошибка с правами доступа:
+
+```sh
+Starting galaxy role install process
+[WARNING]: - elasticsearch-role was NOT installed successfully: - command
+/usr/bin/git clone git@github.com:netology-code/mnt-homeworks-ansible.git
+elasticsearch-role failed in directory /home/jenkins/.ansible/tmp/ansible-
+local-14774x542qgpg/tmprt3or9pc (rc=128) - Permission denied (publickey).
+fatal: Could not read from remote repository.  Please make sure you have the
+correct access rights and the repository exists.
+```
+Установил плагин SSH-agent, пробрасывающий ключ из credentials в проект, установил в настройках среды разработки соответствующий чекбокс.
+
+После этого запустил сборку, все отработало успешно:
+
+```
+
+```
 
 2. Сделать Declarative Pipeline Job, который будет запускать `molecule test` из любого вашего репозитория с ролью.
 
@@ -99,23 +141,23 @@ Agent successfully connected and online
 
 
 
-4. Создать Multibranch Pipeline на запуск `Jenkinsfile` из репозитория.
+3. Создать Multibranch Pipeline на запуск `Jenkinsfile` из репозитория.
 
 
 
-5. Создать Scripted Pipeline, наполнить его скриптом из [pipeline](./pipeline).
+4. Создать Scripted Pipeline, наполнить его скриптом из [pipeline](./pipeline).
 
 
 
-6. Внести необходимые изменения, чтобы Pipeline запускал `ansible-playbook` без флагов `--check --diff`, если не установлен параметр при запуске джобы (prod_run = True), по умолчанию параметр имеет значение False и запускает прогон с флагами `--check --diff`.
+5. Внести необходимые изменения, чтобы Pipeline запускал `ansible-playbook` без флагов `--check --diff`, если не установлен параметр при запуске джобы (prod_run = True), по умолчанию параметр имеет значение False и запускает прогон с флагами `--check --diff`.
 
 
 
-7. Проверить работоспособность, исправить ошибки, исправленный Pipeline вложить в репозиторий в файл `ScriptedJenkinsfile`. Цель: получить собранный стек ELK в Ya.Cloud.
+6. Проверить работоспособность, исправить ошибки, исправленный Pipeline вложить в репозиторий в файл `ScriptedJenkinsfile`. Цель: получить собранный стек ELK в Ya.Cloud.
 
  
 
-8. Отправить две ссылки на репозитории в ответе: с ролью и Declarative Pipeline и c плейбукой и Scripted Pipeline.
+7. Отправить две ссылки на репозитории в ответе: с ролью и Declarative Pipeline и c плейбукой и Scripted Pipeline.
 
 ## Необязательная часть
 
