@@ -1,9 +1,12 @@
-node("linux"){
+node("agent"){
     stage("Git checkout"){
         git credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:aragastmatb/example-playbook.git'
     }
     stage("Sample define secret_check"){
         secret_check=true
+    }
+    stage("Java role download"){
+         'sh ansible-galaxy install -r requirements.yml -p roles'
     }
     stage("Run playbook"){
         if (secret_check){
@@ -11,7 +14,6 @@ node("linux"){
         }
         else{
             echo 'need more action'
-        }
-        
+        }        
     }
 }
