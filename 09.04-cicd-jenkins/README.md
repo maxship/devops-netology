@@ -87,12 +87,12 @@ Agent successfully connected and online
 ## Основная часть
 
 1. Сделать Freestyle Job, который будет запускать `molecule test` из любого вашего репозитория с ролью.
-
-Item -> Freestyle Job. Label `ansible`. 
-Управление исходным кодом `Git`. 
-Credentials -> Add `git@github.com:maxship/kibana-role.git`. 
-Branch Specifier `*/main`.
-Additional Behaviours `Check out for sub-directory`: `kibana-role`.
+`
+Item -> Freestyle Job `Molecule_run_FJ`. Label `ansible`.
+- Управление исходным кодом `Git`. 
+- Credentials -> Add `git@github.com:maxship/kibana-role.git`. 
+- Branch Specifier `*/main`.
+- Additional Behaviours `Check out for sub-directory`: `kibana-role`.
 Сборка -> Выполнить команду shell:
 
   ```sh
@@ -143,7 +143,7 @@ Finished: SUCCESS
 
 2. Сделать Declarative Pipeline Job, который будет запускать `molecule test` из любого вашего репозитория с ролью.
 
-Создал Item -> Pipeline `Molecule run (declarative pipeline)`.
+Создал Item -> Pipeline `Molecule_run_DP`.
 Добавил pipeline script с использованием генератора синтаксиса `Pipeline Syntax -> Snippet Generator / Declarative Directive Generator`.
 
 Как пробросить ключи из credentials через плагин sshagent в скрипте я не разобрался (нужны для загрузки galaxy ролей). Просто добавил публичный ключ агента в гитхаб.
@@ -202,11 +202,18 @@ Finished: SUCCESS
 
 3. Перенести Declarative Pipeline в репозиторий в файл `Jenkinsfile`.
 
-Скопировал скрипт с предыдущего шага.
+Скопировал скрипт с предыдущего шага в созданный `Jenkinsfile`в корневой директории репозитория с ролью.
 
 4. Создать Multibranch Pipeline на запуск `Jenkinsfile` из репозитория.
 
+Создал Item -> Multibranch Pipeline `Molecule_run_MP`. Указал путь к репозиторию и файлу со скриптом. 
 
+```
+Scheduled build for branch: jenkins-multibranch-test
+Processed 2 branches
+[Sat Jan 08 11:57:09 UTC 2022] Finished branch indexing. Indexing took 7.3 sec
+Finished: SUCCESS
+```
 
 5. Создать Scripted Pipeline, наполнить его скриптом из [pipeline](./pipeline).
 
@@ -221,6 +228,10 @@ Finished: SUCCESS
  
 
 8. Отправить две ссылки на репозитории в ответе: с ролью и Declarative Pipeline и c плейбукой и Scripted Pipeline.
+
+### [https://github.com/maxship/kibana-role/tree/main](https://github.com/maxship/kibana-role/tree/main) - Declarative Pipeline
+
+### [https://github.com/maxship/devops-netology/tree/main/09.04-cicd-jenkins](https://github.com/maxship/devops-netology/tree/main/09.04-cicd-jenkins) - Scripted Pipeline
 
 ## Необязательная часть
 
