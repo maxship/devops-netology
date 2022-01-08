@@ -1,17 +1,15 @@
-node("ansible"){
+node("ansible"){  
     stage("Git checkout"){
-        git credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:aragastmatb/example-playbook.git'
+        ws('java'){
+            git credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:aragastmatb/example-playbook.git'
+        }
     }
     stage("Prod check"){
         prod_run=false
     }
-    stage("Java role download"){
-        ws('java'){
-            'sh ansible-galaxy install -r requirements.yml -p roles'
-        }
-    }
     stage("Run playbook"){
         ws('java'){
+            'sh ansible-galaxy install -r requirements.yml -p roles'
             if (prod_run){
                 sh 'ansible-playbook site.yml -i inventory/prod.yml'
             }
