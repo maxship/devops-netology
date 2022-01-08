@@ -130,34 +130,98 @@ correct access rights and the repository exists.
 После этого запустил сборку, все отработало успешно:
 
 ```
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 
+INFO     Pruning extra files from scenario ephemeral directory
+$ ssh-agent -k
+unset SSH_AUTH_SOCK;
+unset SSH_AGENT_PID;
+echo Agent pid 9472 killed;
+[ssh-agent] Stopped.
+Finished: SUCCESS
 ```
 
 2. Сделать Declarative Pipeline Job, который будет запускать `molecule test` из любого вашего репозитория с ролью.
 
+Создал Item -> Pipeline `Molecule run (declarative pipeline)`.
+Добавил pipeline script с использованием генератора синтаксиса `Pipeline Syntax -> Snippet Generator / Declarative Directive Generator`.
 
+Как пробросить ключи из credentials через плагин sshagent в скрипте я не разобрался (нужны для загрузки galaxy ролей). Просто добавил публичный ключ агента в гитхаб.
+
+```yml
+pipeline {
+    agent {
+        label 'ansible'
+    }
+    stages {
+        stage('Cleanup'){
+            steps{
+                cleanWs()
+            }
+        }
+        stage ('Get chekout'){
+            steps {
+                 ws('kibana-role') { // новая рабочая директория для нашей роли
+                    git branch: 'main', credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:maxship/kibana-role.git'
+                 }
+            }
+        }
+        stage ('Install requiments'){
+            steps {
+                ws('kibana-role') {
+                    sh "pip3 install -r test-requirements.txt"
+                }
+            }
+        }
+        stage ('molecule test'){
+            steps {
+                ws('kibana-role') {
+                    sh 'mkdir molecule/default/files'
+                    sh 'molecule test'
+                }
+            }
+        }
+    }
+}
+```
+
+```
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
+[Pipeline] }
+[Pipeline] // ws
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
+```
 
 3. Перенести Declarative Pipeline в репозиторий в файл `Jenkinsfile`.
 
+Скопировал скрипт с предыдущего шага.
 
-
-3. Создать Multibranch Pipeline на запуск `Jenkinsfile` из репозитория.
-
-
-
-4. Создать Scripted Pipeline, наполнить его скриптом из [pipeline](./pipeline).
+4. Создать Multibranch Pipeline на запуск `Jenkinsfile` из репозитория.
 
 
 
-5. Внести необходимые изменения, чтобы Pipeline запускал `ansible-playbook` без флагов `--check --diff`, если не установлен параметр при запуске джобы (prod_run = True), по умолчанию параметр имеет значение False и запускает прогон с флагами `--check --diff`.
+5. Создать Scripted Pipeline, наполнить его скриптом из [pipeline](./pipeline).
 
 
 
-6. Проверить работоспособность, исправить ошибки, исправленный Pipeline вложить в репозиторий в файл `ScriptedJenkinsfile`. Цель: получить собранный стек ELK в Ya.Cloud.
+6. Внести необходимые изменения, чтобы Pipeline запускал `ansible-playbook` без флагов `--check --diff`, если не установлен параметр при запуске джобы (prod_run = True), по умолчанию параметр имеет значение False и запускает прогон с флагами `--check --diff`.
+
+
+
+7. Проверить работоспособность, исправить ошибки, исправленный Pipeline вложить в репозиторий в файл `ScriptedJenkinsfile`. Цель: получить собранный стек ELK в Ya.Cloud.
 
  
 
-7. Отправить две ссылки на репозитории в ответе: с ролью и Declarative Pipeline и c плейбукой и Scripted Pipeline.
+8. Отправить две ссылки на репозитории в ответе: с ролью и Declarative Pipeline и c плейбукой и Scripted Pipeline.
 
 ## Необязательная часть
 
