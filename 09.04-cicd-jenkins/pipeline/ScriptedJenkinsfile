@@ -9,7 +9,7 @@ node("ansible"){
     }
     stage("Run playbook"){
         ws('java'){
-            'sh ansible-galaxy install -r requirements.yml -p roles'
+            sh 'ansible-galaxy install -r requirements.yml -p roles'
             if (prod_run){
                 sh 'ansible-playbook site.yml -i inventory/prod.yml'
             }
