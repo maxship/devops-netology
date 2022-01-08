@@ -1,20 +1,23 @@
 node("ansible"){  
     stage("Git checkout"){
-        ws('elasticsearch-role'){
-            git credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:aragastmatb/example-playbook.git'
+        ws('elk'){
+            git branch: 'ROLES', credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:maxship/netology-8.3-ansible-yandex.git'
         }
     }
     stage("Prod check"){
-        prod_run=false
+        secret_check=true
+        prod_run=true
     }
     stage("Run playbook"){
-        ws('elasticsearch-role'){
-            sh 'ansible-galaxy install -r requirements.yml -p roles'
-            if (prod_run){
-                sh 'ansible-playbook site.yml -i inventory/prod.yml'
-            }
-            else{
-                sh 'ansible-playbook site.yml -i inventory/prod.yml --check --diff'
+        if (secret_check){
+            ws('elk'){
+                sh 'ansible-galaxy install -r requirements.yml'
+                if (prod_run){
+                    sh 'ansible-playbook site.yml -i inventory/elk'
+                }
+                else{
+                    sh 'ansible-playbook site.yml -i inventory/elk --check --diff'
+                }
             }
         }
     }
