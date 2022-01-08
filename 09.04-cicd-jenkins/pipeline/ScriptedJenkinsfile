@@ -10,7 +10,7 @@ node("ansible"){
         'sh ansible-galaxy install -r requirements.yml -p roles'
     }
     stage("Run playbook"){
-        if (param.prod_run){
+        if (params.prod_run){
             sh 'ansible-playbook site.yml -i inventory/prod.yml'
         }
         else{
