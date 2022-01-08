@@ -217,15 +217,61 @@ Finished: SUCCESS
 
 5. Создать Scripted Pipeline, наполнить его скриптом из [pipeline](./pipeline).
 
-
+```yml
+node("linux"){
+    stage("Git checkout"){
+        git credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:aragastmatb/example-playbook.git'
+    }
+    stage("Sample define secret_check"){
+        secret_check=true
+    }
+    stage("Run playbook"){
+        if (secret_check){
+            sh 'ansible-playbook site.yml -i inventory/prod.yml'
+        }
+        else{
+            echo 'need more action'
+        }        
+    }
+}
+```
 
 6. Внести необходимые изменения, чтобы Pipeline запускал `ansible-playbook` без флагов `--check --diff`, если не установлен параметр при запуске джобы (prod_run = True), по умолчанию параметр имеет значение False и запускает прогон с флагами `--check --diff`.
 
+- Поменял лейбл ноды. 
+- В параметрах git указал ранее созданный плейбук elk-стека [https://github.com/maxship/netology-8.3-ansible-yandex/tree/ROLES](https://github.com/maxship/netology-8.3-ansible-yandex/tree/ROLES).
+- Добавил запрос на подтверждение типа джобы (prod_run). Если выбрать прод, то снимается флаг `--check --diff`.
 
+```yml
+node("ansible"){  
+    stage("Git checkout"){
+        ws('elk'){
+            git branch: 'ROLES', credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:maxship/netology-8.3-ansible-yandex.git'
+        }
+    }
+    stage("Prod check"){
+        secret_check=true
+        prod_run = input(message: 'Is it prod job?', parameters: [booleanParam(defaultValue: false, name: 'prod_run')])
+    }
+    stage("Run playbook"){
+        if (secret_check){
+            ws('elk'){
+                sh 'ansible-galaxy install -r requirements.yml'
+                if (prod_run){
+                    sh 'ansible-playbook site.yml -i inventory/elk'
+                }
+                else{
+                    sh 'ansible-playbook site.yml -i inventory/elk --check --diff'
+                }
+            }
+        }
+    }
+}
+```
 
 7. Проверить работоспособность, исправить ошибки, исправленный Pipeline вложить в репозиторий в файл `ScriptedJenkinsfile`. Цель: получить собранный стек ELK в Ya.Cloud.
 
- 
+Пайплайн отработал успешно, `ScriptedJenkinsfile` находится в текущем репозитории
 
 8. Отправить две ссылки на репозитории в ответе: с ролью и Declarative Pipeline и c плейбукой и Scripted Pipeline.
 

@@ -1,17 +1,24 @@
-node("agent"){
+node("ansible"){  
     stage("Git checkout"){
-        git credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:aragastmatb/example-playbook.git'
+        ws('elk'){
+            git branch: 'ROLES', credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:maxship/netology-8.3-ansible-yandex.git'
+        }
     }
-    stage("Sample define secret_check"){
+    stage("Prod check"){
         secret_check=true
+        prod_run = input(message: 'Is it prod job?', parameters: [booleanParam(defaultValue: false, name: 'prod_run')])
     }
     stage("Run playbook"){
         if (secret_check){
-            sh 'ansible-playbook site.yml -i inventory/prod.yml'
+            ws('elk'){
+                sh 'ansible-galaxy install -r requirements.yml'
+                if (prod_run){
+                    sh 'ansible-playbook site.yml -i inventory/elk'
+                }
+                else{
+                    sh 'ansible-playbook site.yml -i inventory/elk --check --diff'
+                }
+            }
         }
-        else{
-            echo 'need more action'
-        }
-        
     }
 }
