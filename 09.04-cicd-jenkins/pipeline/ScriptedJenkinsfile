@@ -6,7 +6,8 @@ node("agent"){
         prod_run=false
     }
     stage("Java role download"){
-        'sh pwd && ansible-galaxy install -r requirements.yml -p roles'
+        'sh mkdir roles'
+        'sh ansible-galaxy install -r requirements.yml -p roles'
     }
     stage("Run playbook"){
         if (prod_run){
