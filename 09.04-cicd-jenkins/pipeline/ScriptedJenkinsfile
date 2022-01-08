@@ -5,15 +5,13 @@ node("agent"){
     stage("Sample define secret_check"){
         secret_check=true
     }
-    stage("Java role download"){
-         'sh ansible-galaxy install -r requirements.yml -p roles'
-    }
     stage("Run playbook"){
         if (secret_check){
             sh 'ansible-playbook site.yml -i inventory/prod.yml'
         }
         else{
             echo 'need more action'
-        }        
+        }
+        
     }
 }
