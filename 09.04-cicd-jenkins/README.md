@@ -148,7 +148,7 @@ Finished: SUCCESS
 
 Как пробросить ключи из credentials через плагин sshagent в скрипте я не разобрался (нужны для загрузки galaxy ролей). Просто добавил публичный ключ агента в гитхаб.
 
-```yml
+```groovy
 pipeline {
     agent {
         label 'ansible'
@@ -217,7 +217,7 @@ Finished: SUCCESS
 
 5. Создать Scripted Pipeline, наполнить его скриптом из [pipeline](./pipeline).
 
-```yml
+```groovy
 node("linux"){
     stage("Git checkout"){
         git credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:aragastmatb/example-playbook.git'
@@ -242,7 +242,7 @@ node("linux"){
 - В параметрах git указал ранее созданный плейбук elk-стека [https://github.com/maxship/netology-8.3-ansible-yandex/tree/ROLES](https://github.com/maxship/netology-8.3-ansible-yandex/tree/ROLES).
 - Добавил запрос на подтверждение типа джобы (prod_run). Если выбрать прод, то снимается флаг `--check --diff`.
 
-```yml
+```groovy
 node("ansible"){  
     stage("Git checkout"){
         ws('elk'){
