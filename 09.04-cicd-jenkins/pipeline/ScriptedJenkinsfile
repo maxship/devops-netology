@@ -6,7 +6,7 @@ node("ansible"){
     }
     stage("Prod check"){
         secret_check=true
-        prod_run=true
+        prod_run = input(message: 'Is it prod job?', parameters: [booleanParam(defaultValue: false, name: 'prod_run')])
     }
     stage("Run playbook"){
         if (secret_check){
