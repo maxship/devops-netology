@@ -1,4 +1,4 @@
-node("agent"){
+node("ansible"){
     stage("Git checkout"){
         git credentialsId: '56d713a4-f66a-47e6-a4bd-7191559e1587', url: 'git@github.com:aragastmatb/example-playbook.git'
     }
