@@ -22,6 +22,54 @@
 6. Точка вызова: запуск скрипта
 7. Если сборка происходит на ветке `master`: Образ должен пушится в docker registry вашего gitlab `python-api:latest`, иначе этот шаг нужно пропустить
 
+---
+
+Создал докерфайл:
+
+```dockerfile
+FROM centos:7
+
+RUN yum install python3 python3-pip -y
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+COPY python-api.py /python_api/python-api.py
+CMD ["python3", "/python_api/python-api.py"]
+```
+
+Необходимые библиотеки прописаны в `requirements.txt`:
+
+```
+flask
+flask-restful
+flask_jsonpify
+```
+
+Создал файл `.gitlab-ci.yml`:
+
+```yml
+stages:
+    - build
+    - deploy
+image: docker:20.10.12
+services:
+    - docker:20.10.12-dind
+builder:
+    stage: build
+    script:
+        - docker build -t local_build:latest .
+    except:
+        - main
+deployer:
+    stage: deploy
+    script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build -t $CI_REGISTRY/maxship/netology-9.6-cicd-gitlab:latest .
+        - docker push $CI_REGISTRY/maxship/netology-9.6-cicd-gitlab:latest
+    only: 
+        - main
+```
+
+
 ### Product Owner
 
 Вашему проекту нужна бизнесовая доработка: необходимо поменять JSON ответа на вызов метода GET `/rest/api/get_info`, необходимо создать Issue в котором указать:
