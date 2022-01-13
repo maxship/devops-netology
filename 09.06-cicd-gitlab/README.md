@@ -141,9 +141,21 @@ if __name__ == '__main__':
 1. Поднять докер-контейнер с образом `python-api:latest` и проверить возврат метода на корректность
 2. Закрыть Issue с комментарием об успешности прохождения, указав желаемый результат и фактически достигнутый
 
+---
+
+Запустил контейнер на локальной машине, проверил возврат метода, все работает корректно:
+
+```sh
+$ docker run --rm -dt --name test-api -p 5290:5290 registry.gitlab.com/maxship/netology-9.6-cicd-gitlab/python-api:latest
+e998055163e7d595954896dfe1f2458c79efa3c71683d4365d2f7bc73e1496d3
+$ curl localhost:5290/get_info
+{"version": 3, "method": "GET", "message": "Running"}
+```
+
 ## Итог
 
-После успешного прохождения всех ролей - отправьте ссылку на ваш проект в гитлаб, как решение домашнего задания
+### Ссылка на проект Gitlab: 
+### [https://gitlab.com/maxship/netology-9.6-cicd-gitlab](https://gitlab.com/maxship/netology-9.6-cicd-gitlab)
 
 ## Необязательная часть
 
