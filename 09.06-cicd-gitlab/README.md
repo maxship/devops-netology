@@ -7,7 +7,7 @@
 3. Создайте новый репозиторий в gitlab, наполните его [файлами](./repository)
 4. Проект должен быть публичным, остальные настройки по желанию
 
-### [https://gitlab.com/maxship/netology-cicd](https://gitlab.com/maxship/netology-cicd)
+### [https://gitlab.com/maxship/netology-9.6-cicd-gitlab](https://gitlab.com/maxship/netology-9.6-cicd-gitlab)
 
 ## Основная часть
 
