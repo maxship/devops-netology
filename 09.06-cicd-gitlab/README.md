@@ -69,6 +69,12 @@ deployer:
         - main
 ```
 
+Все изменения залиты в ветку `main`, сборка завершена успешно, созданный образ появился в хранилище.
+
+![961](https://user-images.githubusercontent.com/72273610/149294181-f6193f79-0931-4e2f-bb3a-1c3d02f8a40f.png)
+
+![962](https://user-images.githubusercontent.com/72273610/149294193-dd23c86d-9540-4253-a09a-1e370c8108bf.png)
+
 
 ### Product Owner
 
