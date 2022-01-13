@@ -1,0 +1,21 @@
+stages:
+    - build
+    #- test
+    - deploy
+image: docker:20.10.12
+services:
+    - docker:20.10.12-dind
+builder:
+    stage: build
+    script:
+        - docker build -t local_build:latest .
+    except:
+        - main
+deployer:
+    stage: deploy
+    script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build -t $CI_REGISTRY/maxship/netology-9.6-cicd-gitlab/python-api:latest .
+        - docker push $CI_REGISTRY/maxship/netology-9.6-cicd-gitlab/python-api:latest
+    only: 
+        - main
