@@ -22,6 +22,10 @@
     - curl http://localhost:8888
     - curl http://localhost:9092/kapacitor/v1/ping
 ```
+А также скриншот веб-интерфейса ПО chronograf (`http://localhost:8888`). 
+
+P.S.: если при запуске некоторые контейнеры будут падать с ошибкой - проставьте им режим `Z`, например
+`./data:/var/lib:Z`
 
 ---
 
@@ -81,12 +85,9 @@ $ curl http://localhost:9092/kapacitor/v1/ping -v
 < 
 * Connection #0 to host localhost left intact
 ```
+![1021](https://user-images.githubusercontent.com/72273610/149995101-bc79242a-a706-449a-b28a-8abe842069a2.png)
 
-
-А также скриншот веб-интерфейса ПО chronograf (`http://localhost:8888`). 
-
-P.S.: если при запуске некоторые контейнеры будут падать с ошибкой - проставьте им режим `Z`, например
-`./data:/var/lib:Z`
+---
 
 4. Перейдите в веб-интерфейс Chronograf (`http://localhost:8888`) и откройте вкладку `Data explorer`.
 
@@ -118,6 +119,10 @@ P.S.: если при запуске некоторые контейнеры б�
 SELECT mean("used_percent") AS "mean_used_percent" FROM "telegraf"."autogen"."mem" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND "host"='telegraf-getting-started' GROUP BY time(:interval:) FILL(null)
 ```
 
+![1022](https://user-images.githubusercontent.com/72273610/149995145-1b87961c-43ea-48dd-9149-35bdc468f961.png)
+
+---
+
 5. Изучите список [telegraf inputs](https://github.com/influxdata/telegraf/tree/master/plugins/inputs). 
 Добавьте в конфигурацию telegraf следующий плагин - [docker](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/docker):
 ```
@@ -147,6 +152,13 @@ SELECT mean("used_percent") AS "mean_used_percent" FROM "telegraf"."autogen"."me
 веб-интерфейсе базы telegraf.autogen . Там должны появиться метрики, связанные с docker.
 
 Факультативно можете изучить какие метрики собирает telegraf после выполнения данного задания.
+
+---
+
+### 5. Решение
+
+
+---
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
 
