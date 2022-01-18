@@ -23,6 +23,10 @@
     - curl http://localhost:9092/kapacitor/v1/ping
 ```
 
+---
+
+### 3. Решение
+
 ```sh
 $ ./sandbox up
 $ docker-compose ps
@@ -36,10 +40,46 @@ netology-102-monitoring-tick_telegraf_1        /entrypoint.sh telegraf          
 ```
 
 ```sh
-maxship@Ryzen5-Desktop:~/devops/devops-netology$ curl http://localhost:8086/ping
-maxship@Ryzen5-Desktop:~/devops/devops-netology$ curl http://localhost:8888
+$ curl http://localhost:8086/ping -v
+*   Trying 127.0.0.1:8086...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 8086 (#0)
+> GET /ping HTTP/1.1
+> Host: localhost:8086
+> User-Agent: curl/7.68.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 204 No Content
+< Content-Type: application/json
+< Request-Id: cb99950d-7885-11ec-81ea-0242ac120002
+< X-Influxdb-Build: OSS
+< X-Influxdb-Version: 1.8.10
+< X-Request-Id: cb99950d-7885-11ec-81ea-0242ac120002
+< Date: Tue, 18 Jan 2022 17:40:58 GMT
+< 
+* Connection #0 to host localhost left intact
+
+$ curl http://localhost:8888
 <!DOCTYPE html><html><head><meta http-equiv="Content-type" content="text/html; charset=utf-8"><title>Chronograf</title><link rel="icon shortcut" href="/favicon.fa749080.ico"><link rel="stylesheet" href="/src.3dbae016.css"></head><body> <div id="react-root" data-basepath=""></div> <script src="/src.fab22342.js"></script> </body></html>
-maxship@Ryzen5-Desktop:~/devops/devops-netology$ curl http://localhost:9092/kapacitor/v1/ping
+
+$ curl http://localhost:9092/kapacitor/v1/ping -v
+*   Trying 127.0.0.1:9092...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 9092 (#0)
+> GET /kapacitor/v1/ping HTTP/1.1
+> Host: localhost:9092
+> User-Agent: curl/7.68.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 204 No Content
+< Content-Type: application/json; charset=utf-8
+< Request-Id: e379ddbc-7885-11ec-81c6-000000000000
+< X-Kapacitor-Version: 1.6.2
+< Date: Tue, 18 Jan 2022 17:41:38 GMT
+< 
+* Connection #0 to host localhost left intact
 ```
 
 
@@ -59,6 +99,24 @@ P.S.: если при запуске некоторые контейнеры б�
 
 Для выполнения задания приведите скриншот с отображением метрик утилизации места на диске 
 (disk->host->telegraf_container_id) из веб-интерфейса.
+
+---
+
+### 4. Решение
+
+Изначально поля `mem` в веб интерфейсе не было, поэтому добавил соответствующие настройки в файл настроек `telegraf/telegraf.conf`
+
+```conf
+  [[inputs.mem]]
+```
+
+После перезапуска docker-compose командой `./sandbox restart` выполняем Explore -> Add a query -> Выбрать DB telegraf.autogen -> В поле Measurments & Tags выбрать раздел Mem -> Host telegraf-getting-started -> В поле Fields выбрать used_percent.
+
+Появился SQL-запрос:
+
+```sql
+SELECT mean("used_percent") AS "mean_used_percent" FROM "telegraf"."autogen"."mem" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND "host"='telegraf-getting-started' GROUP BY time(:interval:) FILL(null)
+```
 
 5. Изучите список [telegraf inputs](https://github.com/influxdata/telegraf/tree/master/plugins/inputs). 
 Добавьте в конфигурацию telegraf следующий плагин - [docker](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/docker):
