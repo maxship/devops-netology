@@ -111,9 +111,9 @@ $ curl http://localhost:9092/kapacitor/v1/ping -v
   [[inputs.mem]]
 ```
 
-После перезапуска docker-compose командой `./sandbox restart` выполняем Explore -> Add a query -> Выбрать DB telegraf.autogen -> В поле Measurments & Tags выбрать раздел Mem -> Host telegraf-getting-started -> В поле Fields выбрать used_percent.
+После перезапуска docker-compose командой `./sandbox restart` выполняем `Explore -> Add a query -> telegraf.autogen -> mem -> host-1 telegraf-getting-started -> used_percent`.
 
-Появился SQL-запрос:
+Сформировался SQL-запрос:
 
 ```sql
 SELECT mean("used_percent") AS "mean_used_percent" FROM "telegraf"."autogen"."mem" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND "host"='telegraf-getting-started' GROUP BY time(:interval:) FILL(null)
@@ -157,6 +157,44 @@ SELECT mean("used_percent") AS "mean_used_percent" FROM "telegraf"."autogen"."me
 
 ### 5. Решение
 
+Добавил соответствующие настройки в файл настроек `telegraf/telegraf.conf`
+
+```yml
+[[inputs.docker]]
+  endpoint = "unix:///var/run/docker.sock"
+  timeout = "5s"
+  perdevice = true
+  total = false
+```
+
+и в `docker-compose.yml`
+
+```yml
+  telegraf:
+    privileged: true
+    # Telegraf requires network access to InfluxDB
+    links:
+      - influxdb
+    volumes:
+      # Mount for telegraf configuration
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:Z
+      # Mount for Docker API access
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - influxdb
+    ports:
+      - "8092:8092/udp"
+      - "8094:8094"
+      - "8125:8125/udp"
+```
+
+После перезапуска новые метрики не появились. Для работы потребовались дополнительные права на `/var/run/docker.sock`:
+
+```
+sudo chmod 666 /var/run/docker.sock
+```
+
+![1023](https://user-images.githubusercontent.com/72273610/151372272-bbdc59fb-0cf7-4dde-8a1b-4d4745241054.png)
 
 ---
 
