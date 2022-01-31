@@ -101,6 +101,13 @@ node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs"}
 
 Для решения ДЗ - приведите скриншот вашей итоговой Dashboard.
 
+---
+
+#### Решение
+
+![1033](https://user-images.githubusercontent.com/72273610/151784575-647824f8-221a-4d52-9e65-5d59b425df34.png)
+
+
 ### Задание 4
 Сохраните ваш Dashboard.
 
@@ -111,4 +118,8 @@ node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs"}
 В решении задания - приведите листинг этого файла.
 
 ---
+
+#### Решение
+
+##### [https://github.com/maxship/devops-netology/blob/main/10.03-monitiring-grafana/my_dashboard.json](https://github.com/maxship/devops-netology/blob/main/10.03-monitiring-grafana/my_dashboard.json)
 
