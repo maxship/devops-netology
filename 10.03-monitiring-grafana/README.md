@@ -29,7 +29,28 @@
 
 Решение домашнего задания - скриншот веб-интерфейса grafana со списком подключенных Datasource.
 
-## Задание 2
+---
+
+#### Решение
+
+Для формирования запросов к prometheus для графаны, потребуется зайти в GUI, поэтому в `docker-compose` открыл дополнительно порты:
+
+```yml
+    ports:
+      - 9090:9090
+```
+После этого prometheus так же будет досупен по адресу `localhost:9090`.
+
+```
+$ docker-compose up -d
+Creating nodeexporter ... done
+Creating prometheus   ... done
+Creating grafana      ... done
+```
+
+![1031](https://user-images.githubusercontent.com/72273610/151760406-1ba95756-53ce-49dc-ad0f-9a29f49ce458.png)
+
+### Задание 2
 Изучите самостоятельно ресурсы:
 - [promql-for-humans](https://timber.io/blog/promql-for-humans/#cpu-usage-by-instance)
 - [understanding prometheus cpu metrics](https://www.robustperception.io/understanding-machine-cpu-usage)
@@ -42,12 +63,45 @@
 
 Для решения данного ДЗ приведите promql запросы для выдачи этих метрик, а также скриншот получившейся Dashboard.
 
-## Задание 3
+---
+
+#### Решение
+
+- Для вывода графика загрузки CPU, воспользуемся значением `idle`, т.е. временем, когда процессор ничего не делает. Вычтем это значение из 100%.
+
+```
+100 -(avg by (instance) (rate(node_cpu_seconds_total{job="nodeexporter",mode="idle"}[1m])) * 100)
+```
+
+- CPULA выведем на один график с помощью запросов:
+
+```
+node_load1{instance="nodeexporter:9100", job="nodeexporter"}
+node_load5{instance="nodeexporter:9100", job="nodeexporter"}
+node_load15{instance="nodeexporter:9100", job="nodeexporter"}
+```
+
+- Количество свободной оперативной памяти:
+
+```
+node_memory_MemFree_bytes{instance="nodeexporter:9100", job="nodeexporter"}
+```
+
+- Количество места на файловой системе:
+
+```
+node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs"}
+```
+
+![1032](https://user-images.githubusercontent.com/72273610/151770871-5eb7a233-6733-48a4-99f6-4d716a436dba.png)
+
+
+### Задание 3
 Создайте для каждой Dashboard подходящее правило alert (можно обратиться к первой лекции в блоке "Мониторинг").
 
 Для решения ДЗ - приведите скриншот вашей итоговой Dashboard.
 
-## Задание 4
+### Задание 4
 Сохраните ваш Dashboard.
 
 Для этого перейдите в настройки Dashboard, выберите в боковом меню "JSON MODEL".
@@ -58,8 +112,3 @@
 
 ---
 
-### Как оформить ДЗ?
-
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-
----
