@@ -17,6 +17,11 @@ Free cloud account имеет следующие ограничения:
 
 Для выполнения задания - пришлите скриншот меню Projects.
 
+---
+
+![1051](https://user-images.githubusercontent.com/72273610/152113563-4487e626-fb5c-48d3-9944-42d97c4fe0af.png)
+
+
 ## Задание 2
 
 Создайте python проект и нажмите `Generate sample event` для генерации тестового события.
@@ -27,6 +32,32 @@ Free cloud account имеет следующие ограничения:
 
 Для выполнения задание предоставьте скриншот `Stack trace` из этого события и список событий проекта, 
 после нажатия `Resolved`.
+
+---
+
+Создал новый проект `python_test_project` и одноименный файл, куда вставил код sdk и код, генерирующий ошибку:
+
+```py
+import sentry_sdk
+sentry_sdk.init(
+    "https://aceec2d4ae0b472188c670b94176ee32@o1133118.ingest.sentry.io/6179365",
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
+division_by_zero = 1 / 0
+```
+
+После выполнения программы во вкладке `Issues` появилось соответствующее событие.
+
+![10512](https://user-images.githubusercontent.com/72273610/152113924-7d6d8035-41f4-4e3e-a388-79897d66999e.png)
+
+
+![1052](https://user-images.githubusercontent.com/72273610/152113586-d64649db-a92c-4fb8-8b6e-1c5e5239a7b0.png)
+
 
 ## Задание 3
 
@@ -48,6 +79,13 @@ Free cloud account имеет следующие ограничения:
 Дополнительно поэкспериментируйте с правилами алёртинга. 
 Выбирайте разные условия отправки и создавайте sample events. 
 
+---
+
+После создания дефолтного правила алерта и очередного запуска приложения, на почту поступило сообщение:
+
+![1053](https://user-images.githubusercontent.com/72273610/152113597-ba618760-da3a-48e9-9199-241eff2de6fb.png)
+
+
 ## Задание повышенной сложности
 
 Создайте проект на ЯП python или GO (небольшой, буквально 10-20 строк), подключите к нему sentry SDK и отправьте несколько тестовых событий.
@@ -58,8 +96,3 @@ Free cloud account имеет следующие ограничения:
 
 ---
 
-### Как оформить ДЗ?
-
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-
----
