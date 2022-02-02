@@ -10,6 +10,7 @@ services:
       - discovery.seed_hosts=es-warm
       - cluster.initial_master_nodes=es-hot,es-warm
       - bootstrap.memory_lock=true
+      - node.attr.box_type=hot
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - data01:/usr/share/elasticsearch/data:Z
@@ -36,6 +37,7 @@ services:
       - discovery.seed_hosts=es-hot
       - cluster.initial_master_nodes=es-hot,es-warm
       - bootstrap.memory_lock=true
+      - node.attr.box_type=warm
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - data02:/usr/share/elasticsearch/data:Z
