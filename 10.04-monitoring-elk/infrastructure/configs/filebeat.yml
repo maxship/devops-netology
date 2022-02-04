@@ -3,6 +3,21 @@ filebeat.inputs:
     paths:
       - '/var/lib/docker/containers/*/*.log'
 
+filebeat.modules:
+- module: system
+  syslog:
+    enabled: true
+  auth:
+    enabled: true
+- module: auditd
+  log:
+    enabled: true
+
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
 processors:
   - add_docker_metadata:
       host: "unix:///var/run/docker.sock"
@@ -12,6 +27,10 @@ processors:
       target: "json"
       overwrite_keys: true
 
+setup.dashboards.enabled: true
+setup.kibana:
+  host: "kibana:5601"
+
 output.logstash:
   hosts: ["logstash:5046"]
 
@@ -20,3 +39,8 @@ output.logstash:
 
 logging.json: true
 logging.metrics.enabled: false
+
+xpack.monitoring:
+  enabled: true
+  elasticsearch:
+    hosts: ["es-hot:9200"]
