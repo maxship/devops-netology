@@ -43,7 +43,4 @@
       become: true
       command: /usr/local/bin/minikube addons enable ingress
 
-    - name: "Start minikube"
-      become: true
-      command: /usr/local/bin/minikube start --vm-driver=none
 
