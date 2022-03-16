@@ -335,9 +335,9 @@ root@fhms9hp5r3klh4lpmtta:/home/ubuntu# minikube addons list
 
 ## Задача 3: Установить kubectl
 
-### 3.1. Установка на локальную машину.
+### 3.1. Установка kubectl
 
-kubectl был установлен в первой задаче:
+kubectl был установлен в первой задаче на удаленную ВМ, а как соединиться с удаленным кластером с локальной машины, пока не разобрался.
 
 ```shell
 root@fhms9hp5r3klh4lpmtta:/home/ubuntu# kubectl version --client
@@ -431,8 +431,4 @@ minikube_master:
     - name: "Enable ingress addon"
       become: true
       command: /usr/local/bin/minikube addons enable ingress
-
-    - name: "Start minikube"
-      become: true
-      command: /usr/local/bin/minikube start --vm-driver=none
 ```

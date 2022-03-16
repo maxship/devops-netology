@@ -43,4 +43,3 @@
       become: true
       command: /usr/local/bin/minikube addons enable ingress
 
-
