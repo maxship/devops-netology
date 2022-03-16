@@ -428,7 +428,27 @@ minikube_master:
         name: conntrack
         state: present
 
+    - name: "Start minikube"
+      become: true
+      command: /usr/local/bin/minikube start --vm-driver=none
+
     - name: "Enable ingress addon"
       become: true
       command: /usr/local/bin/minikube addons enable ingress
+```
+
+Плейбук для установки тестового приложения:
+
+```YML
+#deploy_hello_world.yml
+---
+- name: Hello world
+  hosts: all
+
+  tasks:
+    - name: "Deploy app"
+      command: /usr/local/bin/kubectl create deployment hello-node --image=k8s.gcr.io/echoserver:1.4
+
+    - name: "Expose port"
+      command: /usr/local/bin/kubectl expose deployment hello-node --type=LoadBalancer --port=8080
 ```

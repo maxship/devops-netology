@@ -39,6 +39,10 @@
         name: conntrack
         state: present
 
+    - name: "Start minikube"
+      become: true
+      command: /usr/local/bin/minikube start --vm-driver=none
+
     - name: "Enable ingress addon"
       become: true
       command: /usr/local/bin/minikube addons enable ingress
