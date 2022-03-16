@@ -447,8 +447,10 @@ minikube_master:
 
   tasks:
     - name: "Deploy app"
+      become: true
       command: /usr/local/bin/kubectl create deployment hello-node --image=k8s.gcr.io/echoserver:1.4
 
     - name: "Expose port"
+      become: true
       command: /usr/local/bin/kubectl expose deployment hello-node --type=LoadBalancer --port=8080
 ```
