@@ -370,3 +370,69 @@ user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko
 BODY:
 -no body in request-
 ```
+
+## Задача 4: Cобрать через ansible
+
+Плейбук для установки minikube:
+
+```YAML
+#inventory/prod/hosts.yml
+minikube_master:
+  hosts:
+    ubuntu:
+      ansible_host: 193.32.218.118
+      ansible_port: 22
+      ansible_connection: ssh
+      ansible_user: ubuntu
+
+
+#install_minikube.yml
+---
+- name: Install minikube
+  hosts: all
+
+  tasks:
+    - name: "Get minikube stable version"
+      set_fact:
+        minikube_version: "{{ lookup('url', 'https://storage.googleapis.com/kubernetes-release/release/stable.txt') }}"
+
+    - name: "Download and install kubectl"
+      become: true
+      get_url:
+        url: "https://storage.googleapis.com/kubernetes-release/release/{{ minikube_version }}/bin/linux/amd64/kubectl"
+        dest: "/usr/local/bin/kubectl"
+        mode: 0755
+
+    - name: "Download and install minikube"
+      become: true
+      get_url:
+        url: "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+        dest: "/usr/local/bin/minikube"
+        mode: 0755
+
+    - name: "Upgrade the OS"
+      become: true
+      apt:
+        update_cache: yes
+        upgrade: full
+
+    - name: "Install docker"
+      become: true
+      apt: 
+        name: docker.io
+        state: present
+
+    - name: "Install conntrack"
+      become: true
+      apt: 
+        name: conntrack
+        state: present
+
+    - name: "Enable ingress addon"
+      become: true
+      command: /usr/local/bin/minikube addons enable ingress
+
+    - name: "Start minikube"
+      become: true
+      command: /usr/local/bin/minikube start --vm-driver=none
+```
