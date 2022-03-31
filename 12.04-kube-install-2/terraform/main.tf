@@ -13,21 +13,54 @@ provider "yandex" {
   zone      = "ru-central1-a"
 }
 
-# Инстанс minikube
-resource "yandex_compute_instance" "minikube-01" {
-  name = "minikube-master"
+# control plane
+resource "yandex_compute_instance" "cp-1" {
+  
+  name = "cp-1"
+
   platform_id = "standard-v1"
   allow_stopping_for_update = true
 
   resources {
     cores = 2
-    memory = 4
+    memory = 2
   }
 
   boot_disk {
     initialize_params {
       image_id = "fd8mfc6omiki5govl68h" # Ubuntu-20.04
-      size = 10
+      size = 50
+    }
+  }
+
+  network_interface {
+    subnet_id = "${yandex_vpc_subnet.subnet-01.id}"
+    nat       = true
+  }
+
+  metadata = {
+    ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
+  }  
+}
+
+# Инстансы node
+resource "yandex_compute_instance" "node" {
+  count = 4
+
+  platform_id = "standard-v1"
+  allow_stopping_for_update = true
+
+  name = "node-${count.index+1}"
+
+  resources {
+    cores = 2
+    memory = 2
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = "fd8mfc6omiki5govl68h" # Ubuntu-20.04
+      size = 100
     }
   }
 
