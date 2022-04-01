@@ -361,7 +361,7 @@ users:
     client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJ......LS0tCg==
     client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSB.......LS0tCg==
 ```
-EУдалил minikube и запустил заново с флагом `--apiserver-ips`.
+Удалил minikube и запустил заново с флагом `--apiserver-ips`.
 
 ```sh
 root@fhm2feote4ceokv6a3nk:/etc/kubernetes# minikube delete 
