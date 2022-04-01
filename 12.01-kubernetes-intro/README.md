@@ -337,39 +337,49 @@ root@fhms9hp5r3klh4lpmtta:/home/ubuntu# minikube addons list
 
 ### 3.1. Установка kubectl
 
-kubectl был установлен в первой задаче на удаленную ВМ, а как соединиться с удаленным кластером с локальной машины, пока не разобрался.
+kubectl был установлен в первой задаче на удаленную ВМ. Установил на локальную машину.
+Скопировал содержимое `root@fhm2feote4ceokv6a3nk:/etc/kubernetes/admin.conf` с удаленного хоста в локальный файл настроек `~/.kube/config`, заменив IP адрес мастера на внешний.
 
-```shell
-root@fhms9hp5r3klh4lpmtta:/home/ubuntu# kubectl version --client
-Client Version: version.Info{Major:"1", Minor:"23", GitVersion:"v1.23.4", GitCommit:"e6c093d87ea4cbb530a7b2ae91e54c0842d8308a", GitTreeState:"clean", BuildDate:"2022-02-16T12:38:05Z", GoVersion:"go1.17.7", Compiler:"gc", Platform:"linux/amd64"}
+```yml
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJ.............0tLS0tCg==
+    server: https://51.250.75.249:8443
+  name: mk
+contexts:
+- context:
+    cluster: mk
+    user: kubernetes-admin
+  name: kubernetes-admin@mk
+current-context: kubernetes-admin@mk
+kind: Config
+preferences: {}
+users:
+- name: kubernetes-admin
+  user:
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJ......LS0tCg==
+    client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSB.......LS0tCg==
+```
+EУдалил minikube и запустил заново с флагом `--apiserver-ips`.
+
+```sh
+root@fhm2feote4ceokv6a3nk:/etc/kubernetes# minikube delete 
+
+ubuntu@fhm2feote4ceokv6a3nk:~$ sudo sysctl fs.protected_regular=0
+fs.protected_regular = 0
+
+ubuntu@fhm2feote4ceokv6a3nk:~$ sudo minikube start --vm-driver=none --apiserver-ips=51.250.75.249
+```
+После этого kubectl заработал локально.
+
+```sh
+maxship@Ryzen5-Desktop:~/devops/devops-netology/12.02-kub
+e-commands/ansible$ kubectl get nodes
+NAME                   STATUS   ROLES                  AGE   VERSION
+fhm2feote4ceokv6a3nk   Ready    control-plane,master   2m    v1.23.3
 ```
 
-Порт также был открыт на предыдущем шаге. Проверка работоспособности тестового приложения `http://178.154.200.191:31866/`:
-
-```html
-CLIENT VALUES:
-client_address=172.17.0.1
-command=GET
-real path=/
-query=nil
-request_version=1.1
-request_uri=http://178.154.200.191:8080/
-
-SERVER VALUES:
-server_version=nginx: 1.10.0 - lua: 10001
-
-HEADERS RECEIVED:
-accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-accept-encoding=gzip, deflate
-accept-language=ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-connection=keep-alive
-host=178.154.200.191:31866
-sec-gpc=1
-upgrade-insecure-requests=1
-user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36
-BODY:
--no body in request-
-```
 
 ## Задача 4: Cобрать через ansible
 
