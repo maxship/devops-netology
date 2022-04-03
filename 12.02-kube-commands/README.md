@@ -36,30 +36,17 @@
 ### Задание 1. Запуск пода из образа в деплойменте
 
 ```sh
-$ kubectl create deployment hello-node --image=k8s.gcr.io/echoserver:1.4
-deployment.apps/hello-node created
+root@fhmj9q9t0i4uiq02kvlf:/home/ubuntu# kubectl create deployment hello-node --image=hello-world --replicas=2
+deployment.apps/hello-world created
 
-$ kubectl get deployments
-NAME         READY   UP-TO-DATE   AVAILABLE   AGE
-hello-node   1/1     1            1           84s
-
-$ kubectl get pods
+root@fhmj9q9t0i4uiq02kvlf:/home/ubuntu# kubectl get po
 NAME                          READY   STATUS    RESTARTS   AGE
-hello-node-6b89d599b9-7pxrl   1/1     Running   0          103s
-```
+hello-world-649b9bfb9c-ffdb2   0/1     ContainerCreating   0          5s
+hello-world-649b9bfb9c-l85m9   0/1     Completed           0          5s
 
-```sh
- kubectl scale --replicas=2 deploy/hello-node
-deployment.apps/hello-node scaled
-
-$ kubectl get pods
-NAME                          READY   STATUS    RESTARTS   AGE
-hello-node-6b89d599b9-7pxrl   1/1     Running   0          4m18s
-hello-node-6b89d599b9-xpgsg   1/1     Running   0          3s
-
-$ kubectl get deploy
+root@fhmj9q9t0i4uiq02kvlf:/home/ubuntu# kubectl get deploy
 NAME         READY   UP-TO-DATE   AVAILABLE   AGE
-hello-node   2/2     2            2           5m9s
+hello-world   0/2     2            0           38s
 ```
 
 ## Задание 2: Просмотр логов для разработки.
@@ -85,7 +72,7 @@ kind: CertificateSigningRequest
 metadata:
   name: developer
 spec:
-  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ25qQ0NBWVlDQVFBd1dURUxNQWtHQTFVRUJoTUNRVlV4RXpBUkJnTlZCQWdNQ2xOdmJXVXRVM1JoZEdVeApJVEFmQmdOVkJBb01HRWx1ZEdWeWJtVjBJRmRwWkdkcGRITWdVSFI1SUV4MFpERVNNQkFHQTFVRUF3d0paR1YyClpXeHZjR1Z5TUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF1OHVoNXV4VFo2VTMKalZacFJNeW1pNy85dDRyNXc2cm85dUFFeXJHY2RCVUN2czBMN3N1cnN5bm1JVmFSQXIrcDRMN3NqVlJDR3U4QwpQbUp5OTVWeW9jKzNMc0Q0SDRLcDVmWUJFWHdVOERXdGRidUNuTzRmWklzNmpkMWViREtpUkVKUkZIdGI1ejZQCkJUOXZpNFJwdk1ybGpKZmVPb1FBK0svb205Z2U2U1ZCYXBtU1Z5ZEhzK2FqZlRSSER2NHhSa3poT0lsMHFWc0sKQktNaHVZWmgwbnFZTVVoNVJDeDN4UmdEeUFKMmYzQ05TaFE1MDZuUkk2aXQvTFh2cXcrUVVuT0xtVXNLUWJKZAp3a2g3cDQ4YmJDRTdzNFI4VnhQa2hOTHZZa0FEZCs1R3YyUjZ4UHV5MEp2V2ovRVY2SW1JZXhGWFdhUUpUZmVuCnlQdHZoMXhkbXdJREFRQUJvQUF3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUlnUUZpNFdicDVKNkwrQkZLZWUKWjdiQnZlSmxrd2oxVTh4bTlxU05aQllESkJHdG1nQWgvL2pXeExKZU9OcEJLVWN4WWxLZm4wUVUvUmV5OEpFTQo5MnZYV3JyamxJNGRLdFFYV1ZIZ0J6Tysyc1RXTWtLcHZFMFNxMVpsTlI4dEdjZGRacGk3azlkRE1ENjNDSHRvCis0aVQ3VkQ2QUs5NUJYYVhUMWRQTzR5eEVYZ2NHa2hkSTllUUYzS0piZ3p5WGNoaXA3ZGVqcmdXK1ZIUjlFVmIKWExFMHpUZytJMURFY1dXZGFiRER0ZXJtTkFoZ0lTYWhIV2lra2p6Q2F0Zzlid0tURk9oYk44QWY3MkdyNVEySgp6ZFlzajhuK1R5S0NYR1RWbjVSOGVLRzBBMzVLOVAvMW5Mb0VUMVFoTHNKY2kyTlJheTRKdmF3QzArOGFPZlNFClRiQT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ25qQ0NBWVlDQVFBd1dURUxNQWtHQTFVRUJoTUNRVlV4RXpBUkJnTlZCQWdNQ2xOdmJXVXRVM1JoZEdVeApJVEFmQmdOVkJBb01HRWx1ZEdWeWJtVjBJRmRwWkdkcGRITWdVSFI1SUV4MFpERVNNQkFHQTFVRUF3d0paR1YyClpXeHZjR1Z5TUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF1NXhYTGJGUEVPK2cKaGxxbXVaYU56Ny9uS1dJVnN2am1NTXpZdDB6TmZOcElRUWpaUHNsOW9IOXpreXZveUFMdk1iUmFsUE5HNFZZWAovVldXc3RMbGl0UElLM1drdVhZcEtPU3NDTUlJL053MUY2Mm83WXNDWk5GWjQ2WnkzTlRDbEo1MmJUT3U1V0VxCjdyYkswNTZHNmo1eFRRdUR0Q0ovcVovWTV0amVkWGlxZHo4ZEpZODVIMEsySVRGbzBiYnB3MldsUW80NzY1RFYKaUtxQjJIbzZHa0NqbjNPRXhpcUEyWmFWTGxDN0RwRUpldXc3aUhvTlJkWEpabTJhRDdzU3JCZExaOWtQSzhBQQo4ZENpcHlhSnZaTmtZQm1vUXFQaDFYUnFFd0pYWnhGMnZOa2kwODJ6ZUZ1dVZIMEQzZ1pnYmNVRWNrWDg1M3pOCjZXZHJDMEVvYXdJREFRQUJvQUF3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUUwcENGNldNNk1LTU5Id1dtQ3gKSWhwaHNocmUrYnpKOVRYaC9IbEw0Qk10ZDRYZEZ2OGV5NTYvaDYzeE94dzhyZDFndFgvczNyYnpEbWZJWm5uWQpYUkpLcDQ2Si9aUldZV3NzZWNKMFdtV3psTTRpeXZqYWlvRG9PQWUwRWJIck44QXZvc1VaQXJHMkN1d05OOU9YCjZyeXZDdGpZUElHeGZ3UVpDUDg3SWFGN21LVHF0U0FBbnVJOXNEQzJra2dDWERhbHVCOXRQaG4zSG14Yk9Fb3EKaC9sVFpITzEyRlZZWUZ4MVJiVlBEZ3VsOE5PWlcrbkJLaURvNnVyYTRESHRHTHNUYmJQTFl4Q3k3ZC9xOVJxdQp0L0dnWnB4ZlNjSE1USjhxbnN5R2xnc21uSDN3K3BPZUo1c09MaU5pTWp2Y1dTNWNWbEN3OTMrakhTVTVFWlVTCkhVcz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
   signerName: kubernetes.io/kube-apiserver-client
   expirationSeconds: 86400  # one day
   usages:
@@ -105,7 +92,7 @@ developer   6m    kubernetes.io/kube-apiserver-client           minikube-user   
 $ kubectl get csr developer -o jsonpath='{.status.certificate}'| base64 -d > developer.crt
 
 # Создаем роль с правом на просмотр и чтение pods.
-$ kubectl create role developer --verb=get --verb=list --verb=watch --resource=pods
+$ kubectl create role developer --verb=get --verb=list --verb=watch --resource=pods --resource=pods/log
 role.rbac.authorization.k8s.io/developer created
 
 # Связываем пользователя с ролью.
@@ -127,18 +114,18 @@ Context "developer" created.
 $ kubectl config use-context developer
 
 # Смотрим конфиг:
-root@fhm2feote4ceokv6a3nk:/home/ubuntu# kubectl config view
+root@fhmjpfklkt6bofcadlk1:/home/ubuntu# kubectl config view
 apiVersion: v1
 clusters:
 - cluster:
     certificate-authority: /root/.minikube/ca.crt
     extensions:
     - extension:
-        last-update: Fri, 01 Apr 2022 08:41:07 UTC
+        last-update: Sun, 03 Apr 2022 15:32:18 UTC
         provider: minikube.sigs.k8s.io
         version: v1.25.2
       name: cluster_info
-    server: https://10.2.0.6:8443
+    server: https://10.2.0.17:8443
   name: minikube
 contexts:
 - context:
@@ -149,7 +136,7 @@ contexts:
     cluster: minikube
     extensions:
     - extension:
-        last-update: Fri, 01 Apr 2022 08:41:07 UTC
+        last-update: Sun, 03 Apr 2022 15:32:18 UTC
         provider: minikube.sigs.k8s.io
         version: v1.25.2
       name: context_info
@@ -170,16 +157,27 @@ users:
     client-key: /root/.minikube/profiles/minikube/client.key
 
 # Смотрим список подов: 
-root@fhm2feote4ceokv6a3nk:/home/ubuntu# kubectl get pods
+root@fhmjpfklkt6bofcadlk1:/home/ubuntu# kubectl get pods
 NAME                          READY   STATUS    RESTARTS   AGE
-hello-node-6b89d599b9-7pxrl   1/1     Running   0          124m
-hello-node-6b89d599b9-fr9dv   1/1     Running   0          115m
-hello-node-6b89d599b9-h4kqw   1/1     Running   0          115m
-hello-node-6b89d599b9-qbvpb   1/1     Running   0          115m
-hello-node-6b89d599b9-xpgsg   1/1     Running   0          119m
+hello-world-649b9bfb9c-ffdb2   0/1     CrashLoopBackOff   3 (49s ago)   101s
+hello-world-649b9bfb9c-l85m9   0/1     CrashLoopBackOff   3 (51s ago)   101s
+
+# Смотрим лог пода:
+root@fhmjpfklkt6bofcadlk1:/home/ubuntu# kubectl logs hello-world-649b9bfb9c-l85m9 | head
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+
 
 # Вывод описания пода:
-root@fhm2feote4ceokv6a3nk:/home/ubuntu# kubectl --context=developer describe po hello-node-6b89d599b9-xpgsg
+root@fhm2feote4ceokv6a3nk:/home/ubuntu# kubectl describe po hello-node-6b89d599b9-xpgsg
 Name:         hello-node-6b89d599b9-xpgsg
 Namespace:    default
 Priority:     0
