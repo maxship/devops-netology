@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: db-psql-stateful
+  name: db-psql
   labels:
     app: db-psql
 spec:
-  serviceName: db-psql-svc
+  serviceName: db-psql
   replicas: 1
   selector:
     matchLabels:
@@ -21,7 +21,6 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 5432
-            name: db
         volumeMounts:
           - name: db-volume
             mountPath: /data

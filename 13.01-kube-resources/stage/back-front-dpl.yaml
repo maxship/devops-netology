@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: front-back-dpl
+  name: frontend-backend
   labels:
     app: frontend-backend
 spec:
@@ -19,7 +19,6 @@ spec:
         name: frontend
         ports:
         - containerPort: 80
-          name: front
         env:
           - name: BASE_URL
             value: http://localhost:9000
@@ -28,7 +27,6 @@ spec:
         name: backend
         ports:
         - containerPort: 9000
-          name: back
         env:
           - name: DATABASE_URL
             value: postgres://postgres:postgres@postgres:5432/news
