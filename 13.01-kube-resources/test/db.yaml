@@ -1,23 +1,22 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: db-psql
+  name: postgres
   labels:
-    app: db-psql
+    app: postgres
 spec:
-  serviceName: db-psql
-  replicas: 1
+  serviceName: "postgres"
   selector:
     matchLabels:
-      app: db-psql # должен совпадать с .spec.template.metadata.labels
+      app: postgres
   template:
     metadata:
       labels:
-        app: db-psql # должен совпадать с .spec.selector.matchLabels
+        app: postgres
     spec:
       containers:
-      - name: db-psql
-        image: postgres:alpine3.15
+      - name: postgres
+        image: postgres:13-alpine
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 5432

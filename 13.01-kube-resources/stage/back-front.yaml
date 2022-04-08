@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-backend
+  labels:
+    app: frontend-backend
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: frontend-backend
+  template:
+    metadata:
+      labels:
+        app: frontend-backend
+    spec:
+      containers:
+      - image: moshipitsyn/k8s-frontend:v1
+        imagePullPolicy: IfNotPresent
+        name: frontend
+        ports:
+        - containerPort: 80
+        env:
+          - name: BASE_URL
+            value: http://localhost:9000
+      - image: moshipitsyn/k8s-backend:v1
+        imagePullPolicy: IfNotPresent
+        name: backend
+        ports:
+        - containerPort: 9000
+        env:
+          - name: DATABASE_URL
+            value: postgres://postgres:postgres@postgres:5432/news
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-backend
+  namespace: default
+spec:
+  selector:
+    app: frontend-backend
+  ports:
+    - name: front
+      protocol: TCP
+      port: 8000
+      targetPort: 80
+    - name: back
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+  type: ClusterIP
+
+#---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: frontend-backend
+#spec:
+#  selector:
+#    app: frontend-backend
+#  type: NodePort
+#  ports:
+#    - name: frontend
+#      protocol: TCP
+#      port: 80
+#      nodePort: 32100
+#    - name: backend
+#      protocol: TCP
+#      port: 9000
+#      nodePort: 32000

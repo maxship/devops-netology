@@ -14,7 +14,7 @@ spec:
         app: frontend-backend
     spec:
       containers:
-      - image: moshipitsyn/k8s-frontend:v1
+      - image: alexdies/frontend
         imagePullPolicy: IfNotPresent
         name: frontend
         ports:
@@ -22,7 +22,7 @@ spec:
         env:
           - name: BASE_URL
             value: http://localhost:9000
-      - image: moshipitsyn/k8s-backend:v1
+      - image: alexdies/backend
         imagePullPolicy: IfNotPresent
         name: backend
         ports:
