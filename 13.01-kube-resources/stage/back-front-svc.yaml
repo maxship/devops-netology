@@ -1,15 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kubernetes-01-stage-app
+  name: front-back-svc
 spec:
-  type: ClusterIP
   selector:
-    app: stage-app
+    app: frontend-backend
   ports:
-  - name: frontend
-    port: 8000
-    protocol: TCP
-  - name: backend
-    port: 9000
-    protocol: TCP
+    - name: front
+      protocol: TCP
+      port: 80
+    - name: back
+      protocol: TCP
+      port: 9000
