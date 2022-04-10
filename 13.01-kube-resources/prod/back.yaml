@@ -22,8 +22,7 @@ spec:
         - containerPort: 9000
         env:
           - name: DATABASE_URL
-            value: postgres://postgres:postgres@postgres:5432/news
-
+            value: postgres://postgres:postgres@postgres:5432/news # адрес сервиса БД
 ---
 apiVersion: v1
 kind: Service
@@ -34,7 +33,7 @@ spec:
   selector:
     app: backend
   ports:
-    - name: back
+    - name: backend
       protocol: TCP
       port: 9000
       targetPort: 9000

@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -6,7 +7,7 @@ metadata:
     app: postgres
   namespace: default
 spec:
-  serviceName: "postgres"
+  serviceName: postgres
   selector:
     matchLabels:
       app: postgres # должен совпадать с .spec.template.metadata.labels
@@ -23,7 +24,7 @@ spec:
           - containerPort: 5432
         volumeMounts:
           - name: db-volume
-            mountPath: /data
+            mountPath: "/var/lib/postgresql/data"
         env:
           - name: POSTGRES_PASSWORD
             value: postgres
@@ -33,6 +34,7 @@ spec:
             value: news
       volumes:
         - name: db-volume
+          emptyDir: {}
 
 ---
 apiVersion: v1

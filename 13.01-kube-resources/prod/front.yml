@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,7 +23,7 @@ spec:
         - containerPort: 80
         env:
           - name: BASE_URL
-            value: backend:9000
+            value: backend:9000 # адрес сервиса бекенда
 
 ---
 apiVersion: v1
@@ -34,7 +35,7 @@ spec:
   selector:
     app: frontend
   ports:
-    - name: front
+    - name: frontend
       protocol: TCP
       port: 8000
       targetPort: 80

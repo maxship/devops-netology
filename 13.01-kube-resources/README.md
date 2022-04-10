@@ -43,8 +43,12 @@ $ docker build -t k8s-backend:v1 -f Dockerfile .
 $ docker tag k8s-backend:v1 moshipitsyn/k8s-backend:v1
 $ docker push moshipitsyn/k8s-backend:v1
 ```
-Манифест для БД и ее сервиса:
+Куда какие лейблы в манифесте привязываются, до конца так и не разобрался, поэтому везде прописал одинаковые. Все основные параметры в манифестах взял из `docker-compose.yml` тестового приложения.
+
+[Манифест БД:](./stage/db.yaml)
+
 ```yaml
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -53,7 +57,7 @@ metadata:
     app: postgres
   namespace: default
 spec:
-  serviceName: "postgres"
+  serviceName: postgres
   selector:
     matchLabels:
       app: postgres # должен совпадать с .spec.template.metadata.labels
@@ -70,7 +74,7 @@ spec:
           - containerPort: 5432
         volumeMounts:
           - name: db-volume
-            mountPath: /data
+            mountPath: "/var/lib/postgresql/data"
         env:
           - name: POSTGRES_PASSWORD
             value: postgres
@@ -80,7 +84,7 @@ spec:
             value: news
       volumes:
         - name: db-volume
-
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -97,9 +101,10 @@ spec:
       targetPort: 5432
   type: ClusterIP
 ```
-Манифест для деплоймента фронтенд + бекенд:
+[Манифест для деплоймента фронтенд + бекенд:](./stage/back-front.yaml)
 
 ```yaml
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -133,7 +138,6 @@ spec:
         env:
           - name: DATABASE_URL
             value: postgres://postgres:postgres@postgres:5432/news
-
 ---
 apiVersion: v1
 kind: Service
@@ -144,11 +148,11 @@ spec:
   selector:
     app: frontend-backend
   ports:
-    - name: front
+    - name: frontend
       protocol: TCP
       port: 8000
       targetPort: 80
-    - name: back
+    - name: backend
       protocol: TCP
       port: 9000
       targetPort: 9000
@@ -228,6 +232,9 @@ Session Affinity:  None
 Events:            <none>
 
 # При использовании сервисов типа ClusterIP на удаленном хосте, мы можем проверить работоспособность изнутри кластера. Для этого подключимся по ssh к одной из нод.
+$ ssh ubuntu@51.250.81.158
+
+# Заходим на фронтенд:
 ubuntu@node-1:~$ curl 10.233.60.47:8000
 <!DOCTYPE html>
 <html lang="ru">
@@ -246,8 +253,188 @@ ubuntu@node-1:~$ curl 10.233.60.47:8000
 </body>
 </html>
 
+# Заходим на бекенд:
 ubuntu@node-1:~$ curl 10.233.60.47:9000
 {"detail":"Not Found"}
 ```
+Я не знаю как именно должно работать тестовое приложение, поэтому не уверен что вывод корректен. 
+
+Сделал еще второй вариант сервиса типа NodePort для доступа по внешнему IP:
+
+```yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-backend
+spec:
+  selector:
+    app: frontend-backend
+  type: NodePort # соединение по внешнему IP
+  ports:
+    - name: frontend
+      protocol: TCP
+      port: 80
+      nodePort: 32100
+    - name: backend
+      protocol: TCP
+      port: 9000
+      nodePort: 32000
+```
+По внешнему IP рабочей ноды получил тот же результат:
+
+![фронтенд](img/130101.png)
+
+![бекенд](img/130102.png)
 
 ## Задание 2: подготовить конфиг для production окружения
+
+[Манифест для фронтенда:](./prod/front.yml)
+
+```yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - image: moshipitsyn/k8s-frontend:v1
+        imagePullPolicy: IfNotPresent
+        name: frontend
+        ports:
+        - containerPort: 80
+        env:
+          - name: BASE_URL
+            value: backend:9000 # адрес сервиса бекенда
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: default
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: frontend
+      protocol: TCP
+      port: 8000
+      targetPort: 80
+  type: ClusterIP
+```
+[Манифест для бекенда:](./prod/back.yaml)
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - image: moshipitsyn/k8s-backend:v2
+        imagePullPolicy: IfNotPresent
+        name: backend
+        ports:
+        - containerPort: 9000
+        env:
+          - name: DATABASE_URL
+            value: postgres://postgres:postgres@postgres:5432/news # адрес сервиса БД
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: default
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: backend
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+```
+Манифест БД для прода не поменяется.
+
+Применяем созданные манифесты:
+
+```shell
+$ kubectl apply -f back.yaml
+$ kubectl apply -f front.yml
+```
+
+Смотрим список созданных ресурсов:
+
+```shell
+Every 2,0s: kubectl get po -o wide                                                   Ryzen5-Desktop: Sun Apr 10 15:36:52 2022
+
+NAME                                READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS G
+ATES
+backend-b5d9bcd48-j59w6             1/1     Running   0          3m21s   10.233.112.6   node-1   <none>           <none>
+frontend-65869b85df-m5k2j           1/1     Running   0          2m19s   10.233.112.7   node-1   <none>           <none>
+frontend-backend-7898678669-qtl58   2/2     Running   0          11m     10.233.112.5   node-1   <none>           <none>
+postgres-0                          1/1     Running   0          45m     10.233.112.2   node-1   <none>           <none>
+
+
+Every 2,0s: kubectl get svc -o wide                                                  Ryzen5-Desktop: Sun Apr 10 15:37:16 2022
+
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE     SELECTOR
+backend            ClusterIP   10.233.47.180   <none>        9000/TCP            3m1s    app=backend
+frontend           ClusterIP   10.233.56.105   <none>        8000/TCP            2m43s   app=frontend
+frontend-backend   ClusterIP   10.233.12.93    <none>        8000/TCP,9000/TCP   12m     app=frontend-backend
+kubernetes         ClusterIP   10.233.0.1      <none>        443/TCP             64m     <none>
+postgres           ClusterIP   10.233.36.232   <none>        5432/TCP            46m     app=postgres
+```
+
+![](img/130103.png)
+
+Проверяем работоспособность:
+
+```shell
+# Проверяем фронтенд:
+root@node-1:/home/ubuntu# curl 10.233.56.105:8000 -m 1
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Список</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/build/main.css" rel="stylesheet">
+</head>
+<body>
+    <main class="b-page">
+        <h1 class="b-page__title">Список</h1>
+        <div class="b-page__content b-items js-list"></div>
+    </main>
+    <script src="/build/main.js"></script>
+</body>
+</html>
+
+# Проверяем бекенд:
+root@node-1:/home/ubuntu# curl 10.233.47.180:9000 -m 1
+{"detail":"Not Found"}
+```

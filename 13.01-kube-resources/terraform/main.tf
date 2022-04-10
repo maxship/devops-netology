@@ -45,7 +45,7 @@ resource "yandex_compute_instance" "cp-1" {
 
 # work nodes
 resource "yandex_compute_instance" "node" {
-  count = 2
+  count = 1
 
   platform_id = "standard-v1"
   allow_stopping_for_update = true

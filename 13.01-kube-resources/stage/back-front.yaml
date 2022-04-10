@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -31,7 +32,6 @@ spec:
         env:
           - name: DATABASE_URL
             value: postgres://postgres:postgres@postgres:5432/news
-
 ---
 apiVersion: v1
 kind: Service
@@ -42,15 +42,15 @@ spec:
   selector:
     app: frontend-backend
   ports:
-    - name: front
+    - name: frontend
       protocol: TCP
       port: 8000
       targetPort: 80
-    - name: back
+    - name: backend
       protocol: TCP
       port: 9000
       targetPort: 9000
-  type: ClusterIP
+  type: ClusterIP # Соединение внутри кластера
 
 #---
 #apiVersion: v1
@@ -60,7 +60,7 @@ spec:
 #spec:
 #  selector:
 #    app: frontend-backend
-#  type: NodePort
+#  type: NodePort # соединение по внешнему IP
 #  ports:
 #    - name: frontend
 #      protocol: TCP
