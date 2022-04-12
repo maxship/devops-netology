@@ -2,7 +2,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: pvc-stage
+  name: pvc-prod
 spec:
   storageClassName: "nfs"
   accessModes:

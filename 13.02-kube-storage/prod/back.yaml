@@ -23,6 +23,14 @@ spec:
         env:
           - name: DATABASE_URL
             value: postgres://postgres:postgres@postgres:5432/news # адрес сервиса БД
+        volumeMounts:
+        - mountPath: "/static/pv" # директория в контейнере для монтирования тома
+          name: pv-prod
+      volumes:
+        - name: pv-prod
+          persistentVolumeClaim:
+            claimName: pvc-prod
+
 ---
 apiVersion: v1
 kind: Service

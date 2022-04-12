@@ -24,6 +24,13 @@ spec:
         env:
           - name: BASE_URL
             value: backend:9000 # адрес сервиса бекенда
+        volumeMounts:
+        - mountPath: "/static/pv" # директория в контейнере для монтирования тома
+          name: pv-prod
+      volumes:
+        - name: pv-prod
+          persistentVolumeClaim:
+            claimName: pvc-prod
 
 ---
 apiVersion: v1
