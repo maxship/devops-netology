@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-back
+  labels:
+    app: backend
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.backend }}
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - image: {{ .Values.image.repository.backend }}:{{ .Values.image.tag.backend | default .Chart.AppVersion }}
+        imagePullPolicy: IfNotPresent
+        name: backend
+        ports:
+        - containerPort: 9000
+        env:
+          - name: DATABASE_URL
+            value: postgres://postgres:postgres@postgres:5432/news # адрес сервиса БД

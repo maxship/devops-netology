@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-db
+  labels:
+    app: postgres
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.db }}
+  serviceName: postgres
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: {{ .Values.image.repository.postgres }}:{{ .Values.image.tag.postgres | default .Chart.AppVersion }}
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 5432
+        volumeMounts:
+          - name: db-volume
+            mountPath: "/var/lib/postgresql/data"
+        env:
+          - name: POSTGRES_PASSWORD
+            value: postgres
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_DB
+            value: news
+      volumes:
+        - name: db-volume
+          emptyDir: {}
