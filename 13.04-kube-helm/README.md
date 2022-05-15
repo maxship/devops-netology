@@ -143,4 +143,3 @@ service/helm-app-v3-back-svc    ClusterIP   10.103.5.50      <none>        9000/
 service/helm-app-v3-db-svc      ClusterIP   10.100.182.201   <none>        5432/TCP   2m52s
 service/helm-app-v3-front-svc   ClusterIP   10.108.80.214    <none>        8000/TCP   2m52s
 ```
-
