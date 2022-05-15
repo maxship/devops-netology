@@ -7,7 +7,7 @@
 
 ### Как создать секрет?
 
-```
+```bash
 openssl genrsa -out cert.key 4096
 openssl req -x509 -new -key cert.key -days 3650 -out cert.crt \
 -subj '/C=RU/ST=Moscow/L=Moscow/CN=server.local'
@@ -16,7 +16,7 @@ kubectl create secret tls domain-cert --cert=certs/cert.crt --key=certs/cert.key
 
 ### Как просмотреть список секретов?
 
-```
+```shell
 kubectl get secrets
 kubectl get secret
 ```
@@ -173,4 +173,139 @@ maxship@Ryzen5-Desktop:~/devops/devops-netology/14.01-kube-secrets$ kubectl get 
 NAME                  TYPE                                  DATA   AGE
 default-token-7hltm   kubernetes.io/service-account-token   3      26d
 domain-cert           kubernetes.io/tls                     2      13s
+```
+
+## Задача 2: Работа с секретами внутри модуля
+
+### 2.1 Подключение секрета в виде примонтированного тома
+
+Создал конфигурационный файл пода с подключением секрета в виде тома:
+
+```yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: multitool-1
+  name: pod-secret-mount
+  namespace: default
+spec:
+  containers:
+    - image: praqma/network-multitool:alpine-extra
+      imagePullPolicy: IfNotPresent
+      name: network-multitool
+      volumeMounts:
+        - name: certs-dir
+          mountPath: /test-secret
+  volumes:
+    - name: certs-dir
+      secret:
+        secretName: domain-cert
+  terminationGracePeriodSeconds: 30
+```
+
+Запустил под и проверил примонтированную директорию с сертификатом.
+
+```shell
+$ kubectl apply -f pod-secret-mount.yml 
+pod/pod-secret-mount created
+
+$ kubectl exec -it pod-secret-mount -- ls /test-secret
+tls.crt  tls.key
+```
+
+### 2.2 Подключение секрета в виде переменной окружения
+
+Зашифруем имя пользователя и пароль, используемые в переменной.
+
+```shell
+$ echo -n 'abc123' | base64
+YWJjMTIz
+$ echo -n 'test-user' | base64
+dGVzdC11c2Vy
+```
+
+Создадим файл конфига для секрета с использованием полученных зашифрованных строк.
+
+```yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: env-secret
+type: Opaque
+data:
+  user: dGVzdC11c2Vy
+  password: YWJjMTIz
+```
+Создаем секрет.
+
+```shell
+$ kubectl apply -f env-secret.yml 
+secret/env-secret created
+```
+
+Создаем конфиг для пода с подключением секрета в виде переменной окружения.
+
+```yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: multitool-2
+  name: pod-secret-env
+  namespace: default
+spec:
+  containers:
+    - image: praqma/network-multitool:alpine-extra
+      imagePullPolicy: IfNotPresent
+      name: network-multitool
+      env:
+        - name: SECRET_USER
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: user
+        - name: SECRET_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: password
+  terminationGracePeriodSeconds: 30
+```
+
+Запускаем под.
+
+```shell
+$ kubectl apply -f pod-secret-env.yml 
+pod/pod-secret-env created
+```
+
+Смотрим список созданных объектов.
+
+```shell
+$ kubectl get po,secret
+NAME                   READY   STATUS    RESTARTS   AGE
+pod/pod-secret-env     1/1     Running   0          8m9s
+pod/pod-secret-mount   1/1     Running   0          28m
+
+NAME                         TYPE                                  DATA   AGE
+secret/default-token-vk89p   kubernetes.io/service-account-token   3      51m
+secret/domain-cert           kubernetes.io/tls                     2      35m
+secret/env-secret            Opaque                                2      12m
+
+```
+
+Проверяем, прописались ли переменные:
+
+```shell
+$ kubectl exec -it pod-secret-env -- /bin/bash
+
+bash-5.1# echo $SECRET_USER
+test-user
+
+bash-5.1# echo $SECRET_PASSWORD
+abc123
 ```
