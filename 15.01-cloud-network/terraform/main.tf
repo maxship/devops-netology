@@ -122,7 +122,6 @@ resource "yandex_compute_instance" "vm-private" {
 
   network_interface {
     subnet_id = "${yandex_vpc_subnet.private-subnet.id}"
-    nat       = true
   }
 
   metadata = {

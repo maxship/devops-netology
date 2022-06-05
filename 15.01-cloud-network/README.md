@@ -212,7 +212,6 @@ resource "yandex_compute_instance" "vm-private" {
 
   network_interface {
     subnet_id = "${yandex_vpc_subnet.private-subnet.id}"
-    nat       = true
   }
 
   metadata = {
@@ -236,8 +235,8 @@ ubuntu@fhmauirago7b8tenqhv8:~$ ssh ubuntu@192.168.20.27
 Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-96-generic x86_64)
 ...
 
-# Проверяем внешний IP. Он совпадает с IP NAT инстанса.
+# Проверяем внешний IP. Он совпадает с IP NAT инстанса, что и требовалось получить.
 ubuntu@fhmr654qjt2eomm6mt20:~$ curl 2ip.ru
-51.250.64.189
+51.250.86.203
 ```
 
