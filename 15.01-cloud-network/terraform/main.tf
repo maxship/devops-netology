@@ -42,7 +42,7 @@ resource "yandex_vpc_route_table" "routing-table-private" {
 
   static_route {
     destination_prefix = "0.0.0.0/0" # перенаправление трафика со всех адресов
-    next_hop_address   = "192.168.10.254"
+    next_hop_address   = yandex_compute_instance.nat-public.network_interface.0.ip_address # ip адрес NAT инстанса
   }
 }
 
