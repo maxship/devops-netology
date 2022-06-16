@@ -32,16 +32,7 @@ resource "yandex_compute_instance_group" "lamp_cig" {
 #!/bin/bash
 apt install httpd -y
 cd /var/www/html
-sudo chown -R ubuntu:ubuntu /var/www/html
-echo '<!doctype html>
-<html>
-  <head>
-    <title>This is the title of the webpage!</title>
-  </head>
-  <body>
-    <p>This is an example paragraph. Anything in the <strong>body</strong> tag will appear on the page, just like this <strong>p</strong> tag and its contents.</p>
-  </body>
-</html>' > index.html
+echo '<html><img src="https://storage.yandexcloud.net/s3-bucket-netology-2022/test-image?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=YCAJEqyI_Z3imZpF-dxZ25V0x%2F20220616%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Date=20220616T142345Z&X-Amz-Expires=3600&X-Amz-Signature=ADD6A854BB4CC5F30CF547095B9403E3769341D4B0C631EBFACD20CD8F718F92&X-Amz-SignedHeaders=host"</html>' > index.html
 service httpd start
 EOF
       }

@@ -1,14 +1,4 @@
-resource "yandex_lb_target_group" "lamp-tg" {
-  name      = "lamp-target-group"
-  region_id = "ru-central1"
-
-#  target {
-#    subnet_id = "${yandex_vpc_subnet.my-subnet.id}"
-#    address   = "${yandex_compute_instance.my-instance-2.network_interface.0.ip_address}"
-#  }
-}
-
-
+// Создаем балансировщик
 resource "yandex_lb_network_load_balancer" "lamp-nlb" {
   name = "network-load-balancer"
 
@@ -21,8 +11,9 @@ resource "yandex_lb_network_load_balancer" "lamp-nlb" {
   }
 
   attached_target_group {
-    target_group_id = "${yandex_lb_target_group.lamp-tg.id}"
+    target_group_id = "${yandex_compute_instance_group.lamp_cig.load_balancer.0.target_group_id}"
 
+    // Проверка состояния
     healthcheck {
       name = "http"
       http_options {

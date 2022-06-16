@@ -13,5 +13,6 @@ variable "zone" {
 }
 
 variable "cig_count" {
-  type    = number
+    type    = number
+    default = 3
 }
