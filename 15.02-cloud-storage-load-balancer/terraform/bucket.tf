@@ -30,7 +30,8 @@ resource "yandex_storage_object" "test-object" {
   access_key = yandex_iam_service_account_static_access_key.sa-static-key.access_key
   secret_key = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
   bucket = "s3-bucket-netology-2022"
-  key        = "test-image" # Имя объекта в бакете
-  source     = "../img/falloutboy.png" # Относительный путь к файлу, загружаемому как объект.
+  key        = "test-image" # имя объекта в бакете
+  source     = "../img/falloutboy.png" # относительный путь к файлу, загружаемому как объект.
+  acl = "public-read" # открываем доступ на чтение всем
   depends_on = [yandex_storage_bucket.s3]
 }

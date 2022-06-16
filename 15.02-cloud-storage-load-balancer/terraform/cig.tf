@@ -28,11 +28,12 @@ resource "yandex_compute_instance_group" "lamp_cig" {
 
         metadata = {
             ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
+            // Ссылка на стартовую страницу с картинкой в формате `https://storage.yandexcloud.net/<bucket>/<key>`
             user-data       = <<EOF
 #!/bin/bash
 apt install httpd -y
 cd /var/www/html
-echo '<html><img src="https://storage.yandexcloud.net/s3-bucket-netology-2022/test-image?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=YCAJEqyI_Z3imZpF-dxZ25V0x%2F20220616%2Fru-central1%2Fs3%2Faws4_request&X-Amz-Date=20220616T142345Z&X-Amz-Expires=3600&X-Amz-Signature=ADD6A854BB4CC5F30CF547095B9403E3769341D4B0C631EBFACD20CD8F718F92&X-Amz-SignedHeaders=host"</html>' > index.html
+echo '<html><img src="https://storage.yandexcloud.net/s3-bucket-netology-2022/test-image"/></html>' > index.html
 service httpd start
 EOF
       }
