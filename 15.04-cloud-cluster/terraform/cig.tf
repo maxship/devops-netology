@@ -18,7 +18,7 @@ resource "yandex_compute_instance_group" "lamp_cig" {
 
         network_interface {
             subnet_ids      = ["${yandex_vpc_subnet.public-subnet.id}"]
-            network_id      = "${yandex_vpc_network.vpc-network.id}"
+            network_id      = "${yandex_vpc_network.vpc-netology.id}"
         }
 
         scheduling_policy {
@@ -52,7 +52,7 @@ EOF
     }
 
     allocation_policy {
-        zones   = [local.zone]
+        zones   = [local.zone-a]
     }
 
     load_balancer {
@@ -69,7 +69,7 @@ EOF
     depends_on = [
         yandex_iam_service_account.sa,
         yandex_storage_bucket.s3,
-        yandex_vpc_network.vpc-network,
+        yandex_vpc_network.vpc-netology,
         yandex_vpc_subnet.public-subnet,
         yandex_resourcemanager_folder_iam_member.sa-editor
     ]

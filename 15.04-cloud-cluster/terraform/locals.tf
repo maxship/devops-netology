@@ -1,5 +1,6 @@
 locals {
-  zone       = "ru-central1-a"
+  zone-a       = "ru-central1-a"
+  zone-b       = "ru-central1-b"
   cloud_id  = "b1g3me49qkcgicgvrgv2"
   folder_id = "b1g4fb7qmqpe9rvo57q2"
   cig_count = 3
@@ -8,4 +9,6 @@ locals {
   object_source = "../img/falloutboy.png" # путь к объекту, загружаемому в бакет
   key_name    = "symmetric-key-1" # Имя ключа KMS.
   key_desc    = "Ключ для шифрования бакетов"
+  mdb_mysql_user       = "test_user"
+  mdb_mysql_password   = "test_pass@#$"
 }

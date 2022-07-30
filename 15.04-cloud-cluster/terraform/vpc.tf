@@ -1,28 +1,55 @@
 // VPC network
-resource "yandex_vpc_network" "vpc-network" {
+resource "yandex_vpc_network" "vpc-netology" {
   name = "vpc"
 }
 
-// public subnet
+// public subnets
 resource "yandex_vpc_subnet" "public-subnet" {
   name       = "public"
   v4_cidr_blocks = ["192.168.10.0/24"]
-  zone       = local.zone
-  network_id = "${yandex_vpc_network.vpc-network.id}"
+  zone       = "ru-central1-a"
+  network_id = "${yandex_vpc_network.vpc-netology.id}"
 }
+resource "yandex_vpc_subnet" "public-subnet-a" {
+  name       = "public-a"
+  v4_cidr_blocks = ["192.168.20.0/24"]
+  zone       = local.zone-a
+  network_id = "${yandex_vpc_network.vpc-netology.id}"
+}
+resource "yandex_vpc_subnet" "public-subnet-b" {
+  name       = "public-b"
+  v4_cidr_blocks = ["192.168.30.0/24"]
+  zone       = local.zone-b
+  network_id = "${yandex_vpc_network.vpc-netology.id}"
 
-// private subnet
+}
+// private subnets
 resource "yandex_vpc_subnet" "private-subnet" {
   name       = "private"
-  v4_cidr_blocks = ["192.168.20.0/24"]
-  zone       = local.zone
-  network_id = "${yandex_vpc_network.vpc-network.id}"
+  v4_cidr_blocks = ["192.168.40.0/24"]
+  zone       = "ru-central1-a"
+  network_id = "${yandex_vpc_network.vpc-netology.id}"
+  route_table_id = "${yandex_vpc_route_table.routing-table-private.id}"
+}
+resource "yandex_vpc_subnet" "private-subnet-a" {
+  name       = "private-a"
+  v4_cidr_blocks = ["192.168.50.0/24"]
+  zone       = local.zone-a
+  network_id = "${yandex_vpc_network.vpc-netology.id}"
+  route_table_id = "${yandex_vpc_route_table.routing-table-private.id}"
+}
+resource "yandex_vpc_subnet" "private-subnet-b" {
+  name       = "private-b"
+  v4_cidr_blocks = ["192.168.60.0/24"]
+  zone       = local.zone-b
+  network_id = "${yandex_vpc_network.vpc-netology.id}"
   route_table_id = "${yandex_vpc_route_table.routing-table-private.id}"
 }
 
+
 // routing table for private subnet
 resource "yandex_vpc_route_table" "routing-table-private" {
-  network_id = "${yandex_vpc_network.vpc-network.id}"
+  network_id = "${yandex_vpc_network.vpc-netology.id}"
   name       = "rt-private"
 
   static_route {
@@ -31,30 +58,5 @@ resource "yandex_vpc_route_table" "routing-table-private" {
   }
 }
 
-// NAT instance
-resource "yandex_compute_instance" "nat-instance" {
-  platform_id = "standard-v1"
-  name = "nat-public"
-  zone = local.zone
 
-  resources {
-    cores = 2
-    memory = 4
-  }
 
-  boot_disk {
-    initialize_params {
-      image_id = "fd80mrhj8fl2oe87o4e1" # nat-instance-ubuntu
-    }
-  }
-
-  network_interface {
-    subnet_id = "${yandex_vpc_subnet.public-subnet.id}"
-    ip_address = "192.168.10.254"
-    nat = true
-  }
-
-  metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
-  }
-}
