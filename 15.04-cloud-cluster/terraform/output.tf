@@ -14,11 +14,11 @@ output "vm_private_internal_ip" {
   value = yandex_compute_instance.vm-private.network_interface.0.ip_address
 }
 
-output "kube-cluster-ext-endpoint" {
+output "k8s_cluster_external_ip" {
   value = yandex_kubernetes_cluster.k8s-cluster.master[0].external_v4_endpoint
 }
 
-output "kube-cluster-ca-cert" {
+output "k8s_cluster-ca-cert" {
   value = yandex_kubernetes_cluster.k8s-cluster.master[0].cluster_ca_certificate
 }
 

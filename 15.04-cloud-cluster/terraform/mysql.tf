@@ -5,6 +5,7 @@ resource "yandex_mdb_mysql_cluster" "cluster-mysql-netology" {
   network_id          = yandex_vpc_network.vpc-netology.id
   version             = "8.0"
   folder_id           = local.folder_id
+  security_group_ids  = [ yandex_vpc_security_group.mysql-sg.id ]
   deletion_protection = false // "true" - защита от непреднамеренного удаления
 
   backup_window_start {
@@ -63,4 +64,16 @@ resource "yandex_mdb_mysql_user" "test_user" {
   global_permissions = ["PROCESS"]
 
   authentication_plugin = "SHA256_PASSWORD"
+}
+
+resource "yandex_vpc_security_group" "mysql-sg" {
+  name       = "mysql-sg"
+  network_id = yandex_vpc_network.vpc-netology.id
+
+  ingress {
+    description    = "phpmyadmin"
+    port           = 3306
+    protocol       = "TCP"
+    v4_cidr_blocks = [ "0.0.0.0/0" ]
+  }
 }

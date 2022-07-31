@@ -3,7 +3,7 @@ locals {
   zone-b       = "ru-central1-b"
   zone-c       = "ru-central1-c"
   cloud_id  = "b1g3me49qkcgicgvrgv2"
-  folder_id = "b1gcfmu76tik2v8006d4"
+  folder_id = "b1g4fb7qmqpe9rvo57q2"
   cig_count = 3
   bucket_name = "s3-bucket-netology-2022"
   object_name = "test-image" # имя загружаемого в бакет объекта
