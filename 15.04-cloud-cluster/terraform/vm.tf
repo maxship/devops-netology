@@ -15,6 +15,10 @@ resource "yandex_compute_instance" "nat-instance" {
     }
   }
 
+  scheduling_policy {
+    preemptible = true  # Прерываемая
+  }
+
   network_interface {
     subnet_id = "${yandex_vpc_subnet.public-subnet.id}"
     ip_address = "192.168.10.254"
@@ -44,6 +48,10 @@ resource "yandex_compute_instance" "vm-public" {
     }
   }
 
+  scheduling_policy {
+    preemptible = true  # Прерываемая
+  }
+
   network_interface {
     subnet_id = "${yandex_vpc_subnet.public-subnet.id}"
     nat       = true
@@ -70,6 +78,10 @@ resource "yandex_compute_instance" "vm-private" {
     initialize_params {
       image_id = "fd8mfc6omiki5govl68h" # Ubuntu-20.04
     }
+  }
+
+  scheduling_policy {
+    preemptible = true  # Прерываемая
   }
 
   network_interface {

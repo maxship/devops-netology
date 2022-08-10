@@ -54,6 +54,21 @@
 
 ## Задание 1. Яндекс.Облако 
 
+```shell
+maxship@Ryzen5-Desktop:~/devops/devops-netology/15.04-cloud-cluster/terraform$ terraform apply
+----
+Outputs:
+
+k8s_cluster_external_ip = "https://51.250.7.231"
+k8s_cluster_kubectl_init_local = "To access k8s cluster from local host via YC client, enter this command: 'yc managed-kubernetes cluster get-credentials --id catq9c1om1n492qs6krs --external'"
+mysql_host_address = "MySQL host: rc1a-mi88pw9afhcz5tz7.mdb.yandexcloud.net"
+nat_public_external_ip = "84.201.132.105"
+nat_public_internal_ip = "192.168.10.254"
+vm_private_internal_ip = "192.168.50.20"
+vm_public_external_ip = "84.201.134.78"
+
+```
+
 Получившаяся конфигурация Terraform находится в директории [terraform](./terraform).
 
 Главное меню консоли:
@@ -76,6 +91,13 @@
 
 Рабочие ноды:
 ![k8s-n](./img/15.04-k8s-nodes.png)
+
+Балансировщик:
+![k8s-nlb](./img/15.04-lb-phpmyadmin.png)
+
+![k8s-nlb](./img/15.04-phpmyadm-svc.png)
+
+
 
 Для подключения к кластеру кубернетес через kubectl, воспользовался клиентом YC.
 
@@ -122,5 +144,3 @@ service/phpmyadmin-service   LoadBalancer   10.96.140.170   62.84.113.29   80:31
 
 Проверяем резальтат:
 ![php](./img/15.04-phpmyadmin.png)
-
-Балансировщик работает, но зайти не получается. Не могу понять в чем причина.

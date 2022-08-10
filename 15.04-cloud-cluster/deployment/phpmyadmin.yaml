@@ -22,7 +22,7 @@ spec:
             - containerPort: 80
           env:
             - name: PMA_HOST
-              value: "rc1a-0wh071knmcshslk0.mdb.yandexcloud.net"
+              value: "rc1a-mi88pw9afhcz5tz7.mdb.yandexcloud.net"
             - name: PMA_PORT
               value: "3306"
             - name: MYSQL_USER
@@ -40,5 +40,5 @@ spec:
     app: phpmyadmin
   ports:
   - protocol: TCP
-    port: 80
+    port: 8080
     targetPort: 80

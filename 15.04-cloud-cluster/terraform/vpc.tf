@@ -1,6 +1,6 @@
 // VPC network
 resource "yandex_vpc_network" "vpc-netology" {
-  name = "vpc"
+  name = "vpc-netology"
 }
 
 // public subnets

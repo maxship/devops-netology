@@ -20,8 +20,8 @@ resource "yandex_iam_service_account_static_access_key" "sa-static-key" {
 
 // Создаем ключ шифрования
 resource "yandex_kms_symmetric_key" "sym-key-1" {
-  name              = local.key_name
-  description       = local.key_desc
+  name              = "Ключ для шифрования бакетов"
+  description       = "Symmetric-Key-1"
   default_algorithm = "AES_256"
   rotation_period   = "168h"
 }
@@ -30,7 +30,7 @@ resource "yandex_kms_symmetric_key" "sym-key-1" {
 resource "yandex_storage_bucket" "s3" {
   access_key = yandex_iam_service_account_static_access_key.sa-static-key.access_key
   secret_key = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
-  bucket = local.bucket_name
+  bucket = "s3-bucket-netology-2022"
   // Включаем шифрование на стороне сервера по умолчанию
   server_side_encryption_configuration {
     rule {
@@ -46,7 +46,7 @@ resource "yandex_storage_bucket" "s3" {
 resource "yandex_storage_object" "test-object" {
   access_key = yandex_iam_service_account_static_access_key.sa-static-key.access_key
   secret_key = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
-  bucket = local.bucket_name
+  bucket = yandex_storage_bucket.s3.id
   key        = local.object_name # имя объекта в бакете
   source     = local.object_source # относительный путь к файлу, загружаемому как объект.
   acl = "public-read" # открываем доступ на чтение всем

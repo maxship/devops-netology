@@ -45,17 +45,20 @@ resource "yandex_kubernetes_cluster" k8s-cluster {
     }
   }
 
-  service_account_id      = "${yandex_iam_service_account.k8s-editor.id}"
-  node_service_account_id = "${yandex_iam_service_account.k8s-editor.id}"
-      depends_on              = [
+  service_account_id      = "${yandex_iam_service_account.k8s-sa.id}"
+
+  node_service_account_id = "${yandex_iam_service_account.k8s-sa.id}"
+
+  depends_on              = [
     yandex_resourcemanager_folder_iam_binding.editor,
     yandex_resourcemanager_folder_iam_binding.images-puller,
+    yandex_iam_service_account.k8s-sa
   ]
 }
 
-resource "yandex_iam_service_account" "k8s-editor" {
+resource "yandex_iam_service_account" "k8s-sa" {
   name        = "k8s-editor"
-  description = "service account for kubernetes"
+  description = "service account for access to k8s cluster & registry"
 }
 
 resource "yandex_resourcemanager_folder_iam_binding" "editor" {
@@ -63,9 +66,9 @@ resource "yandex_resourcemanager_folder_iam_binding" "editor" {
   folder_id = local.folder_id
   role      = "editor"
   members   = [
-   "serviceAccount:${yandex_iam_service_account.k8s-editor.id}"
+   "serviceAccount:${yandex_iam_service_account.k8s-sa.id}"
   ]
-  depends_on = [yandex_iam_service_account.k8s-editor]
+  depends_on = [yandex_iam_service_account.k8s-sa]
 }
 
 resource "yandex_resourcemanager_folder_iam_binding" "images-puller" {
@@ -73,9 +76,9 @@ resource "yandex_resourcemanager_folder_iam_binding" "images-puller" {
   folder_id = local.folder_id
   role      = "container-registry.images.puller"
   members   = [
-   "serviceAccount:${yandex_iam_service_account.k8s-editor.id}"
+   "serviceAccount:${yandex_iam_service_account.k8s-sa.id}"
   ]
-  depends_on = [yandex_iam_service_account.k8s-editor]
+  depends_on = [yandex_iam_service_account.k8s-sa]
 
 }
 
