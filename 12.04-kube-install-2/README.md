@@ -303,3 +303,16 @@ node-4   Ready    <none>                 58m   v1.23.5
 ```
 ![vs](./img/120401.png)
 ---
+
+
+A simple way to ensure you get all the correct version of Ansible is to use the [pre-built docker image from Quay](https://quay.io/repository/kubespray/kubespray?tab=tags).
+You will then need to use [bind mounts](https://docs.docker.com/storage/bind-mounts/) to get the inventory and ssh key into the container, like this:
+
+```shell
+docker pull quay.io/kubespray/kubespray:v2.19.0
+docker run --rm -it --mount type=bind,source="$(pwd)"/inventory/sample,dst=/inventory \
+  --mount type=bind,source="${HOME}"/.ssh/id_rsa,dst=/root/.ssh/id_rsa \
+  quay.io/kubespray/kubespray:v2.19.0 bash
+# Inside the container you may now run the kubespray playbooks:
+ansible-playbook -i /inventory/hosts.yml --private-key /root/.ssh/id_rsa cluster.yml
+```

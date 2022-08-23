@@ -23,13 +23,13 @@ resource "yandex_compute_instance" "cp-1" {
 
   resources {
     cores = 2
-    memory = 2
+    memory = 4
   }
 
   boot_disk {
     initialize_params {
       image_id = "fd8mfc6omiki5govl68h" # Ubuntu-20.04
-      size = 50
+      size = 10
     }
   }
 
@@ -39,13 +39,13 @@ resource "yandex_compute_instance" "cp-1" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
+    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   }  
 }
 
 # Инстансы node
 resource "yandex_compute_instance" "node" {
-  count = 4
+  count = 1
 
   platform_id = "standard-v1"
   allow_stopping_for_update = true
@@ -54,7 +54,7 @@ resource "yandex_compute_instance" "node" {
 
   resources {
     cores = 2
-    memory = 2
+    memory = 4
   }
 
   boot_disk {
@@ -70,7 +70,7 @@ resource "yandex_compute_instance" "node" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
+    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   }  
 }
 
